@@ -1,0 +1,47 @@
+﻿{
+    "version": "1.0.0-*",
+
+    "authors": [ "Vahid Nasiri" ],
+    "packOptions": {
+        "owners": [ "Vahid Nasiri" ],
+        "tags": [ "MVC", "aspnetcore", "captcha", ".NET Core" ],
+        "licenseUrl": "https://github.com/VahidN/DNTCaptcha.Core/blob/master/LICENSE.md",
+        "projectUrl": "https://github.com/VahidN/DNTCaptcha.Core"
+    },
+    "description": "DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.",
+
+
+    "dependencies": {
+        "Microsoft.AspNetCore.Http.Extensions": "1.0.0",
+        "Microsoft.AspNetCore.Mvc.Abstractions": "1.0.1",
+        "Microsoft.AspNetCore.Mvc.Core": "1.0.1",
+        "Microsoft.AspNetCore.Mvc.ViewFeatures": "1.0.1",
+        "Microsoft.AspNetCore.Razor.Runtime": "1.0.0",
+        "NETStandard.Library": "1.6.0",
+        "CoreCompat.System.Drawing": "1.0.0-beta006"
+    },
+
+    "frameworks": {
+        "netstandard1.6": {
+            "imports": "dnxcore50"
+        }
+    },
+
+    "buildOptions": {
+        "xmlDoc": true
+    },
+
+    "configurations": {
+        "Release": {
+            "buildOptions": {
+                "optimize": true,
+                "platform": "anycpu"
+            }
+        }
+    },
+    "scripts": {
+        "postcompile": [
+            "dotnet pack --no-build --configuration %compile:Configuration%"
+        ]
+    }
+}
