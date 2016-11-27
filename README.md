@@ -72,3 +72,11 @@ public IActionResult Index([FromForm]AccountViewModel data)
 }
 ```
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
+
+
+Note:
+-----------------
+To run this project on Linux, you will need to install `libgdiplus` too:
+```
+sudo apt-get updatesudo apt-get install libgdiplus
+```
