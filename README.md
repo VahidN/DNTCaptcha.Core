@@ -39,7 +39,7 @@ Usage:
              asp-text-box-template="<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
-             asp-area-name="" />
+             />
 ```
 
 - To register its default providers, call `services.AddDNTCaptcha();` method in your [Startup class](/src/DNTCaptcha.TestWebApp/Startup.cs).

@@ -72,7 +72,6 @@ namespace DNTCaptcha.Core
             _captchaStorageProvider.Remove(HttpContext, model.CaptchaToken);
 
             var tagHelper = HttpContext.RequestServices.GetRequiredService<DNTCaptchaTagHelper>();
-            tagHelper.AreaName = model.AreaName;
             tagHelper.BackColor = model.BackColor;
             tagHelper.FontName = model.FontName;
             tagHelper.FontSize = model.FontSize;

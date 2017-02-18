@@ -9,12 +9,6 @@ namespace DNTCaptcha.Core
     public class DNTCaptchaTagHelperHtmlAttributes
     {
         /// <summary>
-        /// Current area name. It's default value is string.Empty.
-        /// </summary>
-        [HtmlAttributeName("asp-area-name")]
-        public string AreaName { set; get; } = "";
-
-        /// <summary>
         /// The back-color of the captcha. It's default value is string.Empty.
         /// </summary>
         [HtmlAttributeName("asp-back-color")]

@@ -1,6 +1,6 @@
 {
     "dependencies": {
-        "DNTCaptcha.Core": "1.1.0-*",
+        "DNTCaptcha.Core": "1.1.1-*",
         "Microsoft.AspNetCore.Diagnostics": "1.1.0",
         "Microsoft.AspNetCore.Http.Extensions": "1.1.0",
         "Microsoft.AspNetCore.Mvc": "1.1.1",

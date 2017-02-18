@@ -164,7 +164,7 @@ namespace DNTCaptcha.Core
                     backColor = BackColor,
                     fontSize = FontSize,
                     fontName = FontName,
-                    Area = AreaName
+                    area = ""
                 });
 
             var captchaImage = new TagBuilder("img");
@@ -186,7 +186,7 @@ namespace DNTCaptcha.Core
                 new
                 {
                     rndDate = DateTime.Now.Ticks,
-                    AreaName = AreaName,
+                    area = "",
                     BackColor = BackColor,
                     FontName = FontName,
                     FontSize = FontSize,
