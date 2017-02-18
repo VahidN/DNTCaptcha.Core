@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using DNTCaptcha.Core.Contracts;
 using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace DNTCaptcha.Core
     /// DNTCaptcha TagHelper
     /// </summary>
     [HtmlTargetElement("dnt-captcha")]
-    public class DNTCaptchaTagHelper : TagHelper
+    public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
     {
         /// <summary>
         /// The default hidden input name of the captcha.
@@ -58,83 +59,9 @@ namespace DNTCaptcha.Core
         }
 
         /// <summary>
-        /// Current area name. It's default value is string.Empty.
+        /// Default order is <c>0</c>.
         /// </summary>
-        [HtmlAttributeName("asp-area-name")]
-        public string AreaName { set; get; } = "";
-
-        /// <summary>
-        /// The back-color of the captcha. It's default value is string.Empty.
-        /// </summary>
-        [HtmlAttributeName("asp-back-color")]
-        public string BackColor { set; get; } = "";
-
-        /// <summary>
-        /// The font-name of the captcha. It's default value is Tahoma.
-        /// </summary>
-        [HtmlAttributeName("asp-font-name")]
-        public string FontName { set; get; } = "Tahoma";
-
-        /// <summary>
-        /// The font-size of the captcha. It's default value is 12.
-        /// </summary>
-        [HtmlAttributeName("asp-font-size")]
-        public float FontSize { set; get; } = 12;
-
-        /// <summary>
-        /// The fore-color of the captcha. It's default value is #1B0172.
-        /// </summary>
-        [HtmlAttributeName("asp-fore-color")]
-        public string ForeColor { set; get; } = "#1B0172";
-
-        /// <summary>
-        /// The language of the captcha. It's default value is Persian.
-        /// </summary>
-        [HtmlAttributeName("asp-captcha-generator-language")]
-        public Language Language { set; get; } = Language.Persian;
-
-        /// <summary>
-        /// The max value of the captcha. It's default value is 9000.
-        /// </summary>
-        [HtmlAttributeName("asp-captcha-generator-max")]
-        public int Max { set; get; } = 9000;
-
-        /// <summary>
-        /// The min value of the captcha. It's default value is 1.
-        /// </summary>
-        [HtmlAttributeName("asp-captcha-generator-min")]
-        public int Min { set; get; } = 1;
-
-        /// <summary>
-        /// The placeholder value of the captcha. It's default value is `کد امنیتی به رقم`.
-        /// </summary>
-        [HtmlAttributeName("asp-placeholder")]
-        public string Placeholder { set; get; } = "کد امنیتی به رقم";
-
-        /// <summary>
-        /// The css class of the captcha. It's default value is `text-box single-line form-control col-md-4`.
-        /// </summary>
-        [HtmlAttributeName("asp-text-box-class")]
-        public string TextBoxClass { set; get; } = "text-box single-line form-control col-md-4";
-
-        /// <summary>
-        /// The text-box-template of the captcha. It's default value is `<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>`.
-        /// </summary>
-        [HtmlAttributeName("asp-text-box-template")]
-        public string TextBoxTemplate { set; get; } =
-            @"<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>";
-
-        /// <summary>
-        /// The validation-error-message of the captcha. It's default value is `لطفا کد امنیتی را به رقم وارد نمائید`.
-        /// </summary>
-        [HtmlAttributeName("asp-validation-error-message")]
-        public string ValidationErrorMessage { set; get; } = "لطفا کد امنیتی را به رقم وارد نمائید";
-
-        /// <summary>
-        /// The validation-message-class of the captcha. It's default value is `text-danger`.
-        /// </summary>
-        [HtmlAttributeName("asp-validation-message-class")]
-        public string ValidationMessageClass { set; get; } = "text-danger";
+        public int Order { get; } = 0;
 
         /// <summary>
         /// The current ViewContext.
@@ -142,17 +69,23 @@ namespace DNTCaptcha.Core
         [ViewContext, HtmlAttributeNotBound]
         public ViewContext ViewContext { get; set; }
 
+        /// <inheritdoc />
+        public void Init(TagHelperContext context)
+        {
+        }
+
         /// <summary>
         /// Process the taghelper and generate the output.
         /// </summary>
-        public override void Process(TagHelperContext context, TagHelperOutput output)
+        public void Process(TagHelperContext context, TagHelperOutput output)
         {
             context.CheckArgumentNull(nameof(context));
             output.CheckArgumentNull(nameof(output));
 
             output.TagName = "div";
             output.Attributes.Add("class", "dntCaptcha");
-            output.Attributes.Add("id", $"dntCaptcha.{_randomNumberProvider.Next(Min, Max)}");
+            var captchaDivId = $"dntCaptcha{context.UniqueId}{_randomNumberProvider.Next(Min, Max)}";
+            output.Attributes.Add("id", captchaDivId);
             output.TagMode = TagMode.StartTagAndEndTag;
 
             var number = _randomNumberProvider.Next(Min, Max);
@@ -161,6 +94,10 @@ namespace DNTCaptcha.Core
 
             var captchaImage = getCaptchaImageTagBuilder(encryptedText);
             output.Content.AppendHtml(captchaImage);
+
+            var cookieToken = $".{captchaDivId}";
+            var refreshButton = getRefreshButtonTagBuilder(captchaDivId, cookieToken);
+            output.Content.AppendHtml(refreshButton);
 
             var hiddenInput = getHiddenInputTagBuilder(encryptedText);
             output.Content.AppendHtml(hiddenInput);
@@ -171,11 +108,24 @@ namespace DNTCaptcha.Core
             var validationMessage = getValidationMessageTagBuilder();
             output.Content.AppendHtml(validationMessage);
 
-            var cookieToken = $".{context.UniqueId}.{_randomNumberProvider.Next(Min, Max)}";
             var hiddenInputToken = getHiddenInputTokenTagBuilder(_captchaProtectionProvider.Encrypt(cookieToken));
             output.Content.AppendHtml(hiddenInputToken);
 
             _captchaStorageProvider.Add(ViewContext.HttpContext, cookieToken, randomText);
+        }
+
+        /// <summary>
+        /// Asynchronously executes the <see cref="TagHelper"/> with the given <paramref name="context"/> and
+        /// <paramref name="output"/>.
+        /// </summary>
+        /// <param name="context">Contains information associated with the current HTML tag.</param>
+        /// <param name="output">A stateful HTML element used to generate an HTML tag.</param>
+        /// <returns>A <see cref="Task"/> that on completion updates the <paramref name="output"/>.</returns>
+        /// <remarks>By default this calls into <see cref="Process"/>.</remarks>.
+        public Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
+        {
+            Process(context, output);
+            return Task.CompletedTask;
         }
 
         private static TagBuilder getHiddenInputTagBuilder(string encryptedText)
@@ -200,6 +150,8 @@ namespace DNTCaptcha.Core
 
         private TagBuilder getCaptchaImageTagBuilder(string encryptedText)
         {
+            ViewContext.CheckArgumentNull(nameof(ViewContext));
+
             IUrlHelper urlHelper = new UrlHelper(ViewContext);
             var actionUrl = urlHelper.Action(action: nameof(DNTCaptchaImageController.Show),
                 controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
@@ -223,6 +175,46 @@ namespace DNTCaptcha.Core
             captchaImage.Attributes.Add("src", actionUrl);
             captchaImage.Attributes.Add("style", "margin-bottom: 4px;");
             return captchaImage;
+        }
+
+        private TagBuilder getRefreshButtonTagBuilder(string captchaDivId, string captchaToken)
+        {
+            IUrlHelper urlHelper = new UrlHelper(ViewContext);
+            var actionUrl = urlHelper.Action(action: nameof(DNTCaptchaImageController.Refresh),
+                controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
+                values:
+                new
+                {
+                    rndDate = DateTime.Now.Ticks,
+                    AreaName = AreaName,
+                    BackColor = BackColor,
+                    FontName = FontName,
+                    FontSize = FontSize,
+                    ForeColor = ForeColor,
+                    Language = Language,
+                    Max = Max,
+                    Min = Min,
+                    Placeholder = Placeholder,
+                    TextBoxClass = TextBoxClass,
+                    TextBoxTemplate = TextBoxTemplate,
+                    ValidationErrorMessage = ValidationErrorMessage,
+                    ValidationMessageClass = ValidationMessageClass,
+                    CaptchaToken = captchaToken,
+                    RefreshButtonClass = RefreshButtonClass
+                });
+
+            var refreshButton = new TagBuilder("a");
+            var dntCaptchaRefreshButton = "dntCaptchaRefreshButton";
+            refreshButton.Attributes.Add("id", dntCaptchaRefreshButton);
+            refreshButton.Attributes.Add("name", dntCaptchaRefreshButton);
+            refreshButton.Attributes.Add("href", "#refresh");
+            refreshButton.Attributes.Add("data-ajax-url", actionUrl);
+            refreshButton.Attributes.Add("data-ajax", "true");
+            refreshButton.Attributes.Add("data-ajax-method", "POST");
+            refreshButton.Attributes.Add("data-ajax-mode", "replace");
+            refreshButton.Attributes.Add("data-ajax-update", $"#{captchaDivId}");
+            refreshButton.Attributes.Add("class", RefreshButtonClass);
+            return refreshButton;
         }
 
         private TagBuilder getTextInputTagBuilder()

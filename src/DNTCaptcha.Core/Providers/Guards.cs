@@ -5,7 +5,7 @@ namespace DNTCaptcha.Core.Providers
     /// <summary>
     /// Runtime Guards
     /// </summary>
-    public static class Guards
+    internal static class Guards
     {
         /// <summary>
         /// Checks if the argument is null.

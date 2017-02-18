@@ -38,6 +38,7 @@ Usage:
              asp-text-box-class="text-box single-line form-control col-md-4"
              asp-text-box-template="<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
+             asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
              asp-area-name="" />
 ```
 
@@ -78,5 +79,6 @@ Note:
 -----------------
 To run this project on Linux, you will need to install `libgdiplus` too:
 ```
-sudo apt-get updatesudo apt-get install libgdiplus
+sudo apt-get update
+sudo apt-get install libgdiplus
 ```
