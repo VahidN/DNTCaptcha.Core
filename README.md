@@ -72,12 +72,17 @@ public IActionResult Index([FromForm]AccountViewModel data)
     return View();
 }
 ```
+
+- This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
+  *  [bower.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/bower.json#L9)
+  *  [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/bundleconfig.json#L15)
+
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
 
 
 Note:
 -----------------
-To run this project on Linux, you will need to install `libgdiplus` too:
+- To run this project on Linux, you will need to install `libgdiplus` too:
 ```
 sudo apt-get update
 sudo apt-get install libgdiplus
