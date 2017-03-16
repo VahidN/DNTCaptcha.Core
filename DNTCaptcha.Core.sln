@@ -1,20 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BEDF3D21-9B83-4563-923E-CBB8BABD08D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{45AB6355-AA29-4119-BE39-5CAE13389E22}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DNTCaptcha.Core", "src\DNTCaptcha.Core\DNTCaptcha.Core.xproj", "{F564F46A-7BB9-4D48-B63A-4F7821D1457C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNTCaptcha.Core", "src\DNTCaptcha.Core\DNTCaptcha.Core.csproj", "{F564F46A-7BB9-4D48-B63A-4F7821D1457C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "DNTCaptcha.TestWebApp", "src\DNTCaptcha.TestWebApp\DNTCaptcha.TestWebApp.xproj", "{D8F84973-9E4F-4499-A725-CFDD10457A25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DNTCaptcha.TestWebApp", "src\DNTCaptcha.TestWebApp\DNTCaptcha.TestWebApp.csproj", "{D8F84973-9E4F-4499-A725-CFDD10457A25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
