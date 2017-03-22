@@ -211,7 +211,7 @@ namespace DNTCaptcha.Core
             refreshButton.Attributes.Add("data-ajax-url", actionUrl);
             refreshButton.Attributes.Add("data-ajax", "true");
             refreshButton.Attributes.Add("data-ajax-method", "POST");
-            refreshButton.Attributes.Add("data-ajax-mode", "replace");
+            refreshButton.Attributes.Add("data-ajax-mode", "replace-with");
             refreshButton.Attributes.Add("data-ajax-update", $"#{captchaDivId}");
             refreshButton.Attributes.Add("class", RefreshButtonClass);
             return refreshButton;
