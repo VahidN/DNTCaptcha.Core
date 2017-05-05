@@ -71,6 +71,8 @@ namespace DNTCaptcha.Core
                 return;
             }
 
+            inputText = inputText.ToEnglishNumbers();
+
             long inputNumber;
             if (!long.TryParse(inputText, out inputNumber))
             {
