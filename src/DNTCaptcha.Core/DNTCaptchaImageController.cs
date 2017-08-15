@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System.Collections.Generic;
 using System.IO;
@@ -27,6 +28,7 @@ namespace DNTCaptcha.Core
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly ITempDataProvider _tempDataProvider;
+        private readonly ILogger<DNTCaptchaImageController> _logger;
         /// <summary>
         /// DNTCaptcha Image Controller
         /// </summary>
@@ -34,17 +36,20 @@ namespace DNTCaptcha.Core
             ICaptchaImageProvider captchaImageProvider,
             ICaptchaProtectionProvider captchaProtectionProvider,
             ITempDataProvider tempDataProvider,
-            ICaptchaStorageProvider captchaStorageProvider)
+            ICaptchaStorageProvider captchaStorageProvider,
+            ILogger<DNTCaptchaImageController> logger)
         {
             captchaImageProvider.CheckArgumentNull(nameof(captchaImageProvider));
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             tempDataProvider.CheckArgumentNull(nameof(tempDataProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
+            captchaStorageProvider.CheckArgumentNull(nameof(logger));
 
             _captchaImageProvider = captchaImageProvider;
             _captchaProtectionProvider = captchaProtectionProvider;
             _tempDataProvider = tempDataProvider;
             _captchaStorageProvider = captchaStorageProvider;
+            _logger = logger;
         }
 
         /// <summary>
@@ -59,7 +64,7 @@ namespace DNTCaptcha.Core
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
         public IActionResult Refresh(string rndDate, DNTCaptchaTagHelperHtmlAttributes model)
         {
-            if(!isAjaxRequest())
+            if (!isAjaxRequest())
             {
                 return BadRequest();
             }
@@ -146,9 +151,17 @@ namespace DNTCaptcha.Core
                 return BadRequest();
             }
 
-            return new FileContentResult(
-                _captchaImageProvider.DrawCaptcha(decryptedText, foreColor, backColor, fontSize, fontName),
-                "image/png");
+            byte[] image;
+            try
+            {
+                image = _captchaImageProvider.DrawCaptcha(decryptedText, foreColor, backColor, fontSize, fontName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(1001, ex, "DrawCaptcha error.");
+                return BadRequest(ex.Message);
+            }
+            return new FileContentResult(_captchaImageProvider.DrawCaptcha(decryptedText, foreColor, backColor, fontSize, fontName), "image/png");
         }
 
         private bool isAjaxRequest()

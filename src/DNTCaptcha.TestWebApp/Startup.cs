@@ -18,14 +18,9 @@ namespace DNTCaptcha.TestWebApp
             services.AddDNTCaptcha();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddDebug(minLevel: LogLevel.Debug);
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseDeveloperExceptionPage();
 
             // Serve wwwroot as root
             app.UseFileServer();
