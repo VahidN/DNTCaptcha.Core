@@ -14,6 +14,7 @@ namespace DNTCaptcha.Core.Providers
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ILogger<CookieCaptchaStorageProvider> _logger;
+        private const int CookieLifeTimeInMinutes = 7;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
@@ -93,7 +94,8 @@ namespace DNTCaptcha.Core.Providers
             {
                 HttpOnly = true,
                 Path = context.Request.PathBase.HasValue ? context.Request.PathBase.ToString() : "/",
-                Secure = context.Request.IsHttps
+                Secure = context.Request.IsHttps,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(CookieLifeTimeInMinutes)
             };
         }
 
