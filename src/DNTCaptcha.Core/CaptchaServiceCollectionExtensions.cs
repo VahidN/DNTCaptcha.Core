@@ -23,6 +23,7 @@ namespace DNTCaptcha.Core
             services.TryAddSingleton<ICaptchaImageProvider, CaptchaImageProvider>();
             services.TryAddSingleton<ICaptchaProtectionProvider, CaptchaProtectionProvider>();
             services.AddTransient<DNTCaptchaTagHelper>();
+            services.AddTransient<IDNTCaptchaValidatorService, DNTCaptchaValidatorService>();
         }
     }
 }

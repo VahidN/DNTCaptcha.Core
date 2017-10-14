@@ -84,6 +84,17 @@ public IActionResult Index([FromForm]AccountViewModel data)
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
 
 
+
+SPA Usage:
+----------
+
+It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample to demonstrate it:
+- [The server side controller](/src/DNTCaptcha.TestWebApp/Controllers/NgxController.cs)
+- [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
+- [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
+
+
+
 Note:
 -----------------
 - To run this project on Linux, you will need to install `libgdiplus` too:

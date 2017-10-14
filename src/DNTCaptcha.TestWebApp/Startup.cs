@@ -12,6 +12,15 @@ namespace DNTCaptcha.TestWebApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
+            });
             services.AddMvc();
             services.AddDirectoryBrowser();
 
@@ -20,6 +29,8 @@ namespace DNTCaptcha.TestWebApp
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseCors(policyName: "CorsPolicy");
+
             app.UseDeveloperExceptionPage();
 
             // Serve wwwroot as root

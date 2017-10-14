@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Linq;
 using DNTCaptcha.Core.Contracts;
 using DNTCaptcha.Core.Providers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace DNTCaptcha.Core
 {
@@ -37,12 +36,21 @@ namespace DNTCaptcha.Core
         {
             filterContext.CheckArgumentNull(nameof(filterContext));
 
-            var loggerFactory= filterContext.HttpContext.RequestServices.GetService<ILoggerFactory>();
-            var logger = loggerFactory.CreateLogger<ValidateDNTCaptchaAttribute>();
+            var httpContext = filterContext.HttpContext;
+            httpContext.CheckArgumentNull(nameof(httpContext));
 
-            if (!shouldValidate(filterContext))
+            var (captchaText, inputText, cookieToken) = getFormValues(filterContext);
+            var validatorService = httpContext.RequestServices.GetService<IDNTCaptchaValidatorService>();
+            var result = validatorService.Validate(
+                httpContext,
+                captchaText,
+                inputText,
+                cookieToken,
+                CaptchaGeneratorLanguage,
+                ErrorMessage,
+                IsNumericErrorMessage);
+            if (result.IsValid)
             {
-                logger.LogWarning($"Ignoring ValidateDNTCaptcha during `{filterContext.HttpContext.Request.Method}`.");
                 base.OnActionExecuting(filterContext);
                 return;
             }
@@ -50,97 +58,40 @@ namespace DNTCaptcha.Core
             var controllerBase = filterContext.Controller as ControllerBase;
             controllerBase.CheckArgumentNull(nameof(controllerBase));
 
-            var form = filterContext.HttpContext.Request.Form;
-            form.CheckArgumentNull(nameof(form));
-
-            var captchaText = (string)form[DNTCaptchaTagHelper.CaptchaHiddenInputName];
-            if (string.IsNullOrEmpty(captchaText))
-            {
-                logger.LogWarning("CaptchaHiddenInput is empty.");
-                controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, ErrorMessage);
-                base.OnActionExecuting(filterContext);
-                return;
-            }
-
-            var inputText = (string)form[DNTCaptchaTagHelper.CaptchaInputName];
-            if (string.IsNullOrEmpty(inputText))
-            {
-                logger.LogWarning("CaptchaInput is empty.");
-                controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, ErrorMessage);
-                base.OnActionExecuting(filterContext);
-                return;
-            }
-
-            inputText = inputText.ToEnglishNumbers();
-
-            long inputNumber;
-            if (!long.TryParse(inputText, out inputNumber))
-            {
-                logger.LogWarning("inputText is not a number.");
-                controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, IsNumericErrorMessage);
-                base.OnActionExecuting(filterContext);
-                return;
-            }
-
-            var captchaEncryption = filterContext.HttpContext.RequestServices.GetService<ICaptchaProtectionProvider>();
-            var decryptedText = captchaEncryption.Decrypt(captchaText);
-
-            var humanReadableIntegerProvider = filterContext.HttpContext.RequestServices.GetService<IHumanReadableIntegerProvider>();
-            var numberToText = humanReadableIntegerProvider.NumberToText(inputNumber, CaptchaGeneratorLanguage);
-            if (decryptedText == null || !decryptedText.Equals(numberToText))
-            {
-                logger.LogWarning($"{decryptedText} != {numberToText}");
-                controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, ErrorMessage);
-                base.OnActionExecuting(filterContext);
-                return;
-            }
-
-            if (!isValidCookie(filterContext.HttpContext, decryptedText, logger))
-            {
-                controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, ErrorMessage);
-                base.OnActionExecuting(filterContext);
-                return;
-            }
-
+            controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, result.ErrorMessage);
             base.OnActionExecuting(filterContext);
         }
 
-        private static bool isValidCookie(HttpContext context, string decryptedText, ILogger<ValidateDNTCaptchaAttribute> logger)
+        private (string captchaText, string inputText, string cookieToken) getFormValues(ActionExecutingContext filterContext)
         {
-            var cookieToken = (string)context.Request.Form[DNTCaptchaTagHelper.CaptchaHiddenTokenName];
-            if (string.IsNullOrEmpty(cookieToken))
+            var httpContext = filterContext.HttpContext;
+
+            string captchaText, inputText, cookieToken;
+            if (httpContext.Request.HasFormContentType)
             {
-                logger.LogWarning("CaptchaHiddenTokenName is empty.");
-                return false;
+                var form = httpContext.Request.Form;
+                form.CheckArgumentNull(nameof(form));
+
+                captchaText = (string)form[DNTCaptchaTagHelper.CaptchaHiddenInputName];
+                inputText = (string)form[DNTCaptchaTagHelper.CaptchaInputName];
+                cookieToken = (string)form[DNTCaptchaTagHelper.CaptchaHiddenTokenName];
+            }
+            else
+            {
+                var model = filterContext.ActionArguments
+                                         .Select(item => item.Value)
+                                         .OfType<DNTCaptchaBase>()
+                                         .FirstOrDefault();
+                if (model == null)
+                {
+                    throw new NotSupportedException("Your ViewModel should implement the DNTCaptchaBase class (public class AccountViewModel : DNTCaptchaBase {}).");
+                }
+                captchaText = model.DNTCaptchaText;
+                inputText = model.DNTCaptchaInputText;
+                cookieToken = model.DNTCaptchaToken;
             }
 
-            var captchaEncryption = context.RequestServices.GetService<ICaptchaProtectionProvider>();
-            cookieToken = captchaEncryption.Decrypt(cookieToken);
-            if (string.IsNullOrEmpty(cookieToken))
-            {
-                logger.LogWarning("CaptchaHiddenTokenName is invalid.");
-                return false;
-            }
-
-            var captchaStorageProvider = context.RequestServices.GetService<ICaptchaStorageProvider>();
-            var cookieValue = captchaStorageProvider.GetValue(context.Request.HttpContext, cookieToken);
-            if(string.IsNullOrWhiteSpace(cookieValue))
-            {
-                logger.LogWarning("isValidCookie:: cookieValue IsNullOrWhiteSpace.");
-                return false;
-            }
-
-            var result = cookieValue.Equals(decryptedText);
-            if(!result)
-            {
-                logger.LogWarning($"isValidCookie:: {cookieValue} != {decryptedText}");
-            }
-            return result;
-        }
-
-        private static bool shouldValidate(ActionContext context)
-        {
-            return string.Equals("POST", context.HttpContext.Request.Method, StringComparison.OrdinalIgnoreCase);
+            return (captchaText, inputText, cookieToken);
         }
     }
 }

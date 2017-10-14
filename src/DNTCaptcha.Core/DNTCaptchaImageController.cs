@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Net.Http.Headers;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -29,6 +28,7 @@ namespace DNTCaptcha.Core
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly ILogger<DNTCaptchaImageController> _logger;
+
         /// <summary>
         /// DNTCaptcha Image Controller
         /// </summary>
@@ -64,16 +64,6 @@ namespace DNTCaptcha.Core
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
         public IActionResult Refresh(string rndDate, DNTCaptchaTagHelperHtmlAttributes model)
         {
-            if (!isAjaxRequest())
-            {
-                return BadRequest();
-            }
-
-            if (isImageHotlinking())
-            {
-                return BadRequest();
-            }
-
             _captchaStorageProvider.Remove(HttpContext, model.CaptchaToken);
 
             var tagHelper = HttpContext.RequestServices.GetRequiredService<DNTCaptchaTagHelper>();
@@ -140,11 +130,6 @@ namespace DNTCaptcha.Core
                 return BadRequest();
             }
 
-            if (isImageHotlinking())
-            {
-                return BadRequest();
-            }
-
             var decryptedText = _captchaProtectionProvider.Decrypt(text);
             if (decryptedText == null)
             {
@@ -162,19 +147,6 @@ namespace DNTCaptcha.Core
                 return BadRequest(ex.Message);
             }
             return new FileContentResult(_captchaImageProvider.DrawCaptcha(decryptedText, foreColor, backColor, fontSize, fontName), "image/png");
-        }
-
-        private bool isAjaxRequest()
-        {
-            return Request?.Headers != null && Request.Headers["X-Requested-With"] == "XMLHttpRequest";
-        }
-
-        private bool isImageHotlinking()
-        {
-            var applicationUrl = $"{Request.Scheme}://{Request.Host.Value}";
-            var urlReferrer = (string)Request.Headers[HeaderNames.Referer];
-            return string.IsNullOrEmpty(urlReferrer) ||
-                   !urlReferrer.StartsWith(applicationUrl, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

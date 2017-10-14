@@ -165,7 +165,8 @@ namespace DNTCaptcha.Core
                     fontSize = FontSize,
                     fontName = FontName,
                     area = ""
-                });
+                },
+                protocol: ViewContext.HttpContext.Request.Scheme);
 
             var captchaImage = new TagBuilder("img");
             var dntCaptchaImg = "dntCaptchaImg";
