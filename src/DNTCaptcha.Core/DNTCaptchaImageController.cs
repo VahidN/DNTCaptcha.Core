@@ -1,4 +1,5 @@
-﻿using DNTCaptcha.Core.Contracts;
+
+using DNTCaptcha.Core.Contracts;
 using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -21,6 +22,7 @@ namespace DNTCaptcha.Core
     /// DNTCaptcha Image Controller
     /// </summary>
     [AllowAnonymous]
+    [IgnoreAntiforgeryToken]
     public class DNTCaptchaImageController : Controller
     {
         private readonly ICaptchaImageProvider _captchaImageProvider;
