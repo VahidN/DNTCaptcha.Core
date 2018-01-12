@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using DNTCaptcha.Core;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DNTCaptcha.TestWebApp
 {
@@ -21,7 +22,10 @@ namespace DNTCaptcha.TestWebApp
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
             services.AddDirectoryBrowser();
 
             services.AddDNTCaptcha();

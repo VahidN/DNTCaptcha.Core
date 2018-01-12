@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DNTCaptcha.Core.Contracts;
 using DNTCaptcha.Core.Providers;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -33,10 +34,12 @@ namespace DNTCaptcha.Core
         /// </summary>
         public static readonly string CaptchaInputName = "DNTCaptchaInputText";
 
+        private const string DataAjaxBeginFunctionName = "onRefreshButtonDataAjaxBegin";
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly IHumanReadableIntegerProvider _humanReadableIntegerProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
+        private readonly IAntiforgery _antiforgery;
 
         /// <summary>
         /// DNTCaptcha TagHelper
@@ -45,17 +48,20 @@ namespace DNTCaptcha.Core
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
             IHumanReadableIntegerProvider humanReadableIntegerProvider,
-            ICaptchaStorageProvider captchaStorageProvider)
+            ICaptchaStorageProvider captchaStorageProvider,
+            IAntiforgery antiforgery)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             randomNumberProvider.CheckArgumentNull(nameof(randomNumberProvider));
             humanReadableIntegerProvider.CheckArgumentNull(nameof(humanReadableIntegerProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
+            antiforgery.CheckArgumentNull(nameof(antiforgery));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _randomNumberProvider = randomNumberProvider;
             _humanReadableIntegerProvider = humanReadableIntegerProvider;
             _captchaStorageProvider = captchaStorageProvider;
+            _antiforgery = antiforgery;
         }
 
         /// <summary>
@@ -110,6 +116,9 @@ namespace DNTCaptcha.Core
 
             var hiddenInputToken = getHiddenInputTokenTagBuilder(_captchaProtectionProvider.Encrypt(cookieToken));
             output.Content.AppendHtml(hiddenInputToken);
+
+            var dataAjaxBeginScript = getOnRefreshButtonDataAjaxBegin();
+            output.Content.AppendHtml(dataAjaxBeginScript);
 
             _captchaStorageProvider.Add(ViewContext.HttpContext, cookieToken, randomText);
         }
@@ -214,8 +223,19 @@ namespace DNTCaptcha.Core
             refreshButton.Attributes.Add("data-ajax-method", "POST");
             refreshButton.Attributes.Add("data-ajax-mode", "replace-with");
             refreshButton.Attributes.Add("data-ajax-update", $"#{captchaDivId}");
+            refreshButton.Attributes.Add("data-ajax-begin", DataAjaxBeginFunctionName);
             refreshButton.Attributes.Add("class", RefreshButtonClass);
             return refreshButton;
+        }
+
+        private TagBuilder getOnRefreshButtonDataAjaxBegin()
+        {
+            var requestVerificationToken = _antiforgery.GetAndStoreTokens(ViewContext.HttpContext).RequestToken;
+            var script = new TagBuilder("script");
+            script.Attributes.Add("type", "text/javascript");
+            script.InnerHtml.AppendHtml(
+                $"function {DataAjaxBeginFunctionName}(xhr, settings) {{ settings.data = settings.data + '&__RequestVerificationToken={requestVerificationToken}';  }}");
+            return script;
         }
 
         private TagBuilder getTextInputTagBuilder()
