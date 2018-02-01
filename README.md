@@ -76,7 +76,8 @@ public IActionResult Index([FromForm]AccountViewModel data)
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
   *  [bower.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/bower.json#L9)
   *  [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/bundleconfig.json#L15)
-  * Or include it from a CDN (It requires jQuery 1.4.4+):
+  *  Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/tree/master/dist
+  *  Or include it from a CDN (It requires jQuery 1.4.4+):
   ```javascript
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.unobtrusive-ajax.min.js"></script>
   ```
