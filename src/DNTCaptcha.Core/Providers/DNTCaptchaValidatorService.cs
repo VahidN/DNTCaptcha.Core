@@ -88,19 +88,19 @@ namespace DNTCaptcha.Core.Providers
         {
             if (!shouldValidate(httpContext))
             {
-                _logger.LogWarning($"Ignoring ValidateDNTCaptcha during `{httpContext.Request.Method}`.");
+                _logger.LogInformation($"Ignoring ValidateDNTCaptcha during `{httpContext.Request.Method}`.");
                 return new DNTCaptchaValidatorResult { IsValid = true };
             }
 
             if (string.IsNullOrEmpty(captchaText))
             {
-                _logger.LogWarning("CaptchaHiddenInput is empty.");
+                _logger.LogInformation("CaptchaHiddenInput is empty.");
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = errorMessage };
             }
 
             if (string.IsNullOrEmpty(inputText))
             {
-                _logger.LogWarning("CaptchaInput is empty.");
+                _logger.LogInformation("CaptchaInput is empty.");
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = errorMessage };
             }
 
@@ -109,7 +109,7 @@ namespace DNTCaptcha.Core.Providers
             long inputNumber;
             if (!long.TryParse(inputText, out inputNumber))
             {
-                _logger.LogWarning("inputText is not a number.");
+                _logger.LogInformation("inputText is not a number.");
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = isNumericErrorMessage };
             }
 
@@ -118,7 +118,7 @@ namespace DNTCaptcha.Core.Providers
             var numberToText = _humanReadableIntegerProvider.NumberToText(inputNumber, captchaGeneratorLanguage);
             if (decryptedText == null || !decryptedText.Equals(numberToText))
             {
-                _logger.LogWarning($"{decryptedText} != {numberToText}");
+                _logger.LogInformation($"{decryptedText} != {numberToText}");
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = errorMessage };
             }
 
@@ -134,28 +134,28 @@ namespace DNTCaptcha.Core.Providers
         {
             if (string.IsNullOrEmpty(cookieToken))
             {
-                _logger.LogWarning("CaptchaHiddenTokenName is empty.");
+                _logger.LogInformation("CaptchaHiddenTokenName is empty.");
                 return false;
             }
 
             cookieToken = _captchaProtectionProvider.Decrypt(cookieToken);
             if (string.IsNullOrEmpty(cookieToken))
             {
-                _logger.LogWarning("CaptchaHiddenTokenName is invalid.");
+                _logger.LogInformation("CaptchaHiddenTokenName is invalid.");
                 return false;
             }
 
             var cookieValue = _captchaStorageProvider.GetValue(httpContext, cookieToken);
             if (string.IsNullOrWhiteSpace(cookieValue))
             {
-                _logger.LogWarning("isValidCookie:: cookieValue IsNullOrWhiteSpace.");
+                _logger.LogInformation("isValidCookie:: cookieValue IsNullOrWhiteSpace.");
                 return false;
             }
 
             var result = cookieValue.Equals(decryptedText);
             if (!result)
             {
-                _logger.LogWarning($"isValidCookie:: {cookieValue} != {decryptedText}");
+                _logger.LogInformation($"isValidCookie:: {cookieValue} != {decryptedText}");
             }
             return result;
         }

@@ -62,7 +62,7 @@ namespace DNTCaptcha.Core.Providers
             string cookieValue;
             if (!context.Request.Cookies.TryGetValue(token, out cookieValue))
             {
-                _logger.LogWarning("Couldn't find the captcha cookie in the request.");
+                _logger.LogInformation("Couldn't find the captcha cookie in the request.");
                 return null;
             }
 
