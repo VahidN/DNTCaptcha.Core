@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Logging;
 using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +24,8 @@ namespace DNTCaptcha.TestWebApp
             services.AddMvc(options =>
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-            });
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDirectoryBrowser();
 
             services.AddDNTCaptcha();

@@ -95,7 +95,10 @@ namespace DNTCaptcha.Core.Providers
                 HttpOnly = true,
                 Path = context.Request.PathBase.HasValue ? context.Request.PathBase.ToString() : "/",
                 Secure = context.Request.IsHttps,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(CookieLifeTimeInMinutes)
+                Expires = DateTimeOffset.UtcNow.AddMinutes(CookieLifeTimeInMinutes),
+#if NETSTANDARD2_0
+                IsEssential = true
+#endif
             };
         }
 
