@@ -13,6 +13,11 @@
         /// <summary>
         /// Persian Language
         /// </summary>
-        Persian
+        Persian,
+
+        /// <summary>
+        /// Norwegian Language
+        /// </summary>
+        Norwegian
     }
 }
