@@ -1,33 +1,38 @@
-﻿using System;
+using System;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 namespace DNTCaptcha.Core.Providers
 {
     /// <summary>
-    /// Represents the default storage to save the captcha tokens.
+    /// Represents a memory cache storage to save the captcha tokens.
     /// </summary>
-    public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
+    public class MemoryCacheCaptchaStorageProvider : ICaptchaStorageProvider
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
-        private readonly ILogger<CookieCaptchaStorageProvider> _logger;
-        private const int CookieLifeTimeInMinutes = 7;
+        private readonly ILogger<MemoryCacheCaptchaStorageProvider> _logger;
+        private const int LifeTimeInMinutes = 7;
+        private readonly IMemoryCache _memoryCache;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
         /// </summary>
-        public CookieCaptchaStorageProvider(
+        public MemoryCacheCaptchaStorageProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
-            ILogger<CookieCaptchaStorageProvider> logger)
+            IMemoryCache memoryCache,
+            ILogger<MemoryCacheCaptchaStorageProvider> logger)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             logger.CheckArgumentNull(nameof(logger));
-
+            memoryCache.CheckArgumentNull(nameof(memoryCache));
+            
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
+            _memoryCache = memoryCache;
             
-            _logger.LogInformation("Using the CookieCaptchaStorageProvider.");
+            _logger.LogInformation("Using the MemoryCacheCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -36,7 +41,10 @@ namespace DNTCaptcha.Core.Providers
         public void Add(HttpContext context, string token, string value)
         {
             value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
-            context.Response.Cookies.Append(token, value, getCookieOptions(context));
+            _memoryCache.Set(token, value, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes)
+            });
         }
 
         /// <summary>
@@ -49,7 +57,7 @@ namespace DNTCaptcha.Core.Providers
         /// </returns>
         public bool Contains(HttpContext context, string token)
         {
-            return context.Request.Cookies.ContainsKey(token);
+            return _memoryCache.TryGetValue(token, out string _);
         }
 
         /// <summary>
@@ -59,14 +67,13 @@ namespace DNTCaptcha.Core.Providers
         /// <param name="token">The specified token.</param>
         public string GetValue(HttpContext context, string token)
         {
-            if (!context.Request.Cookies.TryGetValue(token, out var cookieValue))
+            if (!_memoryCache.TryGetValue(token, out string cookieValue))
             {
                 _logger.LogInformation("Couldn't find the captcha cookie in the request.");
                 return null;
             }
 
-            Remove(context, token);
-
+            _memoryCache.Remove(token);
             var decryptedValue = _captchaProtectionProvider.Decrypt(cookieValue);
             return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
         }
@@ -78,27 +85,10 @@ namespace DNTCaptcha.Core.Providers
         /// <param name="token">The specified token.</param>
         public void Remove(HttpContext context, string token)
         {
-            if (Contains(context, token))
+            if (!Contains(context, token))
             {
-                context.Response.Cookies.Delete(token, getCookieOptions(context));
+                _memoryCache.Remove(token);
             }
-        }
-
-        /// <summary>
-        /// Expires at the end of the browser's session.
-        /// </summary>
-        private CookieOptions getCookieOptions(HttpContext context)
-        {
-            return new CookieOptions
-            {
-                HttpOnly = true,
-                Path = context.Request.PathBase.HasValue ? context.Request.PathBase.ToString() : "/",
-                Secure = context.Request.IsHttps,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(CookieLifeTimeInMinutes),
-#if NETSTANDARD2_0
-                IsEssential = true
-#endif
-            };
         }
     }
 }

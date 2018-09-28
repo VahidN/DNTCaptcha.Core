@@ -21,14 +21,16 @@ namespace DNTCaptcha.TestWebApp
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
-            services.AddMvc(options =>
-            {
-                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-            })
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddDirectoryBrowser();
 
-            services.AddDNTCaptcha();
+            services.AddDNTCaptcha(options => 
+                // options.UseSessionStorageProvider()
+                options.UseMemoryCacheStorageProvider()
+                );
+            
+            services.AddSession();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -43,13 +45,15 @@ namespace DNTCaptcha.TestWebApp
             app.UseFileServer(new FileServerOptions
             {
                 // Set root of file server
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "bower_components")),
+                FileProvider =
+                    new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "bower_components")),
                 // Only react to requests that match this path
                 RequestPath = "/bower_components",
                 // Don't expose file system
                 EnableDirectoryBrowsing = false
             });
-
+            
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

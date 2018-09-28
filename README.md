@@ -1,5 +1,7 @@
 DNTCaptcha.Core
 =======
+[![Build status](https://ci.appveyor.com/api/projects/status/bbf050rjk4nvmh7g?svg=true)](https://ci.appveyor.com/project/VahidN/dntcaptcha-core)
+
 `DNTCaptcha.Core` is a captcha generator and validator for ASP.NET Core applications.
 
 ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/dntcaptcha.png)
@@ -52,7 +54,7 @@ namespace DNTCaptcha.TestWebApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDNTCaptcha();
+            services.AddDNTCaptcha(options => options.UseCookieStorageProvider());
         }
 ```
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System.Linq;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -6,20 +6,19 @@ using Microsoft.Extensions.Logging;
 namespace DNTCaptcha.Core.Providers
 {
     /// <summary>
-    /// Represents the default storage to save the captcha tokens.
+    /// Represents a session storage to save the captcha tokens.
     /// </summary>
-    public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
+    public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
-        private readonly ILogger<CookieCaptchaStorageProvider> _logger;
-        private const int CookieLifeTimeInMinutes = 7;
+        private readonly ILogger<SessionCaptchaStorageProvider> _logger;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
         /// </summary>
-        public CookieCaptchaStorageProvider(
+        public SessionCaptchaStorageProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
-            ILogger<CookieCaptchaStorageProvider> logger)
+            ILogger<SessionCaptchaStorageProvider> logger)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             logger.CheckArgumentNull(nameof(logger));
@@ -27,7 +26,7 @@ namespace DNTCaptcha.Core.Providers
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
             
-            _logger.LogInformation("Using the CookieCaptchaStorageProvider.");
+            _logger.LogInformation("Using the SessionCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -36,7 +35,7 @@ namespace DNTCaptcha.Core.Providers
         public void Add(HttpContext context, string token, string value)
         {
             value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
-            context.Response.Cookies.Append(token, value, getCookieOptions(context));
+            context.Session.SetString(token, value);
         }
 
         /// <summary>
@@ -49,7 +48,7 @@ namespace DNTCaptcha.Core.Providers
         /// </returns>
         public bool Contains(HttpContext context, string token)
         {
-            return context.Request.Cookies.ContainsKey(token);
+            return context.Session.Keys.Any(key => key == token);
         }
 
         /// <summary>
@@ -59,15 +58,16 @@ namespace DNTCaptcha.Core.Providers
         /// <param name="token">The specified token.</param>
         public string GetValue(HttpContext context, string token)
         {
-            if (!context.Request.Cookies.TryGetValue(token, out var cookieValue))
+            var value  = context.Session.GetString(token);
+            if (string.IsNullOrWhiteSpace(value))
             {
-                _logger.LogInformation("Couldn't find the captcha cookie in the request.");
+                _logger.LogInformation("Couldn't find the captcha's session value in the request.");
                 return null;
             }
 
             Remove(context, token);
 
-            var decryptedValue = _captchaProtectionProvider.Decrypt(cookieValue);
+            var decryptedValue = _captchaProtectionProvider.Decrypt(value);
             return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
         }
 
@@ -80,25 +80,8 @@ namespace DNTCaptcha.Core.Providers
         {
             if (Contains(context, token))
             {
-                context.Response.Cookies.Delete(token, getCookieOptions(context));
+                context.Session.Remove(token);
             }
-        }
-
-        /// <summary>
-        /// Expires at the end of the browser's session.
-        /// </summary>
-        private CookieOptions getCookieOptions(HttpContext context)
-        {
-            return new CookieOptions
-            {
-                HttpOnly = true,
-                Path = context.Request.PathBase.HasValue ? context.Request.PathBase.ToString() : "/",
-                Secure = context.Request.IsHttps,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(CookieLifeTimeInMinutes),
-#if NETSTANDARD2_0
-                IsEssential = true
-#endif
-            };
         }
     }
 }
