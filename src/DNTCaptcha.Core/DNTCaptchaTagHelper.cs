@@ -247,6 +247,8 @@ namespace DNTCaptcha.Core
             textInput.Attributes.Add("class", TextBoxClass);
             textInput.Attributes.Add("data-val", "true");
             textInput.Attributes.Add("data-val-required", ValidationErrorMessage);
+            textInput.Attributes.Add("required", "required");
+            textInput.Attributes.Add("data-required-msg", ValidationErrorMessage);
             textInput.Attributes.Add("placeholder", Placeholder);
             textInput.Attributes.Add("dir", "ltr");
             textInput.Attributes.Add("type", "text");
