@@ -22,14 +22,14 @@ namespace DNTCaptcha.TestWebApp
                         .AllowCredentials());
             });
             services.AddMvc(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDirectoryBrowser();
 
-            services.AddDNTCaptcha(options => 
+            services.AddDNTCaptcha(options =>
                 // options.UseSessionStorageProvider()
                 options.UseMemoryCacheStorageProvider()
                 );
-            
+
             services.AddSession();
         }
 
@@ -52,7 +52,7 @@ namespace DNTCaptcha.TestWebApp
                 // Don't expose file system
                 EnableDirectoryBrowsing = false
             });
-            
+
             app.UseSession();
 
             app.UseMvc(routes =>

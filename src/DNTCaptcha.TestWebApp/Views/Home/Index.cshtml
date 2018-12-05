@@ -18,17 +18,13 @@
         <div role="tabpanel" class="tab-pane active" id="login1">
             <form asp-controller="Home" asp-action="Index" asp-antiforgery="true"
                   method="post" id="loginForm1" autocomplete="off" role="form">
-                @{
-                    await Html.RenderPartialAsync("_LoginFormBody", Model).ConfigureAwait(false);
-                }
+                  <partial name="_LoginFormBody" model="Model" />
             </form>
         </div>
         <div role="tabpanel" class="tab-pane" id="login2">
             <form asp-controller="Home" asp-action="Login2" asp-antiforgery="true"
                   method="post" id="loginForm2" autocomplete="off" role="form">
-                @{
-                    await Html.RenderPartialAsync("_LoginFormBody", Model).ConfigureAwait(false);
-                }
+                  <partial name="_LoginFormBody" model="Model" />
             </form>
         </div>
     </div>
