@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
@@ -41,9 +39,7 @@ namespace DNTCaptcha.Core
         private readonly IHumanReadableIntegerProvider _humanReadableIntegerProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
         private readonly IAntiforgery _antiforgery;
-#if NETSTANDARD2_0
-        private readonly LinkGenerator _linkGenerator;
-#endif
+        private IUrlHelper _urlHelper;
 
         /// <summary>
         /// DNTCaptcha TagHelper
@@ -54,9 +50,6 @@ namespace DNTCaptcha.Core
             IHumanReadableIntegerProvider humanReadableIntegerProvider,
             ICaptchaStorageProvider captchaStorageProvider,
             IAntiforgery antiforgery
-#if NETSTANDARD2_0
-            , LinkGenerator linkGenerator
-#endif
             )
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
@@ -64,19 +57,12 @@ namespace DNTCaptcha.Core
             humanReadableIntegerProvider.CheckArgumentNull(nameof(humanReadableIntegerProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
             antiforgery.CheckArgumentNull(nameof(antiforgery));
-#if NETSTANDARD2_0
-            linkGenerator.CheckArgumentNull(nameof(linkGenerator));
-#endif
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _randomNumberProvider = randomNumberProvider;
             _humanReadableIntegerProvider = humanReadableIntegerProvider;
             _captchaStorageProvider = captchaStorageProvider;
             _antiforgery = antiforgery;
-
-#if NETSTANDARD2_0
-            _linkGenerator = linkGenerator;
-#endif
         }
 
         /// <summary>
@@ -102,6 +88,8 @@ namespace DNTCaptcha.Core
         {
             context.CheckArgumentNull(nameof(context));
             output.CheckArgumentNull(nameof(output));
+
+            setUrlHelper();
 
             output.TagName = "div";
             output.Attributes.Add("class", "dntCaptcha");
@@ -136,6 +124,15 @@ namespace DNTCaptcha.Core
             output.Content.AppendHtml(dataAjaxBeginScript);
 
             _captchaStorageProvider.Add(ViewContext.HttpContext, cookieToken, randomText);
+        }
+
+        private void setUrlHelper()
+        {
+            _urlHelper = ViewContext.HttpContext.Items.Values.OfType<IUrlHelper>().FirstOrDefault();
+            if (_urlHelper == null)
+            {
+                throw new NullReferenceException("Failed to find the IUrlHelper of ViewContext.HttpContext.");
+            }
         }
 
         /// <summary>
@@ -176,37 +173,20 @@ namespace DNTCaptcha.Core
         {
             ViewContext.CheckArgumentNull(nameof(ViewContext));
 
-#if NETSTANDARD1_6
-            IUrlHelper urlHelper = new UrlHelper(ViewContext);
-#else
-            var urlHelper = _linkGenerator;
-#endif
-
-            var values = new
-            {
-                text = encryptedText,
-                rndDate = DateTime.Now.Ticks,
-                foreColor = ForeColor,
-                backColor = BackColor,
-                fontSize = FontSize,
-                fontName = FontName,
-                area = ""
-            };
-
-#if NETSTANDARD1_6
-            var actionUrl = urlHelper.Action(
+            var actionUrl = _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                            values: values,
+                            values: new
+                            {
+                                text = encryptedText,
+                                rndDate = DateTime.Now.Ticks,
+                                foreColor = ForeColor,
+                                backColor = BackColor,
+                                fontSize = FontSize,
+                                fontName = FontName,
+                                area = ""
+                            },
                             protocol: ViewContext.HttpContext.Request.Scheme);
-#else
-            var actionUrl = urlHelper.GetUriByAction(
-                            httpContext: ViewContext.HttpContext,
-                            action: nameof(DNTCaptchaImageController.Show),
-                            controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                            values: values,
-                            scheme: ViewContext.HttpContext.Request.Scheme);
-#endif
 
             var captchaImage = new TagBuilder("img");
             var dntCaptchaImg = "dntCaptchaImg";
@@ -220,46 +200,29 @@ namespace DNTCaptcha.Core
 
         private TagBuilder getRefreshButtonTagBuilder(string captchaDivId, string captchaToken)
         {
-#if NETSTANDARD1_6
-            IUrlHelper urlHelper = new UrlHelper(ViewContext);
-#else
-            var urlHelper = _linkGenerator;
-#endif
-
-            var values = new
-            {
-                rndDate = DateTime.Now.Ticks,
-                area = "",
-                BackColor = BackColor,
-                FontName = FontName,
-                FontSize = FontSize,
-                ForeColor = ForeColor,
-                Language = Language,
-                Max = Max,
-                Min = Min,
-                Placeholder = Placeholder,
-                TextBoxClass = TextBoxClass,
-                TextBoxTemplate = TextBoxTemplate,
-                ValidationErrorMessage = ValidationErrorMessage,
-                ValidationMessageClass = ValidationMessageClass,
-                CaptchaToken = captchaToken,
-                RefreshButtonClass = RefreshButtonClass
-            };
-
-#if NETSTANDARD1_6
-            var actionUrl = urlHelper.Action(
+            var actionUrl = _urlHelper.Action(
                 action: nameof(DNTCaptchaImageController.Refresh),
                 controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                values: values,
+                values: new
+                {
+                    rndDate = DateTime.Now.Ticks,
+                    area = "",
+                    BackColor = BackColor,
+                    FontName = FontName,
+                    FontSize = FontSize,
+                    ForeColor = ForeColor,
+                    Language = Language,
+                    Max = Max,
+                    Min = Min,
+                    Placeholder = Placeholder,
+                    TextBoxClass = TextBoxClass,
+                    TextBoxTemplate = TextBoxTemplate,
+                    ValidationErrorMessage = ValidationErrorMessage,
+                    ValidationMessageClass = ValidationMessageClass,
+                    CaptchaToken = captchaToken,
+                    RefreshButtonClass = RefreshButtonClass
+                },
                 protocol: ViewContext.HttpContext.Request.Scheme);
-#else
-            var actionUrl = urlHelper.GetUriByAction(
-                httpContext: ViewContext.HttpContext,
-                action: nameof(DNTCaptchaImageController.Refresh),
-                controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                values: values,
-                scheme: ViewContext.HttpContext.Request.Scheme);
-#endif
 
             var refreshButton = new TagBuilder("a");
             var dntCaptchaRefreshButton = "dntCaptchaRefreshButton";

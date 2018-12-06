@@ -83,7 +83,7 @@ namespace DNTCaptcha.Core
 
             var tagHelperContext = new TagHelperContext(
                 allAttributes: new TagHelperAttributeList(),
-                items: new Dictionary<object, object>(),
+                items: new Dictionary<object, object> { { typeof(IUrlHelper), this.Url } },
                 uniqueId: Guid.NewGuid().ToString("N"));
 
             var tagHelperOutput = new TagHelperOutput(
