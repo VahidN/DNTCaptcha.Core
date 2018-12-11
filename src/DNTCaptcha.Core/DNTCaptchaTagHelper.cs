@@ -152,6 +152,7 @@ namespace DNTCaptcha.Core
         private static TagBuilder getHiddenInputTagBuilder(string encryptedText)
         {
             var hiddenInput = new TagBuilder("input");
+            hiddenInput.RenderSelfClosingTag();
             hiddenInput.Attributes.Add("id", CaptchaHiddenInputName);
             hiddenInput.Attributes.Add("name", CaptchaHiddenInputName);
             hiddenInput.Attributes.Add("type", "hidden");
@@ -162,6 +163,7 @@ namespace DNTCaptcha.Core
         private static TagBuilder getHiddenInputTokenTagBuilder(string token)
         {
             var hiddenInput = new TagBuilder("input");
+            hiddenInput.RenderSelfClosingTag();
             hiddenInput.Attributes.Add("id", CaptchaHiddenTokenName);
             hiddenInput.Attributes.Add("name", CaptchaHiddenTokenName);
             hiddenInput.Attributes.Add("type", "hidden");
@@ -190,6 +192,7 @@ namespace DNTCaptcha.Core
 
             var captchaImage = new TagBuilder("img");
             var dntCaptchaImg = "dntCaptchaImg";
+            captchaImage.RenderSelfClosingTag();
             captchaImage.Attributes.Add("id", dntCaptchaImg);
             captchaImage.Attributes.Add("name", dntCaptchaImg);
             captchaImage.Attributes.Add("alt", "captcha");
@@ -252,6 +255,7 @@ namespace DNTCaptcha.Core
         private TagBuilder getTextInputTagBuilder()
         {
             var textInput = new TagBuilder("input");
+            textInput.RenderSelfClosingTag();
             textInput.Attributes.Add("id", CaptchaInputName);
             textInput.Attributes.Add("name", CaptchaInputName);
             textInput.Attributes.Add("autocomplete", "off");
