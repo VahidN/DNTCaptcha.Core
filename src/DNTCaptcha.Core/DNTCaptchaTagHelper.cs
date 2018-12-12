@@ -152,9 +152,7 @@ namespace DNTCaptcha.Core
         private static TagBuilder getHiddenInputTagBuilder(string encryptedText)
         {
             var hiddenInput = new TagBuilder("input");
-#if NETSTANDARD2_0
-            hiddenInput.RenderSelfClosingTag();
-#endif
+            hiddenInput.TagRenderMode = Microsoft.AspNetCore.Mvc.Rendering.TagRenderMode.SelfClosing;
             hiddenInput.Attributes.Add("id", CaptchaHiddenInputName);
             hiddenInput.Attributes.Add("name", CaptchaHiddenInputName);
             hiddenInput.Attributes.Add("type", "hidden");
@@ -165,9 +163,7 @@ namespace DNTCaptcha.Core
         private static TagBuilder getHiddenInputTokenTagBuilder(string token)
         {
             var hiddenInput = new TagBuilder("input");
-#if NETSTANDARD2_0
-            hiddenInput.RenderSelfClosingTag();
-#endif
+            hiddenInput.TagRenderMode = Microsoft.AspNetCore.Mvc.Rendering.TagRenderMode.SelfClosing;
             hiddenInput.Attributes.Add("id", CaptchaHiddenTokenName);
             hiddenInput.Attributes.Add("name", CaptchaHiddenTokenName);
             hiddenInput.Attributes.Add("type", "hidden");
@@ -196,9 +192,7 @@ namespace DNTCaptcha.Core
 
             var captchaImage = new TagBuilder("img");
             var dntCaptchaImg = "dntCaptchaImg";
-#if NETSTANDARD2_0
-            captchaImage.RenderSelfClosingTag();
-#endif
+            captchaImage.TagRenderMode = Microsoft.AspNetCore.Mvc.Rendering.TagRenderMode.SelfClosing;
             captchaImage.Attributes.Add("id", dntCaptchaImg);
             captchaImage.Attributes.Add("name", dntCaptchaImg);
             captchaImage.Attributes.Add("alt", "captcha");
@@ -261,9 +255,7 @@ namespace DNTCaptcha.Core
         private TagBuilder getTextInputTagBuilder()
         {
             var textInput = new TagBuilder("input");
-#if NETSTANDARD2_0
-            textInput.RenderSelfClosingTag();
-#endif
+            textInput.TagRenderMode = Microsoft.AspNetCore.Mvc.Rendering.TagRenderMode.SelfClosing;
             textInput.Attributes.Add("id", CaptchaInputName);
             textInput.Attributes.Add("name", CaptchaInputName);
             textInput.Attributes.Add("autocomplete", "off");
