@@ -27,6 +27,9 @@ Usage:
 ```
 
 - Then to use it, add its new tag-helper to [your view](/src/DNTCaptcha.TestWebApp/Views/Home/_LoginFormBody.cshtml):
+
+For bootstrap-3:
+
 ```xml
 <dnt-captcha asp-captcha-generator-max="9000"
              asp-captcha-generator-min="1"
@@ -41,6 +44,25 @@ Usage:
              asp-text-box-template="<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
+             />
+```
+
+For bootstrap-4 (you will need to `npm install components-font-awesome` for the missing [font-glyphs](https://fontawesome.com/?from=io) too):
+
+```xml
+<dnt-captcha asp-captcha-generator-max="9000"
+             asp-captcha-generator-min="1"
+             asp-captcha-generator-language="English"
+             asp-placeholder="Security code as a number"
+             asp-validation-error-message="Please enter the security code as a number."
+             asp-font-name="Tahoma"
+             asp-font-size="20"
+             asp-fore-color="#333333"
+             asp-back-color="#ccc"
+             asp-text-box-class="text-box form-control"
+             asp-text-box-template="<div class='input-group'><span class='input-group-prepend'><span class='input-group-text'><i class='fas fa-lock'></i></span></span>{0}</div>"
+             asp-validation-message-class="text-danger"
+             asp-refresh-button-class="fas fa-redo btn-sm"
              />
 ```
 
