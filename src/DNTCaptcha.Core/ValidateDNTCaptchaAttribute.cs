@@ -48,7 +48,8 @@ namespace DNTCaptcha.Core
                 cookieToken,
                 CaptchaGeneratorLanguage,
                 ErrorMessage,
-                IsNumericErrorMessage);
+                IsNumericErrorMessage,
+                deleteCookieAfterValidation: true);
             if (result.IsValid)
             {
                 base.OnActionExecuting(filterContext);

@@ -19,6 +19,7 @@ namespace DNTCaptcha.TestWebApp
                         .AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader()
+                        .SetIsOriginAllowed((host) => true)
                         .AllowCredentials());
             });
             services.AddMvc(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); })
@@ -27,7 +28,8 @@ namespace DNTCaptcha.TestWebApp
 
             services.AddDNTCaptcha(options =>
                 // options.UseSessionStorageProvider()
-                options.UseMemoryCacheStorageProvider()
+                // options.UseMemoryCacheStorageProvider()
+                options.UseCookieStorageProvider()
                 );
 
             services.AddSession();

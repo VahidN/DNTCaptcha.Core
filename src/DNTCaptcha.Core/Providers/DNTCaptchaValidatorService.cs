@@ -37,7 +37,8 @@ namespace DNTCaptcha.Core.Providers
             string cookieToken,
             Language captchaGeneratorLanguage,
             string errorMessage,
-            string isNumericErrorMessage);
+            string isNumericErrorMessage,
+            bool deleteCookieAfterValidation);
     }
 
     /// <summary>
@@ -84,7 +85,8 @@ namespace DNTCaptcha.Core.Providers
             string cookieToken,
             Language captchaGeneratorLanguage,
             string errorMessage,
-            string isNumericErrorMessage)
+            string isNumericErrorMessage,
+            bool deleteCookieAfterValidation)
         {
             if (!shouldValidate(httpContext))
             {
@@ -122,7 +124,7 @@ namespace DNTCaptcha.Core.Providers
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = errorMessage };
             }
 
-            if (!isValidCookie(httpContext, decryptedText, cookieToken))
+            if (!isValidCookie(httpContext, decryptedText, cookieToken, deleteCookieAfterValidation))
             {
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = errorMessage };
             }
@@ -130,7 +132,7 @@ namespace DNTCaptcha.Core.Providers
             return new DNTCaptchaValidatorResult { IsValid = true };
         }
 
-        private bool isValidCookie(HttpContext httpContext, string decryptedText, string cookieToken)
+        private bool isValidCookie(HttpContext httpContext, string decryptedText, string cookieToken, bool deleteCookieAfterValidation)
         {
             if (string.IsNullOrEmpty(cookieToken))
             {
@@ -152,12 +154,17 @@ namespace DNTCaptcha.Core.Providers
                 return false;
             }
 
-            var result = cookieValue.Equals(decryptedText);
-            if (!result)
+            var areEqual = cookieValue.Equals(decryptedText);
+            if (!areEqual)
             {
                 _logger.LogInformation($"isValidCookie:: {cookieValue} != {decryptedText}");
             }
-            return result;
+
+            if (areEqual && deleteCookieAfterValidation)
+            {
+                _captchaStorageProvider.Remove(httpContext, cookieToken);
+            }
+            return areEqual;
         }
 
         private static bool shouldValidate(HttpContext context)
