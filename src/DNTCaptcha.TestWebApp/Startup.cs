@@ -27,9 +27,9 @@ namespace DNTCaptcha.TestWebApp
             services.AddDirectoryBrowser();
 
             services.AddDNTCaptcha(options =>
-                // options.UseSessionStorageProvider()
-                // options.UseMemoryCacheStorageProvider()
-                options.UseCookieStorageProvider()
+                // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
+                // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
+                options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
                 );
 
             services.AddSession();
