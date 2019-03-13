@@ -41,6 +41,19 @@ namespace DNTCaptcha.TestWebApp.Controllers
             return View(nameof(Index));
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
+                                    IsNumericErrorMessage = "The input value should be a number.",
+                                    CaptchaGeneratorLanguage = Language.English)]
+        public IActionResult Login3([FromForm]AccountViewModel data) // For Ajax Forms
+        {
+            if (ModelState.IsValid)
+            {
+                //TODO: Save data
+                return Ok();
+            }
+            return BadRequest(ModelState);
+        }
 
         public IActionResult Thanks(string name)
         {
