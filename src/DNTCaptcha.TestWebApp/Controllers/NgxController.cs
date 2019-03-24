@@ -16,7 +16,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
                             CaptchaGeneratorLanguage = Language.English)]
         public IActionResult Login([FromBody]AccountViewModel data)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
             {
                 //TODO: Save data
                 return Ok(new { name = data.Username });

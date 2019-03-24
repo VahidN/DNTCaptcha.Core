@@ -88,7 +88,7 @@ namespace DNTCaptcha.TestWebApp
                     CaptchaGeneratorLanguage = Language.English)]
 public IActionResult Index([FromForm]AccountViewModel data)
 {
-    if (ModelState.IsValid)
+    if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
     {
         //TODO: Save data
         return RedirectToAction(nameof(Thanks), new { name = data.Username });

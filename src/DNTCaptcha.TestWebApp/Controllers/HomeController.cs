@@ -18,7 +18,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
                             CaptchaGeneratorLanguage = Language.English)]
         public IActionResult Index([FromForm]AccountViewModel data)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
             {
                 //TODO: Save data
                 return RedirectToAction(nameof(Thanks), new { name = data.Username });
@@ -33,7 +33,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
                             CaptchaGeneratorLanguage = Language.English)]
         public IActionResult Login2([FromForm]AccountViewModel data)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
             {
                 //TODO: Save data
                 return RedirectToAction(nameof(Thanks), new { name = data.Username });
@@ -47,7 +47,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
                                     CaptchaGeneratorLanguage = Language.English)]
         public IActionResult Login3([FromForm]AccountViewModel data) // For Ajax Forms
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
             {
                 //TODO: Save data
                 return Ok();
