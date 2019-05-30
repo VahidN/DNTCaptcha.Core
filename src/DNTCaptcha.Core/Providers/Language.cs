@@ -18,6 +18,11 @@
         /// <summary>
         /// Norwegian Language
         /// </summary>
-        Norwegian
+        Norwegian,
+
+        /// <summary>
+        /// Italian Language
+        /// </summary>
+        Italian
     }
 }
