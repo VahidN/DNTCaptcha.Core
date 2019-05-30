@@ -13,7 +13,8 @@ namespace DNTCaptcha.Core.Providers
         {
             { Language.English, " " },
             { Language.Persian, " و " },
-            { Language.Norwegian, " og " }
+            { Language.Norwegian, " og " },
+            { Language.Italian, " " }
         };
         private readonly IList<NumberWord> _numberWords = new List<NumberWord>
         {
@@ -23,6 +24,8 @@ namespace DNTCaptcha.Core.Providers
                 new List<string> { string.Empty, "یک", "دو", "سه", "چهار", "پنج", "شش", "هفت", "هشت", "نه" }},
             new NumberWord { Group= DigitGroup.Ones, Language= Language.Norwegian, Names=
                 new List<string> { string.Empty, "en", "to", "tre", "fire", "fem", "seks", "syv", "åtte", "ni" }},
+            new NumberWord { Group= DigitGroup.Ones, Language= Language.Italian, Names=
+                new List<string> { string.Empty, "Uno", "Due", "Tre", "Quattro", "Cinque", "Sei", "Sette", "Otto", "Nove" }},
 
             new NumberWord { Group= DigitGroup.Teens, Language= Language.English, Names=
                 new List<string> { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" }},
@@ -30,6 +33,8 @@ namespace DNTCaptcha.Core.Providers
                 new List<string> { "ده", "یازده", "دوازده", "سیزده", "چهارده", "پانزده", "شانزده", "هفده", "هجده", "نوزده" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Norwegian, Names=
                 new List<string> { "ti", "elleve", "tolv", "tretten", "fjorten", "femten", "seksten", "sytten", "atten", "nitten" }},
+            new NumberWord { Group= DigitGroup.Teens, Language= Language.Italian, Names=
+                new List<string> { "Dieci", "Undici", "Dodici", "Tredici", "Quattordici", "Quindici", "Sedici", "Diciassette", "Diciotto", "Diciannove" }},
 
             new NumberWord { Group= DigitGroup.Tens, Language= Language.English, Names=
                 new List<string> { "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" }},
@@ -37,6 +42,8 @@ namespace DNTCaptcha.Core.Providers
                 new List<string> { "بیست", "سی", "چهل", "پنجاه", "شصت", "هفتاد", "هشتاد", "نود" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Norwegian, Names=
                 new List<string> { "tjue", "tretti", "førti", "femti", "seksti", "sytti", "åtti", "nitti" }},
+            new NumberWord { Group= DigitGroup.Tens, Language= Language.Italian, Names=
+                new List<string> { "Venti", "Trenta", "Quaranta", "Cinquanta", "Sessanta", "Settanta", "Ottanta", "Novanta" }},
 
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.English, Names=
                 new List<string> {string.Empty, "One Hundred", "Two Hundred", "Three Hundred", "Four Hundred",
@@ -44,8 +51,9 @@ namespace DNTCaptcha.Core.Providers
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Persian, Names=
                 new List<string> {string.Empty, "یکصد", "دویست", "سیصد", "چهارصد", "پانصد", "ششصد", "هفتصد", "هشتصد" , "نهصد" }},
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Norwegian, Names=
-                new List<string> {string.Empty, "ett hundre", "to hundre", "tre hundre", "fire hundre",
-                    "fem hundre", "seks hundre", "syv hundre", "åtte hundre", "ni hundre" }},
+                new List<string> {string.Empty, "ett hundre", "to hundre", "tre hundre", "fire hundre", "fem hundre", "seks hundre", "syv hundre", "åtte hundre", "ni hundre" }},
+            new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Italian, Names=
+                new List<string> {string.Empty, "Cento", "Duecento", "Trecento", "Quattrocento", "Cinquecento", "Seicento", "Settecento", "Ottocento", "Novecento" }},
 
             new NumberWord { Group= DigitGroup.Thousands, Language= Language.English, Names=
               new List<string> { string.Empty, " Thousand", " Million", " Billion"," Trillion", " Quadrillion", " Quintillion", " Sextillian",
@@ -66,18 +74,27 @@ namespace DNTCaptcha.Core.Providers
             " Quattuordecillion", " Quindecillion", " Sexdecillion", " Septendecillion", " Octodecillion", " Novemdecillion",
             " Vigintillion", " Unvigintillion", " Duovigintillion", " 10^72", " 10^75", " 10^78", " 10^81", " 10^84", " 10^87",
             " Vigintinonillion", " 10^93", " 10^96", " Duotrigintillion", " Trestrigintillion" }},
+            new NumberWord { Group= DigitGroup.Thousands, Language= Language.Italian, Names=
+              new List<string> { string.Empty, "mila", "Milioni", "Miliardi","Bilioni", "Biliardi", "Trilioni", "Triliardi",
+            " Quadrilioni", "Quadriliardi", "Quintilioni", "Quintiliardi", "Sistilioni", "Sistiliardi", "Settilioni",
+            " Settiliardi", " Ottilioni", "Ottiliardi", "Novilioni", "Noviliardi", "Decilioni",
+            " Deciliardi", "Undicilioni", "Undiciliardi ", "Dodicilioni", "Dodiciliardi", "Tredicilioni", "Trediciliardi", "Quattordicilioni", "Quattordiciliardi",
+            "Quindicilioni", "Quindiciliardi", "Sedicilioni", "Sediciliardi", "Diciasettilioni" }}
         };
+
         private readonly IDictionary<Language, string> _negative = new Dictionary<Language, string>
         {
             { Language.English, "Negative " },
             { Language.Persian, "منهای " },
-            { Language.Norwegian, "Negativ" }
+            { Language.Norwegian, "Negativ" },
+            { Language.Italian, "Negativo" }
         };
         private readonly IDictionary<Language, string> _zero = new Dictionary<Language, string>
         {
             { Language.English, "Zero" },
             { Language.Persian, "صفر" },
-            { Language.Norwegian, "Null" }
+            { Language.Norwegian, "Null" },
+            { Language.Italian, "Zero" }
         };
 
         // Public Methods (5)
