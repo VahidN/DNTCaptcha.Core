@@ -1,10 +1,9 @@
-﻿using System.IO;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace DNTCaptcha.TestWebApp
 {
@@ -16,15 +15,14 @@ namespace DNTCaptcha.TestWebApp
             {
                 options.AddPolicy("CorsPolicy",
                     builder => builder
-                        .AllowAnyOrigin()
+                        .WithOrigins("http://localhost:4200") //Note:  The URL must be specified without a trailing slash (/).
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .SetIsOriginAllowed((host) => true)
                         .AllowCredentials());
             });
-            services.AddMvc(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddDirectoryBrowser();
+            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             services.AddDNTCaptcha(options =>
                 // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
@@ -33,35 +31,38 @@ namespace DNTCaptcha.TestWebApp
                 );
 
             services.AddSession();
+
+            services.AddControllersWithViews();
+            services.AddRazorPages();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
+            app.UseHttpsRedirection();
+
             app.UseCors(policyName: "CorsPolicy");
 
-            app.UseDeveloperExceptionPage();
+            app.UseStaticFiles();
 
-            // Serve wwwroot as root
-            app.UseFileServer();
-
-            app.UseFileServer(new FileServerOptions
-            {
-                // Set root of file server
-                FileProvider =
-                    new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "bower_components")),
-                // Only react to requests that match this path
-                RequestPath = "/bower_components",
-                // Don't expose file system
-                EnableDirectoryBrowsing = false
-            });
+            app.UseRouting();
 
             app.UseSession();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
+                endpoints.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }

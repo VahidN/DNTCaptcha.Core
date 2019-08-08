@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>DNTCaptcha.TestWebApp</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -14,13 +14,10 @@
   <ItemGroup>
     <ProjectReference Include="..\DNTCaptcha.Core\DNTCaptcha.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
   <Target Name="PrecompileScript" BeforeTargets="BeforeBuild">
     <Exec Command="dotnet bundle" />
   </Target>
   <ItemGroup>
-    <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.8.391" />
+    <DotNetCliToolReference Include="BundlerMinifier.Core" Version="2.9.406" />
   </ItemGroup>
 </Project>

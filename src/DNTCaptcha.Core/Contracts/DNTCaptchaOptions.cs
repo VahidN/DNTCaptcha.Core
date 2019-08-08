@@ -9,16 +9,16 @@ namespace DNTCaptcha.Core.Contracts
     public class DNTCaptchaOptions
     {
         internal Type CaptchaStorageProvider { get; set; }
-        
+
         /// <summary>
-        /// You can introduce a custom ICaptchaStorageProvider to be used as an StorageProvider. 
+        /// You can introduce a custom ICaptchaStorageProvider to be used as an StorageProvider.
         /// </summary>
         /// <typeparam name="T">Implements ICaptchaStorageProvider</typeparam>
         public void UseCustomStorageProvider<T>() where T : ICaptchaStorageProvider
         {
             CaptchaStorageProvider = typeof(T);
         }
-        
+
         /// <summary>
         /// Introduces the built-in `SessionCaptchaStorageProvider` to be used as an StorageProvider.
         /// Don't forget to add `services.AddSession();` in ConfigureServices() method and `app.UseSession();` in Configure() method.
@@ -27,17 +27,17 @@ namespace DNTCaptcha.Core.Contracts
         {
             CaptchaStorageProvider = typeof(SessionCaptchaStorageProvider);
         }
-        
+
         /// <summary>
-        /// Introduces the built-in `CookieCaptchaStorageProvider` to be used as an StorageProvider. 
+        /// Introduces the built-in `CookieCaptchaStorageProvider` to be used as an StorageProvider.
         /// </summary>
         public void UseCookieStorageProvider()
         {
             CaptchaStorageProvider = typeof(CookieCaptchaStorageProvider);
         }
-        
+
         /// <summary>
-        /// Introduces the built-in `CookieCaptchaStorageProvider` to be used as an StorageProvider. 
+        /// Introduces the built-in `CookieCaptchaStorageProvider` to be used as an StorageProvider.
         /// </summary>
         public void UseMemoryCacheStorageProvider()
         {
