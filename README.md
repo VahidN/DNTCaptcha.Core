@@ -34,6 +34,7 @@ For bootstrap-3:
 <dnt-captcha asp-captcha-generator-max="9000"
              asp-captcha-generator-min="1"
              asp-captcha-generator-language="English"
+             asp-captcha-generator-display-mode="NumberToWord"
              asp-placeholder="Security code as a number"
              asp-validation-error-message="Please enter the security code as a number."
              asp-font-name="Tahoma"
@@ -53,6 +54,7 @@ For bootstrap-4 (you will need to `npm install components-font-awesome` for the 
 <dnt-captcha asp-captcha-generator-max="9000"
              asp-captcha-generator-min="1"
              asp-captcha-generator-language="English"
+             asp-captcha-generator-display-mode="NumberToWord"
              asp-placeholder="Security code as a number"
              asp-validation-error-message="Please enter the security code as a number."
              asp-font-name="Tahoma"
@@ -85,7 +87,8 @@ namespace DNTCaptcha.TestWebApp
 [HttpPost, ValidateAntiForgeryToken]
 [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                     IsNumericErrorMessage = "The input value should be a number.",
-                    CaptchaGeneratorLanguage = Language.English)]
+                    CaptchaGeneratorLanguage = Language.English,
+                    CaptchaGeneratorDisplayMode = DisplayMode.NumberToWord)]
 public IActionResult Index([FromForm]AccountViewModel data)
 {
     if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.

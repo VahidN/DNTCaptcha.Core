@@ -13,7 +13,8 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost("[action]")]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                             IsNumericErrorMessage = "The input value should be a number.",
-                            CaptchaGeneratorLanguage = Language.English)]
+                            CaptchaGeneratorLanguage = Language.English,
+                            CaptchaGeneratorDisplayMode = DisplayMode.NumberToWord)]
         public IActionResult Login([FromBody]AccountViewModel data)
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.

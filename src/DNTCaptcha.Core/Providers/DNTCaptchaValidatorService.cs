@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -36,6 +37,7 @@ namespace DNTCaptcha.Core.Providers
             string inputText,
             string cookieToken,
             Language captchaGeneratorLanguage,
+            DisplayMode captchaGeneratorDisplayMode,
             string errorMessage,
             string isNumericErrorMessage,
             bool deleteCookieAfterValidation);
@@ -49,7 +51,7 @@ namespace DNTCaptcha.Core.Providers
         private readonly ILogger<DNTCaptchaValidatorService> _logger;
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
-        private readonly IHumanReadableIntegerProvider _humanReadableIntegerProvider;
+        private readonly ICaptchaTextProvider _captchaTextProvider;
 
         /// <summary>
         ///
@@ -58,7 +60,7 @@ namespace DNTCaptcha.Core.Providers
             ILogger<DNTCaptchaValidatorService> logger,
             ICaptchaProtectionProvider captchaProtectionProvider,
             ICaptchaStorageProvider captchaStorageProvider,
-            IHumanReadableIntegerProvider humanReadableIntegerProvider
+            ICaptchaTextProvider captchaTextProvider
         )
         {
             logger.CheckArgumentNull(nameof(logger));
@@ -70,8 +72,8 @@ namespace DNTCaptcha.Core.Providers
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
             _captchaStorageProvider = captchaStorageProvider;
 
-            humanReadableIntegerProvider.CheckArgumentNull(nameof(humanReadableIntegerProvider));
-            _humanReadableIntegerProvider = humanReadableIntegerProvider;
+            captchaTextProvider.CheckArgumentNull(nameof(captchaTextProvider));
+            _captchaTextProvider = captchaTextProvider;
         }
 
         /// <summary>
@@ -84,6 +86,7 @@ namespace DNTCaptcha.Core.Providers
             string inputText,
             string cookieToken,
             Language captchaGeneratorLanguage,
+            DisplayMode captchaGeneratorDisplayMode,
             string errorMessage,
             string isNumericErrorMessage,
             bool deleteCookieAfterValidation)
@@ -108,8 +111,11 @@ namespace DNTCaptcha.Core.Providers
 
             inputText = inputText.ToEnglishNumbers();
 
-            long inputNumber;
-            if (!long.TryParse(inputText, out inputNumber))
+            if (!long.TryParse(
+                inputText,
+                NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+                CultureInfo.InvariantCulture,
+                 out long inputNumber))
             {
                 _logger.LogInformation("inputText is not a number.");
                 return new DNTCaptchaValidatorResult { IsValid = false, ErrorMessage = isNumericErrorMessage };
@@ -117,7 +123,7 @@ namespace DNTCaptcha.Core.Providers
 
             var decryptedText = _captchaProtectionProvider.Decrypt(captchaText);
 
-            var numberToText = _humanReadableIntegerProvider.NumberToText(inputNumber, captchaGeneratorLanguage);
+            var numberToText = _captchaTextProvider.GetText(inputNumber, captchaGeneratorLanguage, captchaGeneratorDisplayMode);
             if (decryptedText == null || !decryptedText.Equals(numberToText))
             {
                 _logger.LogInformation($"{decryptedText} != {numberToText}");

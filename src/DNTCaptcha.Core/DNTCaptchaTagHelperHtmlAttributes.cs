@@ -39,6 +39,12 @@ namespace DNTCaptcha.Core
         public Language Language { set; get; } = Language.Persian;
 
         /// <summary>
+        /// Display mode of the captcha's text. It's default value is NumberToWord.
+        /// </summary>
+        [HtmlAttributeName("asp-captcha-generator-display-mode")]
+        public DisplayMode DisplayMode { set; get; }
+
+        /// <summary>
         /// The max value of the captcha. It's default value is 9000.
         /// </summary>
         [HtmlAttributeName("asp-captcha-generator-max")]

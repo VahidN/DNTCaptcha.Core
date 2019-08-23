@@ -36,7 +36,7 @@ namespace DNTCaptcha.Core
         private const string DataAjaxBeginFunctionName = "onRefreshButtonDataAjaxBegin";
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
-        private readonly IHumanReadableIntegerProvider _humanReadableIntegerProvider;
+        private readonly ICaptchaTextProvider _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
         private readonly IAntiforgery _antiforgery;
         private IUrlHelper _urlHelper;
@@ -47,20 +47,20 @@ namespace DNTCaptcha.Core
         public DNTCaptchaTagHelper(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
-            IHumanReadableIntegerProvider humanReadableIntegerProvider,
+            ICaptchaTextProvider captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,
             IAntiforgery antiforgery
             )
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             randomNumberProvider.CheckArgumentNull(nameof(randomNumberProvider));
-            humanReadableIntegerProvider.CheckArgumentNull(nameof(humanReadableIntegerProvider));
+            captchaTextProvider.CheckArgumentNull(nameof(captchaTextProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
             antiforgery.CheckArgumentNull(nameof(antiforgery));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _randomNumberProvider = randomNumberProvider;
-            _humanReadableIntegerProvider = humanReadableIntegerProvider;
+            _captchaTextProvider = captchaTextProvider;
             _captchaStorageProvider = captchaStorageProvider;
             _antiforgery = antiforgery;
         }
@@ -98,7 +98,7 @@ namespace DNTCaptcha.Core
             output.TagMode = TagMode.StartTagAndEndTag;
 
             var number = _randomNumberProvider.Next(Min, Max);
-            var randomText = _humanReadableIntegerProvider.NumberToText(number, Language);
+            var randomText = _captchaTextProvider.GetText(number, Language, DisplayMode);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
 
             var captchaImage = getCaptchaImageTagBuilder(encryptedText);
@@ -223,7 +223,8 @@ namespace DNTCaptcha.Core
                     ValidationErrorMessage = ValidationErrorMessage,
                     ValidationMessageClass = ValidationMessageClass,
                     CaptchaToken = captchaToken,
-                    RefreshButtonClass = RefreshButtonClass
+                    RefreshButtonClass = RefreshButtonClass,
+                    DisplayMode = DisplayMode
                 },
                 protocol: ViewContext.HttpContext.Request.Scheme);
 

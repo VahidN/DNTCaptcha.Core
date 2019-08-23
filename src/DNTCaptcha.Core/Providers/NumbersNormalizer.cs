@@ -6,7 +6,6 @@
         /// Converts Persian and Arabic digits of a given string to their equivalent English digits.
         /// </summary>
         /// <param name="data">Persian number</param>
-        /// <returns></returns>
         internal static string ToEnglishNumbers(this string data)
         {
             if (string.IsNullOrWhiteSpace(data)) return string.Empty;
@@ -32,6 +31,29 @@
                     .Replace("\u0669", "9") //٩
                     .Replace("\u06F9", "9") //۹
                 ;
+        }
+
+        /// <summary>
+        /// Converts English digits of a given string to their equivalent Persian digits.
+        /// </summary>
+        /// <param name="data">English number</param>
+        internal static string ToPersianNumbers(this string data)
+        {
+            if (string.IsNullOrWhiteSpace(data)) return string.Empty;
+            return
+               data
+                .ToEnglishNumbers()
+                .Replace("0", "\u06F0")
+                .Replace("1", "\u06F1")
+                .Replace("2", "\u06F2")
+                .Replace("3", "\u06F3")
+                .Replace("4", "\u06F4")
+                .Replace("5", "\u06F5")
+                .Replace("6", "\u06F6")
+                .Replace("7", "\u06F7")
+                .Replace("8", "\u06F8")
+                .Replace("9", "\u06F9")
+                .Replace(".", ",");
         }
     }
 }

@@ -80,6 +80,7 @@ namespace DNTCaptcha.Core
             tagHelper.ValidationErrorMessage = model.ValidationErrorMessage;
             tagHelper.ValidationMessageClass = model.ValidationMessageClass;
             tagHelper.RefreshButtonClass = model.RefreshButtonClass;
+            tagHelper.DisplayMode = model.DisplayMode;
 
             var tagHelperContext = new TagHelperContext(
                 allAttributes: new TagHelperAttributeList(),

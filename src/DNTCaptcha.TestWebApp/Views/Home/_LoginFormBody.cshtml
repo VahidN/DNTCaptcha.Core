@@ -36,9 +36,10 @@
                 Security code
             </label>
             <div class="controls col col-md-10">
-                <dnt-captcha asp-captcha-generator-max="9000"
+                <dnt-captcha asp-captcha-generator-max="30"
                              asp-captcha-generator-min="1"
                              asp-captcha-generator-language="English"
+                             asp-captcha-generator-display-mode="SumOfTwoNumbers"
                              asp-placeholder="Security code as a number"
                              asp-validation-error-message="Please enter the security code as a number."
                              asp-font-name="Tahoma"

@@ -12,7 +12,7 @@ namespace DNTCaptcha.Core
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
-        private readonly IHumanReadableIntegerProvider _humanReadableIntegerProvider;
+        private readonly ICaptchaTextProvider _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
 
         /// <summary>
@@ -21,17 +21,17 @@ namespace DNTCaptcha.Core
         public DNTCaptchaApiController(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
-            IHumanReadableIntegerProvider humanReadableIntegerProvider,
+            ICaptchaTextProvider captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             randomNumberProvider.CheckArgumentNull(nameof(randomNumberProvider));
-            humanReadableIntegerProvider.CheckArgumentNull(nameof(humanReadableIntegerProvider));
+            captchaTextProvider.CheckArgumentNull(nameof(captchaTextProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _randomNumberProvider = randomNumberProvider;
-            _humanReadableIntegerProvider = humanReadableIntegerProvider;
+            _captchaTextProvider = captchaTextProvider;
             _captchaStorageProvider = captchaStorageProvider;
         }
 
@@ -45,7 +45,7 @@ namespace DNTCaptcha.Core
         public IActionResult CreateDNTCaptcha([FromBody]DNTCaptchaTagHelperHtmlAttributes captchaAttributes)
         {
             var number = _randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max);
-            var randomText = _humanReadableIntegerProvider.NumberToText(number, captchaAttributes.Language);
+            var randomText = _captchaTextProvider.GetText(number, captchaAttributes.Language, captchaAttributes.DisplayMode);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
             var captchaImageUrl = getCaptchaImageUrl(captchaAttributes, encryptedText);
             var captchaDivId = $"dntCaptcha{Guid.NewGuid().ToString("N")}{_randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max)}";

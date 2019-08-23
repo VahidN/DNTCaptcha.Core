@@ -23,11 +23,14 @@ namespace DNTCaptcha.Core
             configOptions(services, options);
 
             services.TryAddSingleton<IHumanReadableIntegerProvider, HumanReadableIntegerProvider>();
+            services.TryAddSingleton<ICaptchaTextProvider, CaptchaTextProvider>();
+            services.TryAddSingleton<IShowDigitsProvider, ShowDigitsProvider>();
+            services.TryAddSingleton<ISumOfTwoNumbersProvider, SumOfTwoNumbersProvider>();
             services.TryAddSingleton<IRandomNumberProvider, RandomNumberProvider>();
             services.TryAddSingleton<ICaptchaImageProvider, CaptchaImageProvider>();
             services.TryAddSingleton<ICaptchaProtectionProvider, CaptchaProtectionProvider>();
-            services.AddTransient<DNTCaptchaTagHelper>();
-            services.AddTransient<IDNTCaptchaValidatorService, DNTCaptchaValidatorService>();
+            services.TryAddTransient<DNTCaptchaTagHelper>();
+            services.TryAddTransient<IDNTCaptchaValidatorService, DNTCaptchaValidatorService>();
         }
 
         private static void configOptions(IServiceCollection services, Action<DNTCaptchaOptions> options)

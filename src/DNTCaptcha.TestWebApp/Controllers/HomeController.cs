@@ -15,7 +15,8 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                             IsNumericErrorMessage = "The input value should be a number.",
-                            CaptchaGeneratorLanguage = Language.English)]
+                            CaptchaGeneratorLanguage = Language.English,
+                            CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbers)]
         public IActionResult Index([FromForm]AccountViewModel data)
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
@@ -30,7 +31,8 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                             IsNumericErrorMessage = "The input value should be a number.",
-                            CaptchaGeneratorLanguage = Language.English)]
+                            CaptchaGeneratorLanguage = Language.English,
+                            CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbers)]
         public IActionResult Login2([FromForm]AccountViewModel data)
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
@@ -44,7 +46,8 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                                     IsNumericErrorMessage = "The input value should be a number.",
-                                    CaptchaGeneratorLanguage = Language.English)]
+                                    CaptchaGeneratorLanguage = Language.English,
+                                    CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbers)]
         public IActionResult Login3([FromForm]AccountViewModel data) // For Ajax Forms
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.

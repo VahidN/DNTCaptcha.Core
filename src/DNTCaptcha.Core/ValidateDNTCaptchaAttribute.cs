@@ -20,6 +20,11 @@ namespace DNTCaptcha.Core
         public Language CaptchaGeneratorLanguage { set; get; } = Language.Persian;
 
         /// <summary>
+        /// The display mode of captcha generator. It's default value is NumberToWord.
+        /// </summary>
+        public DisplayMode CaptchaGeneratorDisplayMode { set; get; }
+
+        /// <summary>
         /// Validation error message. It's default value is `لطفا کد امنیتی را به رقم وارد نمائید`.
         /// </summary>
         public string ErrorMessage { set; get; } = "لطفا کد امنیتی را به رقم وارد نمائید";
@@ -47,6 +52,7 @@ namespace DNTCaptcha.Core
                 inputText,
                 cookieToken,
                 CaptchaGeneratorLanguage,
+                CaptchaGeneratorDisplayMode,
                 ErrorMessage,
                 IsNumericErrorMessage,
                 deleteCookieAfterValidation: true);
