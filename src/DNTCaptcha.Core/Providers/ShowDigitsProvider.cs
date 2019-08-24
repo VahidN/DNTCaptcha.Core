@@ -6,7 +6,7 @@ namespace DNTCaptcha.Core.Providers
     /// <summary>
     /// display a numeric value using the equivalent text
     /// </summary>
-    public class ShowDigitsProvider : IShowDigitsProvider
+    public class ShowDigitsProvider : ICaptchaTextProvider
     {
         /// <summary>
         /// display a numeric value using the equivalent text

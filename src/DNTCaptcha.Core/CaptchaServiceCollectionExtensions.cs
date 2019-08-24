@@ -22,10 +22,23 @@ namespace DNTCaptcha.Core
 
             configOptions(services, options);
 
-            services.TryAddSingleton<IHumanReadableIntegerProvider, HumanReadableIntegerProvider>();
-            services.TryAddSingleton<ICaptchaTextProvider, CaptchaTextProvider>();
-            services.TryAddSingleton<IShowDigitsProvider, ShowDigitsProvider>();
-            services.TryAddSingleton<ISumOfTwoNumbersProvider, SumOfTwoNumbersProvider>();
+            services.TryAddSingleton<HumanReadableIntegerProvider>();
+            services.TryAddSingleton<ShowDigitsProvider>();
+            services.TryAddSingleton<SumOfTwoNumbersProvider>();
+            services.TryAddSingleton<Func<DisplayMode, ICaptchaTextProvider>>(serviceProvider => key =>
+            {
+                switch (key)
+                {
+                    case DisplayMode.NumberToWord:
+                        return serviceProvider.GetRequiredService<HumanReadableIntegerProvider>();
+                    case DisplayMode.ShowDigits:
+                        return serviceProvider.GetRequiredService<ShowDigitsProvider>();
+                    case DisplayMode.SumOfTwoNumbers:
+                        return serviceProvider.GetRequiredService<SumOfTwoNumbersProvider>();
+                    default:
+                        throw new NotImplementedException($"Service of type {key} is not implemented.");
+                }
+            });
             services.TryAddSingleton<IRandomNumberProvider, RandomNumberProvider>();
             services.TryAddSingleton<ICaptchaImageProvider, CaptchaImageProvider>();
             services.TryAddSingleton<ICaptchaProtectionProvider, CaptchaProtectionProvider>();

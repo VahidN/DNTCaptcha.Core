@@ -51,7 +51,7 @@ namespace DNTCaptcha.Core.Providers
         private readonly ILogger<DNTCaptchaValidatorService> _logger;
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
-        private readonly ICaptchaTextProvider _captchaTextProvider;
+        private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
 
         /// <summary>
         ///
@@ -60,7 +60,7 @@ namespace DNTCaptcha.Core.Providers
             ILogger<DNTCaptchaValidatorService> logger,
             ICaptchaProtectionProvider captchaProtectionProvider,
             ICaptchaStorageProvider captchaStorageProvider,
-            ICaptchaTextProvider captchaTextProvider
+            Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider
         )
         {
             logger.CheckArgumentNull(nameof(logger));
@@ -123,7 +123,7 @@ namespace DNTCaptcha.Core.Providers
 
             var decryptedText = _captchaProtectionProvider.Decrypt(captchaText);
 
-            var numberToText = _captchaTextProvider.GetText(inputNumber, captchaGeneratorLanguage, captchaGeneratorDisplayMode);
+            var numberToText = _captchaTextProvider(captchaGeneratorDisplayMode).GetText(inputNumber, captchaGeneratorLanguage);
             if (decryptedText == null || !decryptedText.Equals(numberToText))
             {
                 _logger.LogInformation($"{decryptedText} != {numberToText}");

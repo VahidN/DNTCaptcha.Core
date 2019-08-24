@@ -36,7 +36,7 @@ namespace DNTCaptcha.Core
         private const string DataAjaxBeginFunctionName = "onRefreshButtonDataAjaxBegin";
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
-        private readonly ICaptchaTextProvider _captchaTextProvider;
+        private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
         private readonly IAntiforgery _antiforgery;
         private IUrlHelper _urlHelper;
@@ -47,7 +47,7 @@ namespace DNTCaptcha.Core
         public DNTCaptchaTagHelper(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
-            ICaptchaTextProvider captchaTextProvider,
+            Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,
             IAntiforgery antiforgery
             )
@@ -98,7 +98,7 @@ namespace DNTCaptcha.Core
             output.TagMode = TagMode.StartTagAndEndTag;
 
             var number = _randomNumberProvider.Next(Min, Max);
-            var randomText = _captchaTextProvider.GetText(number, Language, DisplayMode);
+            var randomText = _captchaTextProvider(DisplayMode).GetText(number, Language);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
 
             var captchaImage = getCaptchaImageTagBuilder(encryptedText);

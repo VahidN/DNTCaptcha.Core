@@ -12,7 +12,7 @@ namespace DNTCaptcha.Core
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
-        private readonly ICaptchaTextProvider _captchaTextProvider;
+        private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace DNTCaptcha.Core
         public DNTCaptchaApiController(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
-            ICaptchaTextProvider captchaTextProvider,
+            Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
@@ -45,7 +45,7 @@ namespace DNTCaptcha.Core
         public IActionResult CreateDNTCaptcha([FromBody]DNTCaptchaTagHelperHtmlAttributes captchaAttributes)
         {
             var number = _randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max);
-            var randomText = _captchaTextProvider.GetText(number, captchaAttributes.Language, captchaAttributes.DisplayMode);
+            var randomText = _captchaTextProvider(captchaAttributes.DisplayMode).GetText(number, captchaAttributes.Language);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
             var captchaImageUrl = getCaptchaImageUrl(captchaAttributes, encryptedText);
             var captchaDivId = $"dntCaptcha{Guid.NewGuid().ToString("N")}{_randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max)}";

@@ -7,7 +7,7 @@ namespace DNTCaptcha.Core.Providers
     /// <summary>
     /// Convert a number into words
     /// </summary>
-    public class HumanReadableIntegerProvider : IHumanReadableIntegerProvider
+    public class HumanReadableIntegerProvider : ICaptchaTextProvider
     {
         private readonly IDictionary<Language, string> _and = new Dictionary<Language, string>
         {
@@ -16,6 +16,7 @@ namespace DNTCaptcha.Core.Providers
             { Language.Norwegian, " og " },
             { Language.Italian, " " }
         };
+
         private readonly IList<NumberWord> _numberWords = new List<NumberWord>
         {
             new NumberWord { Group= DigitGroup.Ones, Language= Language.English, Names=
@@ -89,6 +90,7 @@ namespace DNTCaptcha.Core.Providers
             { Language.Norwegian, "Negativ" },
             { Language.Italian, "Negativo" }
         };
+
         private readonly IDictionary<Language, string> _zero = new Dictionary<Language, string>
         {
             { Language.English, "Zero" },
@@ -97,7 +99,16 @@ namespace DNTCaptcha.Core.Providers
             { Language.Italian, "Zero" }
         };
 
-        // Public Methods (5)
+        /// <summary>
+        /// display a numeric value using the equivalent text
+        /// </summary>
+        /// <param name="number">input number</param>
+        /// <param name="language">local language</param>
+        /// <returns>the equivalent text</returns>
+        public string GetText(long number, Language language)
+        {
+            return NumberToText(number, language);
+        }
 
         /// <summary>
         /// display a numeric value using the equivalent text
@@ -169,54 +180,53 @@ namespace DNTCaptcha.Core.Providers
 
             if (number < 0)
             {
-				return _negative[language] + NumberToText(-number, language);
-			}
-
-			return wordify(number, language, string.Empty, 0);
-		}
-		// Private Methods (2)
-
-		private string getName(int idx, Language language, DigitGroup group)
-		{
-			return _numberWords.First(x => x.Group == group && x.Language == language).Names[idx];
-		}
-
-		private string wordify(long number, Language language, string leftDigitsText, int thousands)
-		{
-			if (number == 0)
-			{
-				return leftDigitsText;
-			}
-
-			var wordValue = leftDigitsText;
-			if (wordValue.Length > 0)
-			{
-				wordValue += _and[language];
+                return _negative[language] + NumberToText(-number, language);
             }
 
-			if (number < 10)
-			{
-				wordValue += getName((int)number, language, DigitGroup.Ones);
-			}
-			else if (number < 20)
-			{
-				wordValue += getName((int)(number - 10), language, DigitGroup.Teens);
-			}
-			else if (number < 100)
-			{
-				wordValue += wordify(number % 10, language, getName((int)(number / 10 - 2), language, DigitGroup.Tens), 0);
-			}
-			else if (number < 1000)
-			{
-				wordValue += wordify(number % 100, language, getName((int)(number / 100), language, DigitGroup.Hundreds), 0);
-			}
-			else
-			{
-				wordValue += wordify(number % 1000, language, wordify(number / 1000, language, string.Empty, thousands + 1), 0);
-			}
+            return wordify(number, language, string.Empty, 0);
+        }
 
-			if (number % 1000 == 0) return wordValue;
-			return wordValue + getName(thousands, language, DigitGroup.Thousands);
-		}
-	}
+        private string getName(int idx, Language language, DigitGroup group)
+        {
+            return _numberWords.First(x => x.Group == group && x.Language == language).Names[idx];
+        }
+
+        private string wordify(long number, Language language, string leftDigitsText, int thousands)
+        {
+            if (number == 0)
+            {
+                return leftDigitsText;
+            }
+
+            var wordValue = leftDigitsText;
+            if (wordValue.Length > 0)
+            {
+                wordValue += _and[language];
+            }
+
+            if (number < 10)
+            {
+                wordValue += getName((int)number, language, DigitGroup.Ones);
+            }
+            else if (number < 20)
+            {
+                wordValue += getName((int)(number - 10), language, DigitGroup.Teens);
+            }
+            else if (number < 100)
+            {
+                wordValue += wordify(number % 10, language, getName((int)(number / 10 - 2), language, DigitGroup.Tens), 0);
+            }
+            else if (number < 1000)
+            {
+                wordValue += wordify(number % 100, language, getName((int)(number / 100), language, DigitGroup.Hundreds), 0);
+            }
+            else
+            {
+                wordValue += wordify(number % 1000, language, wordify(number / 1000, language, string.Empty, thousands + 1), 0);
+            }
+
+            if (number % 1000 == 0) return wordValue;
+            return wordValue + getName(thousands, language, DigitGroup.Thousands);
+        }
+    }
 }

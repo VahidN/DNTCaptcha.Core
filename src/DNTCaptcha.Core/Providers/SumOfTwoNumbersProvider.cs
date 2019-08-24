@@ -5,7 +5,7 @@ namespace DNTCaptcha.Core.Providers
     /// <summary>
     /// SumOfTwoNumbers Provider
     /// </summary>
-    public class SumOfTwoNumbersProvider : ISumOfTwoNumbersProvider
+    public class SumOfTwoNumbersProvider : ICaptchaTextProvider
     {
         private readonly int _randomNumber;
 
