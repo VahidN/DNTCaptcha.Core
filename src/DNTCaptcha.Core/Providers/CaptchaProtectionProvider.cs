@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using System.Text;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
 namespace DNTCaptcha.Core.Providers
@@ -38,7 +39,7 @@ namespace DNTCaptcha.Core.Providers
 
             try
             {
-                var inputBytes = Convert.FromBase64String(inputText);
+                var inputBytes = WebEncoders.Base64UrlDecode(inputText);
                 var bytes = _dataProtector.Unprotect(inputBytes);
                 return Encoding.UTF8.GetString(bytes);
             }
@@ -63,7 +64,7 @@ namespace DNTCaptcha.Core.Providers
 
             var inputBytes = Encoding.UTF8.GetBytes(inputText);
             var bytes = _dataProtector.Protect(inputBytes);
-            return Convert.ToBase64String(bytes);
+            return WebEncoders.Base64UrlEncode(bytes);
         }
 
         /// <summary>

@@ -28,6 +28,7 @@ namespace DNTCaptcha.Core
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly ILogger<DNTCaptchaImageController> _logger;
+        private readonly ISerializationProvider _serializationProvider;
 
         /// <summary>
         /// DNTCaptcha Image Controller
@@ -37,19 +38,22 @@ namespace DNTCaptcha.Core
             ICaptchaProtectionProvider captchaProtectionProvider,
             ITempDataProvider tempDataProvider,
             ICaptchaStorageProvider captchaStorageProvider,
-            ILogger<DNTCaptchaImageController> logger)
+            ILogger<DNTCaptchaImageController> logger,
+            ISerializationProvider serializationProvider)
         {
             captchaImageProvider.CheckArgumentNull(nameof(captchaImageProvider));
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             tempDataProvider.CheckArgumentNull(nameof(tempDataProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
-            captchaStorageProvider.CheckArgumentNull(nameof(logger));
+            logger.CheckArgumentNull(nameof(logger));
+            serializationProvider.CheckArgumentNull(nameof(serializationProvider));
 
             _captchaImageProvider = captchaImageProvider;
             _captchaProtectionProvider = captchaProtectionProvider;
             _tempDataProvider = tempDataProvider;
             _captchaStorageProvider = captchaStorageProvider;
             _logger = logger;
+            _serializationProvider = serializationProvider;
         }
 
         /// <summary>
@@ -62,9 +66,21 @@ namespace DNTCaptcha.Core
         /// Refresh the captcha
         /// </summary>
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-        public IActionResult Refresh(string rndDate, DNTCaptchaTagHelperHtmlAttributes model)
+        public IActionResult Refresh(string id)
         {
-            _captchaStorageProvider.Remove(HttpContext, model.CaptchaToken);
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return BadRequest();
+            }
+
+            var decryptedModel = _captchaProtectionProvider.Decrypt(id);
+            if (decryptedModel == null)
+            {
+                return BadRequest();
+            }
+            var model = _serializationProvider.Deserialize<DNTCaptchaTagHelperHtmlAttributes>(decryptedModel);
+
+            invalidateToken(model);
 
             var tagHelper = HttpContext.RequestServices.GetRequiredService<DNTCaptchaTagHelper>();
             tagHelper.BackColor = model.BackColor;
@@ -119,19 +135,30 @@ namespace DNTCaptcha.Core
             return Content(content);
         }
 
+        private void invalidateToken(DNTCaptchaTagHelperHtmlAttributes model)
+        {
+            _captchaStorageProvider.Remove(HttpContext, model.CaptchaToken);
+        }
+
         /// <summary>
         /// Creates the captcha image.
         /// </summary>
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-        public IActionResult Show(string text, string rndDate, string foreColor = "#1B0172",
-            string backColor = "", float fontSize = 12, string fontName = "Tahoma")
+        public IActionResult Show(string id)
         {
-            if (string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest();
             }
 
-            var decryptedText = _captchaProtectionProvider.Decrypt(text);
+            var decryptedModel = _captchaProtectionProvider.Decrypt(id);
+            if (decryptedModel == null)
+            {
+                return BadRequest();
+            }
+            var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
+
+            var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
             if (decryptedText == null)
             {
                 return BadRequest();
@@ -140,14 +167,16 @@ namespace DNTCaptcha.Core
             byte[] image;
             try
             {
-                image = _captchaImageProvider.DrawCaptcha(decryptedText, foreColor, backColor, fontSize, fontName);
+                image = _captchaImageProvider.DrawCaptcha(
+                            decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical(1001, ex, "DrawCaptcha error.");
                 return BadRequest(ex.Message);
             }
-            return new FileContentResult(_captchaImageProvider.DrawCaptcha(decryptedText, foreColor, backColor, fontSize, fontName), "image/png");
+            return new FileContentResult(_captchaImageProvider.DrawCaptcha(
+                   decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName), "image/png");
         }
     }
 }

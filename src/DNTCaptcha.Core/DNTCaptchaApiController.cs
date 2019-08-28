@@ -14,6 +14,7 @@ namespace DNTCaptcha.Core
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
+        private readonly ISerializationProvider _serializationProvider;
 
         /// <summary>
         /// DNTCaptcha TagHelper
@@ -22,17 +23,20 @@ namespace DNTCaptcha.Core
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
-            ICaptchaStorageProvider captchaStorageProvider)
+            ICaptchaStorageProvider captchaStorageProvider,
+            ISerializationProvider serializationProvider)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             randomNumberProvider.CheckArgumentNull(nameof(randomNumberProvider));
             captchaTextProvider.CheckArgumentNull(nameof(captchaTextProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
+            serializationProvider.CheckArgumentNull(nameof(serializationProvider));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _randomNumberProvider = randomNumberProvider;
             _captchaTextProvider = captchaTextProvider;
             _captchaStorageProvider = captchaStorageProvider;
+            _serializationProvider = serializationProvider;
         }
 
         /// <summary>
@@ -65,19 +69,19 @@ namespace DNTCaptcha.Core
 
         private string getCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
         {
+            var values = new CaptchaImageParams
+            {
+                Text = encryptedText,
+                RndDate = DateTime.Now.Ticks.ToString(),
+                ForeColor = captchaAttributes.ForeColor,
+                BackColor = captchaAttributes.BackColor,
+                FontSize = captchaAttributes.FontSize,
+                FontName = captchaAttributes.FontName
+            };
+            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = Url.Action(action: nameof(DNTCaptchaImageController.Show),
                controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-               values:
-               new
-               {
-                   text = encryptedText,
-                   rndDate = DateTime.Now.Ticks,
-                   foreColor = captchaAttributes.ForeColor,
-                   backColor = captchaAttributes.BackColor,
-                   fontSize = captchaAttributes.FontSize,
-                   fontName = captchaAttributes.FontName,
-                   area = ""
-               },
+               values: new { id = encryptSerializedValues, area = "" },
                protocol: HttpContext.Request.Scheme);
             return actionUrl;
         }

@@ -39,6 +39,7 @@ namespace DNTCaptcha.Core
                         throw new NotImplementedException($"Service of type {key} is not implemented.");
                 }
             });
+            services.TryAddSingleton<ISerializationProvider, SerializationProvider>();
             services.TryAddSingleton<IRandomNumberProvider, RandomNumberProvider>();
             services.TryAddSingleton<ICaptchaImageProvider, CaptchaImageProvider>();
             services.TryAddSingleton<ICaptchaProtectionProvider, CaptchaProtectionProvider>();

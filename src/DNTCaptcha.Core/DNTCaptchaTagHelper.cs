@@ -40,6 +40,7 @@ namespace DNTCaptcha.Core
         private readonly IRandomNumberProvider _randomNumberProvider;
         private readonly IAntiforgery _antiforgery;
         private IUrlHelper _urlHelper;
+        private readonly ISerializationProvider _serializationProvider;
 
         /// <summary>
         /// DNTCaptcha TagHelper
@@ -49,7 +50,8 @@ namespace DNTCaptcha.Core
             IRandomNumberProvider randomNumberProvider,
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,
-            IAntiforgery antiforgery
+            IAntiforgery antiforgery,
+            ISerializationProvider serializationProvider
             )
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
@@ -57,12 +59,14 @@ namespace DNTCaptcha.Core
             captchaTextProvider.CheckArgumentNull(nameof(captchaTextProvider));
             captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
             antiforgery.CheckArgumentNull(nameof(antiforgery));
+            serializationProvider.CheckArgumentNull(nameof(serializationProvider));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _randomNumberProvider = randomNumberProvider;
             _captchaTextProvider = captchaTextProvider;
             _captchaStorageProvider = captchaStorageProvider;
             _antiforgery = antiforgery;
+            _serializationProvider = serializationProvider;
         }
 
         /// <summary>
@@ -175,19 +179,20 @@ namespace DNTCaptcha.Core
         {
             ViewContext.CheckArgumentNull(nameof(ViewContext));
 
+            var values = new CaptchaImageParams
+            {
+                Text = encryptedText,
+                RndDate = DateTime.Now.Ticks.ToString(),
+                ForeColor = ForeColor,
+                BackColor = BackColor,
+                FontSize = FontSize,
+                FontName = FontName
+            };
+            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                            values: new
-                            {
-                                text = encryptedText,
-                                rndDate = DateTime.Now.Ticks,
-                                foreColor = ForeColor,
-                                backColor = BackColor,
-                                fontSize = FontSize,
-                                fontName = FontName,
-                                area = ""
-                            },
+                            values: new { id = encryptSerializedValues, area = "" },
                             protocol: ViewContext.HttpContext.Request.Scheme);
 
             var captchaImage = new TagBuilder("img");
@@ -203,29 +208,30 @@ namespace DNTCaptcha.Core
 
         private TagBuilder getRefreshButtonTagBuilder(string captchaDivId, string captchaToken)
         {
+            var values = new
+            {
+                rndDate = DateTime.Now.Ticks,
+                BackColor = BackColor,
+                FontName = FontName,
+                FontSize = FontSize,
+                ForeColor = ForeColor,
+                Language = Language,
+                Max = Max,
+                Min = Min,
+                Placeholder = Placeholder,
+                TextBoxClass = TextBoxClass,
+                TextBoxTemplate = TextBoxTemplate,
+                ValidationErrorMessage = ValidationErrorMessage,
+                ValidationMessageClass = ValidationMessageClass,
+                CaptchaToken = captchaToken,
+                RefreshButtonClass = RefreshButtonClass,
+                DisplayMode = DisplayMode
+            };
+            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = _urlHelper.Action(
                 action: nameof(DNTCaptchaImageController.Refresh),
                 controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                values: new
-                {
-                    rndDate = DateTime.Now.Ticks,
-                    area = "",
-                    BackColor = BackColor,
-                    FontName = FontName,
-                    FontSize = FontSize,
-                    ForeColor = ForeColor,
-                    Language = Language,
-                    Max = Max,
-                    Min = Min,
-                    Placeholder = Placeholder,
-                    TextBoxClass = TextBoxClass,
-                    TextBoxTemplate = TextBoxTemplate,
-                    ValidationErrorMessage = ValidationErrorMessage,
-                    ValidationMessageClass = ValidationMessageClass,
-                    CaptchaToken = captchaToken,
-                    RefreshButtonClass = RefreshButtonClass,
-                    DisplayMode = DisplayMode
-                },
+                values: new { id = encryptSerializedValues, area = "" },
                 protocol: ViewContext.HttpContext.Request.Scheme);
 
             var refreshButton = new TagBuilder("a");
