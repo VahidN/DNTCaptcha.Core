@@ -188,7 +188,8 @@ namespace DNTCaptcha.Core
                 FontSize = FontSize,
                 FontName = FontName
             };
-            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
+            var serializedValues = _serializationProvider.Serialize(values);
+            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
             var actionUrl = _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
@@ -227,7 +228,8 @@ namespace DNTCaptcha.Core
                 RefreshButtonClass = RefreshButtonClass,
                 DisplayMode = DisplayMode
             };
-            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
+            var serializedValues = _serializationProvider.Serialize(values);
+            var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
             var actionUrl = _urlHelper.Action(
                 action: nameof(DNTCaptchaImageController.Refresh),
                 controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),

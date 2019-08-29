@@ -1,0 +1,58 @@
+@using DNTCaptcha.TestWebApp.Models
+@model AccountViewModel
+@{
+    ViewBag.Title = "Login";
+}
+<div>
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#login1" aria-controls="login1" role="tab" data-toggle="tab">Instance 1</a>
+        </li>
+        <li role="presentation">
+            <a href="#login2" aria-controls="login2" role="tab" data-toggle="tab">Instance 2</a>
+        </li>
+        <li role="presentation">
+            <a href="#login3" aria-controls="login3" role="tab" data-toggle="tab">Instance 3/Ajax Form</a>
+        </li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="login1">
+            <form asp-controller="Home" asp-action="Index" asp-antiforgery="true"
+                  method="post" id="loginForm1" autocomplete="off" role="form">
+                  <partial name="_LoginFormBody" model="Model" />
+            </form>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="login2">
+            <form asp-controller="Home" asp-action="Login2" asp-antiforgery="true"
+                  method="post" id="loginForm2" autocomplete="off" role="form">
+                  <partial name="_LoginFormBody" model="Model" />
+            </form>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="login3">
+            <form asp-controller="Home" asp-action="Login3" asp-antiforgery="true"
+                  method="post" id="loginForm3" autocomplete="off" role="form"
+                  data-ajax="true"
+                  data-ajax-success="dataAjaxSuccess"
+                  data-ajax-failure="dataAjaxFailure">
+                  <partial name="_LoginFormBody" model="Model" />
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+  <script type="text/javascript">
+    function dataAjaxSuccess(data, status, xhr) {
+        alert('Success!');
+        $("#loginForm3 #dntCaptchaRefreshButton").click(); // refresh captcha
+    }
+
+    function dataAjaxFailure(xhr, status, error) {
+        alert('Failure! Try Again!');
+        $("#loginForm3 #dntCaptchaRefreshButton").click(); // refresh captcha
+    }
+  </script>
+}
