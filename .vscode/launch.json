@@ -6,9 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp/bin/Debug/netcoreapp3.0/DNTCaptcha.TestWebApp.dll",
+      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x/bin/Debug/netcoreapp3.0/DNTCaptcha.TestWebApp.dll",
       "args": [],
-      "cwd": "${workspaceRoot}/src/DNTCaptcha.TestWebApp",
+      "cwd": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x",
       "stopAtEntry": false,
       "internalConsoleOptions": "openOnSessionStart",
       "launchBrowser": {

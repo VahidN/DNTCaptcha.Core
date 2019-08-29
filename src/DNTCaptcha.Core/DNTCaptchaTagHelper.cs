@@ -193,7 +193,7 @@ namespace DNTCaptcha.Core
             var actionUrl = _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                            values: new { id = encryptSerializedValues, area = "" },
+                            values: new { data = encryptSerializedValues, area = "" },
                             protocol: ViewContext.HttpContext.Request.Scheme);
 
             var captchaImage = new TagBuilder("img");
@@ -233,7 +233,7 @@ namespace DNTCaptcha.Core
             var actionUrl = _urlHelper.Action(
                 action: nameof(DNTCaptchaImageController.Refresh),
                 controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-                values: new { id = encryptSerializedValues, area = "" },
+                values: new { data = encryptSerializedValues, area = "" },
                 protocol: ViewContext.HttpContext.Request.Scheme);
 
             var refreshButton = new TagBuilder("a");

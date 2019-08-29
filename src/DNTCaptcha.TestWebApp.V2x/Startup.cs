@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 
 namespace DNTCaptcha.TestWebApp
 {
@@ -24,6 +25,8 @@ namespace DNTCaptcha.TestWebApp
             });
             services.AddMvc(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
+
             services.AddDirectoryBrowser();
 
             services.AddDNTCaptcha(options =>

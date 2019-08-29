@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Routing;
 
 namespace DNTCaptcha.TestWebApp
 {
@@ -23,6 +24,8 @@ namespace DNTCaptcha.TestWebApp
             });
             services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+
+            services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
 
             services.AddDNTCaptcha(options =>
                 // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.

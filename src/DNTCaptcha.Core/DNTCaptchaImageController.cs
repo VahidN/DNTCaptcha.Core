@@ -66,14 +66,14 @@ namespace DNTCaptcha.Core
         /// Refresh the captcha
         /// </summary>
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-        public IActionResult Refresh(string id)
+        public IActionResult Refresh(string data)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(data))
             {
                 return BadRequest();
             }
 
-            var decryptedModel = _captchaProtectionProvider.Decrypt(id);
+            var decryptedModel = _captchaProtectionProvider.Decrypt(data);
             if (decryptedModel == null)
             {
                 return BadRequest();
@@ -144,14 +144,14 @@ namespace DNTCaptcha.Core
         /// Creates the captcha image.
         /// </summary>
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-        public IActionResult Show(string id)
+        public IActionResult Show(string data)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(data))
             {
                 return BadRequest();
             }
 
-            var decryptedModel = _captchaProtectionProvider.Decrypt(id);
+            var decryptedModel = _captchaProtectionProvider.Decrypt(data);
             if (decryptedModel == null)
             {
                 return BadRequest();

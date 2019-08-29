@@ -81,7 +81,7 @@ namespace DNTCaptcha.Core
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = Url.Action(action: nameof(DNTCaptchaImageController.Show),
                controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-               values: new { id = encryptSerializedValues, area = "" },
+               values: new { data = encryptSerializedValues, area = "" },
                protocol: HttpContext.Request.Scheme);
             return actionUrl;
         }
