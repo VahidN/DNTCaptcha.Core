@@ -105,8 +105,8 @@ public IActionResult Index([FromForm]AccountViewModel data)
 ```
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
-  *  [bower.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/bower.json#L9)
-  *  [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/bundleconfig.json#L15)
+  *  [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/package.json)
+  *  [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/bundleconfig.json)
   *  Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/tree/master/dist
   *  Or include it from a CDN (It requires jQuery 1.4.4+):
   ```javascript
@@ -149,7 +149,7 @@ To run this project on non-Windows-based operating systems, you will need to ins
 	- make
 	- make install
 	- cd /usr/lib64/
-	- ln -s /usr/local/lib/libgdiplus.so gdiplus.dll
+	- ln -s /usr/local/lib/libgdiplus.so libgdiplus.so
 - Docker
 	- RUN apt-get update \\
 

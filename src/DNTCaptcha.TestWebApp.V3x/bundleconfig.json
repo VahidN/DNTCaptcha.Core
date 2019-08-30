@@ -2,18 +2,24 @@
     {
         "outputFileName": "wwwroot/css/site.min.css",
         "inputFiles": [
-            "bower_components/bootstrap/dist/css/bootstrap.min.css",
+            "node_modules/bootstrap/dist/css/bootstrap.min.css",
             "content/site.css"
-        ]
+        ],
+        "minify": {
+            "enabled": true,
+            "renameLocals": false,
+            "adjustRelativePaths": false
+        },
+        "sourceMap": false
     },
     {
         "outputFileName": "wwwroot/js/site.min.js",
         "inputFiles": [
-            "bower_components/jquery/dist/jquery.min.js",
-            "bower_components/jquery-validation/dist/jquery.validate.min.js",
-            "bower_components/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js",
-            "bower_components/jquery-ajax-unobtrusive/jquery.unobtrusive-ajax.min.js",
-            "bower_components/bootstrap/dist/js/bootstrap.min.js"
+            "node_modules/jquery/dist/jquery.min.js",
+            "node_modules/jquery-validation/dist/jquery.validate.min.js",
+            "node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js",
+            "node_modules/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.min.js",
+            "node_modules/bootstrap/dist/js/bootstrap.min.js"
         ],
         "minify": {
             "enabled": true,
