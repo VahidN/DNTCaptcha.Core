@@ -13,5 +13,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.0.100-preview9-014004        
+    - name: npm install
+      run: npm install
     - name: Build with dotnet
       run: dotnet build --configuration Release
