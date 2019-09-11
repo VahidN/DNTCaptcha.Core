@@ -97,6 +97,7 @@ namespace DNTCaptcha.Core
             tagHelper.ValidationMessageClass = model.ValidationMessageClass;
             tagHelper.RefreshButtonClass = model.RefreshButtonClass;
             tagHelper.DisplayMode = model.DisplayMode;
+            tagHelper.UseRelativeUrls = model.UseRelativeUrls;
 
             var tagHelperContext = new TagHelperContext(
                 allAttributes: new TagHelperAttributeList(),

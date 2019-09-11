@@ -9,6 +9,12 @@ namespace DNTCaptcha.Core
     public class DNTCaptchaTagHelperHtmlAttributes
     {
         /// <summary>
+        /// Create an absolute "fully qualified" url from an action and controller.
+        /// </summary>
+        [HtmlAttributeName("asp-use-relative-urls")]
+        public bool UseRelativeUrls { set; get; }
+
+        /// <summary>
         /// The back-color of the captcha. It's default value is string.Empty.
         /// </summary>
         [HtmlAttributeName("asp-back-color")]

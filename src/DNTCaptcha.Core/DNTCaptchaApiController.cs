@@ -79,7 +79,11 @@ namespace DNTCaptcha.Core
                 FontName = captchaAttributes.FontName
             };
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
-            var actionUrl = Url.Action(action: nameof(DNTCaptchaImageController.Show),
+            var actionUrl = captchaAttributes.UseRelativeUrls ?
+             Url.Action(action: nameof(DNTCaptchaImageController.Show),
+               controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
+               values: new { data = encryptSerializedValues, area = "" }) :
+             Url.Action(action: nameof(DNTCaptchaImageController.Show),
                controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                values: new { data = encryptSerializedValues, area = "" },
                protocol: HttpContext.Request.Scheme);

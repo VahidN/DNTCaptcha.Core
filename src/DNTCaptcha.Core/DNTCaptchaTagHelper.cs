@@ -190,7 +190,12 @@ namespace DNTCaptcha.Core
             };
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
-            var actionUrl = _urlHelper.Action(
+            var actionUrl = UseRelativeUrls ?
+             _urlHelper.Action(
+                            action: nameof(DNTCaptchaImageController.Show),
+                            controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
+                            values: new { data = encryptSerializedValues, area = "" }) :
+             _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                             values: new { data = encryptSerializedValues, area = "" },
@@ -226,11 +231,17 @@ namespace DNTCaptcha.Core
                 ValidationMessageClass = ValidationMessageClass,
                 CaptchaToken = captchaToken,
                 RefreshButtonClass = RefreshButtonClass,
-                DisplayMode = DisplayMode
+                DisplayMode = DisplayMode,
+                UseRelativeUrls = UseRelativeUrls
             };
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
-            var actionUrl = _urlHelper.Action(
+            var actionUrl = UseRelativeUrls ?
+            _urlHelper.Action(
+                action: nameof(DNTCaptchaImageController.Refresh),
+                controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
+                values: new { data = encryptSerializedValues, area = "" }) :
+            _urlHelper.Action(
                 action: nameof(DNTCaptchaImageController.Refresh),
                 controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                 values: new { data = encryptSerializedValues, area = "" },
