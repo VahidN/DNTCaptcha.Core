@@ -12,6 +12,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: [3.0.100-preview9-014004, 2.2.300]
+        dotnet-version: 3.0.100-preview9-014004
+        dotnet-version: 2.2.300
     - name: Build with dotnet
       run: dotnet build --configuration Release
