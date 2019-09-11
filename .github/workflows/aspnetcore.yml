@@ -15,3 +15,7 @@ jobs:
         dotnet-version: 3.0.100-preview9-014004        
     - name: Build DNTCaptcha.Core lib
       run: dotnet build ./src/DNTCaptcha.Core/DNTCaptcha.Core.csproj --configuration Release
+    - name: Build NuGet Package
+      run: dotnet pack ./src/DNTCaptcha.Core/DNTCaptcha.Core.csproj --configuration Release -o NuGetPackages
+    - name: Deploy NuGet Package
+      run: dotnet nuget push ./src/DNTCaptcha.Core/NuGetPackages/*.nupkg -k $ -s https://api.nuget.org/v3/index.json	  
