@@ -18,4 +18,4 @@ jobs:
     - name: Build NuGet Package
       run: dotnet pack ./src/DNTCaptcha.Core/DNTCaptcha.Core.csproj --configuration Release -o NuGetPackages
     - name: Deploy NuGet Package
-      run: dotnet nuget push ./src/DNTCaptcha.Core/NuGetPackages/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json	  
+      run: dotnet nuget push ./src/DNTCaptcha.Core/NuGetPackages/DNTCaptcha.Core.1.9.4.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json	  
