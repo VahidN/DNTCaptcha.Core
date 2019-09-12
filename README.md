@@ -1,6 +1,12 @@
 DNTCaptcha.Core
 =======
-![Github tags](https://github.com/VahidN/DNTCaptcha.Core/workflows/.NET%20Core%20Build/badge.svg)
+
+<p align="left">  
+  <a href="https://github.com/VahidN/DNTCaptcha.Core">
+     <img alt="GitHub Actions status" src="https://github.com/VahidN/DNTCaptcha.Core/workflows/.NET%20Core%20Build/badge.svg">
+  </a>
+</p>
+
 
 `DNTCaptcha.Core` is a captcha generator and validator for ASP.NET Core applications.
 
