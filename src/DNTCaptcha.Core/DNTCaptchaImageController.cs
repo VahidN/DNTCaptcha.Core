@@ -162,7 +162,12 @@ namespace DNTCaptcha.Core
             {
                 return BadRequest();
             }
+
             var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
+            if (model == null)
+            {
+                return BadRequest();
+            }
 
             var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
             if (decryptedText == null)

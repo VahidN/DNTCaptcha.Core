@@ -18,6 +18,11 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Display a numeric value as a sum of 2 numbers
         /// </summary>
-        SumOfTwoNumbers
+        SumOfTwoNumbers,
+
+        /// <summary>
+        /// Display a numeric value as a sum of 2 numbers using the equivalent text
+        /// </summary>
+        SumOfTwoNumbersToWords
     }
 }

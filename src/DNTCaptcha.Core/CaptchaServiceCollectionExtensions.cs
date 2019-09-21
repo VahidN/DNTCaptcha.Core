@@ -25,6 +25,7 @@ namespace DNTCaptcha.Core
             services.TryAddSingleton<HumanReadableIntegerProvider>();
             services.TryAddSingleton<ShowDigitsProvider>();
             services.TryAddSingleton<SumOfTwoNumbersProvider>();
+            services.TryAddSingleton<SumOfTwoNumbersToWordsProvider>();
             services.TryAddSingleton<Func<DisplayMode, ICaptchaTextProvider>>(serviceProvider => key =>
             {
                 switch (key)
@@ -35,6 +36,8 @@ namespace DNTCaptcha.Core
                         return serviceProvider.GetRequiredService<ShowDigitsProvider>();
                     case DisplayMode.SumOfTwoNumbers:
                         return serviceProvider.GetRequiredService<SumOfTwoNumbersProvider>();
+                    case DisplayMode.SumOfTwoNumbersToWords:
+                        return serviceProvider.GetRequiredService<SumOfTwoNumbersToWordsProvider>();
                     default:
                         throw new NotImplementedException($"Service of type {key} is not implemented.");
                 }

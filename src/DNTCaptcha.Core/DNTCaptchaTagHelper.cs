@@ -300,8 +300,7 @@ namespace DNTCaptcha.Core
 
             if (!ViewContext.ModelState.IsValid)
             {
-                ModelStateEntry captchaInputNameValidationState;
-                if (ViewContext.ModelState.TryGetValue(CaptchaInputName, out captchaInputNameValidationState))
+                if (ViewContext.ModelState.TryGetValue(CaptchaInputName, out var captchaInputNameValidationState))
                 {
                     if (captchaInputNameValidationState.ValidationState == ModelValidationState.Invalid)
                     {
