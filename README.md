@@ -1,7 +1,7 @@
 DNTCaptcha.Core
 =======
 
-<p align="left">  
+<p align="left">
   <a href="https://github.com/VahidN/DNTCaptcha.Core">
      <img alt="GitHub Actions status" src="https://github.com/VahidN/DNTCaptcha.Core/workflows/.NET%20Core%20Build/badge.svg">
   </a>
@@ -111,6 +111,18 @@ public IActionResult Index([FromForm]AccountViewModel data)
     return View();
 }
 ```
+
+
+**Different supported DisplayModes:**
+
+DisplayMode | Output |
+---------|----------|
+ NumberToWord | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode1.png) |
+ ShowDigits | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode2.png) |
+ SumOfTwoNumbers | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode3.png) |
+ SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode4.png) |
+
+
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
   *  [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/package.json)
