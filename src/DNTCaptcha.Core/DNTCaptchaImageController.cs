@@ -78,7 +78,12 @@ namespace DNTCaptcha.Core
             {
                 return BadRequest();
             }
+
             var model = _serializationProvider.Deserialize<DNTCaptchaTagHelperHtmlAttributes>(decryptedModel);
+            if (model == null)
+            {
+                return BadRequest();
+            }
 
             invalidateToken(model);
 
