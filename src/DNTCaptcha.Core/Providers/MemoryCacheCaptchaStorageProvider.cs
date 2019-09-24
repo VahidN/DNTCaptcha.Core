@@ -44,6 +44,9 @@ namespace DNTCaptcha.Core.Providers
             _memoryCache.Set(token, value, new MemoryCacheEntryOptions
             {
                 AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes)
+#if !NETSTANDARD1_6                
+                , Size = 1 // the size limit is the count of entries
+#endif
             });
         }
 
