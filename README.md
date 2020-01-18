@@ -125,13 +125,10 @@ DisplayMode | Output |
 
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
-  *  [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/package.json)
-  *  [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/bundleconfig.json)
-  *  Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/tree/master/dist
-  *  Or include it from a CDN (It requires jQuery 1.4.4+):
-  ```javascript
-  <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.unobtrusive-ajax.min.js"></script>
-  ```
+  *  Add the required files using the NPM: [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/package.json#L14-L17) and then run the `npm install` command
+  *  [Bundle](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/DNTCaptcha.TestWebApp.V3.csproj#L18) the installed dependencies using `dotnet bundle` [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/bundleconfig.json#L17)
+  *  Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/releases
+  
 
 Please follow the [DNTCaptcha.TestWebApp.V3x](/src/DNTCaptcha.TestWebApp.V3x) sample for more details.
 
