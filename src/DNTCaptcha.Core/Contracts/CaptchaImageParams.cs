@@ -1,8 +1,11 @@
+using System;
+
 namespace DNTCaptcha.Core.Contracts
 {
     /// <summary>
     /// Captcha's Image Params
     /// </summary>
+    [Serializable]
     public class CaptchaImageParams
     {
         /// <summary>

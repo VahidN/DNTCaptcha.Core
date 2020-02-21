@@ -1,6 +1,7 @@
 using System;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 #if NETCOREAPP3_0
 using System.Text.Json;
 #else
@@ -10,22 +11,28 @@ using Newtonsoft.Json;
 namespace DNTCaptcha.Core.Providers
 {
     /// <summary>
-    /// Serialization Provider
+    /// In-memory serialization provider
     /// </summary>
-    public class SerializationProvider : ISerializationProvider
+    public class InMemorySerializationProvider : ISerializationProvider
     {
         private const int LifeTimeInMinutes = 7;
         private readonly IMemoryCache _memoryCache;
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ILogger<InMemorySerializationProvider> _logger;
 
         /// <summary>
         /// Serialization Provider
         /// </summary>
-        public SerializationProvider(IMemoryCache memoryCache, ICaptchaProtectionProvider captchaProtectionProvider)
+        public InMemorySerializationProvider(
+            IMemoryCache memoryCache,
+            ICaptchaProtectionProvider captchaProtectionProvider,
+            ILogger<InMemorySerializationProvider> logger)
         {
             memoryCache.CheckArgumentNull(nameof(memoryCache));
             _memoryCache = memoryCache;
+            _logger = logger;
             _captchaProtectionProvider = captchaProtectionProvider;
+            _logger.LogInformation("Using the InMemorySerializationProvider.");
         }
 
         /// <summary>
@@ -37,10 +44,8 @@ namespace DNTCaptcha.Core.Providers
             var token = _captchaProtectionProvider.Hash(result);
             _memoryCache.Set(token, result, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes)
-#if !NETSTANDARD1_6                
-                , Size = 1 // the size limit is the count of entries
-#endif                
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes),
+                Size = 1 // the size limit is the count of entries
             });
             return token;
         }

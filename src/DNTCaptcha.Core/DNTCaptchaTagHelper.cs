@@ -191,11 +191,11 @@ namespace DNTCaptcha.Core
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
             var actionUrl = UseRelativeUrls ?
-             _urlHelper.Action(
+            _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                             values: new { data = encryptSerializedValues, area = "" }) :
-             _urlHelper.Action(
+            _urlHelper.Action(
                             action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                             values: new { data = encryptSerializedValues, area = "" },
@@ -214,9 +214,9 @@ namespace DNTCaptcha.Core
 
         private TagBuilder getRefreshButtonTagBuilder(string captchaDivId, string captchaToken)
         {
-            var values = new
+            var values = new RefreshData
             {
-                rndDate = DateTime.Now.Ticks,
+                RndDate = DateTime.Now.Ticks,
                 BackColor = BackColor,
                 FontName = FontName,
                 FontSize = FontSize,

@@ -1,4 +1,5 @@
-﻿using DNTCaptcha.Core.Providers;
+﻿using System;
+using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace DNTCaptcha.Core
@@ -6,6 +7,7 @@ namespace DNTCaptcha.Core
     /// <summary>
     /// Tag helper attributes
     /// </summary>
+    [Serializable]
     public class DNTCaptchaTagHelperHtmlAttributes
     {
         /// <summary>

@@ -9,6 +9,7 @@ namespace DNTCaptcha.Core.Contracts
     public class DNTCaptchaOptions
     {
         internal Type CaptchaStorageProvider { get; set; }
+        internal Type CaptchaSerializationProvider { get; set; }
 
         /// <summary>
         /// You can introduce a custom ICaptchaStorageProvider to be used as an StorageProvider.
@@ -17,6 +18,23 @@ namespace DNTCaptcha.Core.Contracts
         public void UseCustomStorageProvider<T>() where T : ICaptchaStorageProvider
         {
             CaptchaStorageProvider = typeof(T);
+        }
+
+        /// <summary>
+        /// Using the IDistributedCache
+        /// Don't forget to configure your DistributedCache provider such as `services.AddStackExchangeRedisCache()` first.
+        /// </summary>
+        public void UseDistributedSerializationProvider()
+        {
+            CaptchaSerializationProvider = typeof(DistributedSerializationProvider);
+        }
+
+        /// <summary>
+        /// Using the IMemoryCache
+        /// </summary>
+        public void UseInMemorySerializationProvider()
+        {
+            CaptchaSerializationProvider = typeof(InMemorySerializationProvider);
         }
 
         /// <summary>
@@ -42,6 +60,16 @@ namespace DNTCaptcha.Core.Contracts
         public void UseMemoryCacheStorageProvider()
         {
             CaptchaStorageProvider = typeof(MemoryCacheCaptchaStorageProvider);
+        }
+
+        /// <summary>
+        /// Introduces the built-in `DistributedCacheCaptchaStorageProvider` to be used as an StorageProvider.
+        /// Don't forget to configure your DistributedCache provider such as `services.AddStackExchangeRedisCache()` first.
+        /// </summary>
+        public void UseDistributedCacheStorageProvider()
+        {
+            CaptchaStorageProvider = typeof(DistributedCacheCaptchaStorageProvider);
+            CaptchaSerializationProvider = typeof(DistributedSerializationProvider);
         }
     }
 }

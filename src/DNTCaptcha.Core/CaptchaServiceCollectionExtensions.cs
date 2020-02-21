@@ -42,7 +42,7 @@ namespace DNTCaptcha.Core
                         throw new NotImplementedException($"Service of type {key} is not implemented.");
                 }
             });
-            services.TryAddSingleton<ISerializationProvider, SerializationProvider>();
+
             services.TryAddSingleton<IRandomNumberProvider, RandomNumberProvider>();
             services.TryAddSingleton<ICaptchaImageProvider, CaptchaImageProvider>();
             services.TryAddSingleton<ICaptchaProtectionProvider, CaptchaProtectionProvider>();
@@ -54,7 +54,24 @@ namespace DNTCaptcha.Core
         {
             var captchaOptions = new DNTCaptchaOptions();
             options?.Invoke(captchaOptions);
+            setCaptchaStorageProvider(services, captchaOptions);
+            setSerializationProvider(services, captchaOptions);
+        }
 
+        private static void setSerializationProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
+        {
+            if (captchaOptions.CaptchaSerializationProvider == null)
+            {
+                services.TryAddSingleton<ISerializationProvider, InMemorySerializationProvider>();
+            }
+            else
+            {
+                services.TryAddSingleton(typeof(ISerializationProvider), captchaOptions.CaptchaSerializationProvider);
+            }
+        }
+
+        private static void setCaptchaStorageProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
+        {
             if (captchaOptions.CaptchaStorageProvider == null)
             {
                 services.TryAddSingleton<ICaptchaStorageProvider, CookieCaptchaStorageProvider>();

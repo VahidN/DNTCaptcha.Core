@@ -22,16 +22,26 @@ namespace DNTCaptcha.TestWebApp
                         .SetIsOriginAllowed((host) => true)
                         .AllowCredentials());
             });
-            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()))
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
             services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
 
+
+            // Added it for AddDNTCaptcha -> options.UseDistributedCacheStorageProvider()
+            /*services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379";
+                options.InstanceName = "test";
+            });*/
+
             services.AddDNTCaptcha(options =>
-                // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
-                // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
-                options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
-                );
+            {
+                // options.UseSessionStorageProvider(); // -> It doesn't rely on the server or client's times. Also it's the safest one.
+                // options.UseMemoryCacheStorageProvider(); // -> It relies on the server's times. It's safer than the CookieStorageProvider.
+                options.UseCookieStorageProvider(); // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+                // options.UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+                // options.UseDistributedSerializationProvider();
+            });
 
             services.AddSession();
 

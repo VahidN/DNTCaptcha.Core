@@ -1,38 +1,39 @@
 using System;
+using System.Text;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 
 namespace DNTCaptcha.Core.Providers
 {
     /// <summary>
-    /// Represents a memory cache storage to save the captcha tokens.
+    /// Represents a distributed cache storage to save the captcha tokens.
     /// </summary>
-    public class MemoryCacheCaptchaStorageProvider : ICaptchaStorageProvider
+    public class DistributedCacheCaptchaStorageProvider : ICaptchaStorageProvider
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
-        private readonly ILogger<MemoryCacheCaptchaStorageProvider> _logger;
+        private readonly ILogger<DistributedCacheCaptchaStorageProvider> _logger;
         private const int LifeTimeInMinutes = 7;
-        private readonly IMemoryCache _memoryCache;
+        private readonly IDistributedCache _distributedCache;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
         /// </summary>
-        public MemoryCacheCaptchaStorageProvider(
+        public DistributedCacheCaptchaStorageProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
-            IMemoryCache memoryCache,
-            ILogger<MemoryCacheCaptchaStorageProvider> logger)
+            IDistributedCache distributedCache,
+            ILogger<DistributedCacheCaptchaStorageProvider> logger)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             logger.CheckArgumentNull(nameof(logger));
-            memoryCache.CheckArgumentNull(nameof(memoryCache));
+            distributedCache.CheckArgumentNull(nameof(distributedCache));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
-            _memoryCache = memoryCache;
+            _distributedCache = distributedCache;
 
-            _logger.LogInformation("Using the MemoryCacheCaptchaStorageProvider.");
+            _logger.LogInformation("Using the DistributedCacheCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -41,10 +42,9 @@ namespace DNTCaptcha.Core.Providers
         public void Add(HttpContext context, string token, string value)
         {
             value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
-            _memoryCache.Set(token, value, new MemoryCacheEntryOptions
+            _distributedCache.Set(token, Encoding.UTF8.GetBytes(value), new DistributedCacheEntryOptions
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes),
-                Size = 1 // the size limit is the count of entries
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes)
             });
         }
 
@@ -58,7 +58,7 @@ namespace DNTCaptcha.Core.Providers
         /// </returns>
         public bool Contains(HttpContext context, string token)
         {
-            return _memoryCache.TryGetValue(token, out string _);
+            return _distributedCache.Get(token) != null;
         }
 
         /// <summary>
@@ -68,14 +68,15 @@ namespace DNTCaptcha.Core.Providers
         /// <param name="token">The specified token.</param>
         public string GetValue(HttpContext context, string token)
         {
-            if (!_memoryCache.TryGetValue(token, out string cookieValue))
+            var cookieValueBytes = _distributedCache.Get(token);
+            if (cookieValueBytes == null)
             {
                 _logger.LogInformation("Couldn't find the captcha cookie in the request.");
                 return null;
             }
 
-            _memoryCache.Remove(token);
-            var decryptedValue = _captchaProtectionProvider.Decrypt(cookieValue);
+            _distributedCache.Remove(token);
+            var decryptedValue = _captchaProtectionProvider.Decrypt(Encoding.UTF8.GetString(cookieValueBytes));
             return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
         }
 
@@ -86,7 +87,7 @@ namespace DNTCaptcha.Core.Providers
         /// <param name="token">The specified token.</param>
         public void Remove(HttpContext context, string token)
         {
-            _memoryCache.Remove(token);
+            _distributedCache.Remove(token);
         }
     }
 }
