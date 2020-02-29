@@ -186,7 +186,8 @@ namespace DNTCaptcha.Core
                 ForeColor = ForeColor,
                 BackColor = BackColor,
                 FontSize = FontSize,
-                FontName = FontName
+                FontName = FontName,
+                UseNoise = UseNoise
             };
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
@@ -232,7 +233,8 @@ namespace DNTCaptcha.Core
                 CaptchaToken = captchaToken,
                 RefreshButtonClass = RefreshButtonClass,
                 DisplayMode = DisplayMode,
-                UseRelativeUrls = UseRelativeUrls
+                UseRelativeUrls = UseRelativeUrls,
+                UseNoise = UseNoise
             };
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);

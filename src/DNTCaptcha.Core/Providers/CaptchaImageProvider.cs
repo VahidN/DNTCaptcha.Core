@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DNTCaptcha.Core.Contracts;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
-using DNTCaptcha.Core.Contracts;
+using System.Runtime.InteropServices;
 
 namespace DNTCaptcha.Core.Providers
 {
@@ -71,7 +72,54 @@ namespace DNTCaptcha.Core.Providers
                     }
                 }
             }
+        }
 
+        /// <summary>
+        /// Creates the captcha image.
+        /// </summary>
+        public byte[] DrawCaptcha(string message, string foreColor, float fontSize, string fontName)
+        {
+            var fColor = ColorTranslator.FromHtml(foreColor);
+            message = message.Replace(",", string.Empty);
+            const int margin = 8;
+            var captchaFont = new Font(fontName, fontSize, FontStyle.Bold, GraphicsUnit.Pixel);
+            var captchaSize = measureString(message, captchaFont);
+            var height = (int)captchaSize.Height + margin;
+            var width = (int)captchaSize.Width + margin;
+
+            using (var pic = new Bitmap(width, height, PixelFormat.Format24bppRgb))
+            {
+                var data = pic.LockBits(new Rectangle(0, 0, pic.Width, pic.Height), ImageLockMode.WriteOnly, pic.PixelFormat);
+                var noise = new byte[data.Width * data.Height * 3];
+                new Random().NextBytes(noise);
+                Marshal.Copy(noise, 0, data.Scan0, noise.Length);
+                pic.UnlockBits(data);
+                using (var graphics = Graphics.FromImage(pic))
+                {
+                    var stringFormat = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    graphics.DrawString(message, captchaFont, new SolidBrush(fColor), new RectangleF(0, 0, pic.Width, pic.Height), stringFormat);
+                    var random = new Random((int)DateTime.Now.Ticks);
+                    for (var i = 0; i < 30; i++)
+                    {
+                        var x0 = random.Next(0, width);
+                        var y0 = random.Next(0, height);
+                        var x1 = random.Next(0, width);
+                        var y1 = random.Next(0, height);
+                        graphics.DrawLine(Pens.White, x0, y0, x1, x1);
+                    }
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    distortImage(height, width, pic);
+                    pic.Save(stream, ImageFormat.Png);
+                    return stream.ToArray();
+                }
+            }
         }
 
         private static Rectangle drawRoundedRectangle(Graphics gfx, Rectangle bounds, int cornerRadius, Pen drawPen, Color fillColor)
