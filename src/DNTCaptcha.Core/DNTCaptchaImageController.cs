@@ -103,6 +103,7 @@ namespace DNTCaptcha.Core
             tagHelper.RefreshButtonClass = model.RefreshButtonClass;
             tagHelper.DisplayMode = model.DisplayMode;
             tagHelper.UseRelativeUrls = model.UseRelativeUrls;
+            tagHelper.UseNoise = model.UseNoise;
 
             var tagHelperContext = new TagHelperContext(
                 allAttributes: new TagHelperAttributeList(),
@@ -178,16 +179,17 @@ namespace DNTCaptcha.Core
             byte[] image;
             try
             {
-                image = _captchaImageProvider.DrawCaptcha(
-                            decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
+                if (model.UseNoise)
+                    image = _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName);
+                else
+                    image = _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
             }
             catch (Exception ex)
             {
                 _logger.LogCritical(1001, ex, "DrawCaptcha error.");
                 return BadRequest(ex.Message);
             }
-            return new FileContentResult(_captchaImageProvider.DrawCaptcha(
-                   decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName), "image/png");
+            return new FileContentResult(image, "image/png");
         }
     }
 }
