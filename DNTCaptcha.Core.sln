@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNTCaptcha.TestWebApp.V2", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNTCaptcha.TestWebApp.V3", "src\DNTCaptcha.TestWebApp.V3x\DNTCaptcha.TestWebApp.V3.csproj", "{8BB4025D-0CC9-45D0-9A81-0B57D41DE715}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DNTCaptcha.TestRazorPages", "src\DNTCaptcha.TestRazorPages\DNTCaptcha.TestRazorPages.csproj", "{869D42C0-5FB2-4C26-9774-4DDF137199D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|Any CPU = Release|Any CPU
@@ -28,6 +30,8 @@ Global
 		{A694E431-7560-4F17-B3E0-E3CE39AFCEA9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BB4025D-0CC9-45D0-9A81-0B57D41DE715}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BB4025D-0CC9-45D0-9A81-0B57D41DE715}.Release|Any CPU.Build.0 = Release|Any CPU
+		{869D42C0-5FB2-4C26-9774-4DDF137199D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{869D42C0-5FB2-4C26-9774-4DDF137199D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,5 +40,6 @@ Global
 		{F564F46A-7BB9-4D48-B63A-4F7821D1457C} = {BEDF3D21-9B83-4563-923E-CBB8BABD08D4}
 		{A694E431-7560-4F17-B3E0-E3CE39AFCEA9} = {BEDF3D21-9B83-4563-923E-CBB8BABD08D4}
 		{8BB4025D-0CC9-45D0-9A81-0B57D41DE715} = {BEDF3D21-9B83-4563-923E-CBB8BABD08D4}
+		{869D42C0-5FB2-4C26-9774-4DDF137199D2} = {BEDF3D21-9B83-4563-923E-CBB8BABD08D4}
 	EndGlobalSection
 EndGlobal
