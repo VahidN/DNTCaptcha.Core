@@ -1,10 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -23,6 +19,16 @@ namespace DNTCaptcha.TestRazorPages
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDNTCaptcha(options =>
+            {
+                // options.UseSessionStorageProvider(); // -> It doesn't rely on the server or client's times. Also it's the safest one.
+                // options.UseMemoryCacheStorageProvider(); // -> It relies on the server's times. It's safer than the CookieStorageProvider.
+                options.UseCookieStorageProvider(); // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+                // options.UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+                // options.UseDistributedSerializationProvider();
+            });
+
+            services.AddControllers(); // this is necessary for the captcha's image provider
             services.AddRazorPages();
         }
 
@@ -50,6 +56,11 @@ namespace DNTCaptcha.TestRazorPages
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+
+                // this is necessary for the captcha's image provider
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

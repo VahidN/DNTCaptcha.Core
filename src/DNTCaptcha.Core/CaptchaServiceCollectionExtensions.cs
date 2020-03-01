@@ -22,6 +22,8 @@ namespace DNTCaptcha.Core
 
             configOptions(services, options);
 
+            services.AddHttpContextAccessor();
+
             services.TryAddSingleton<HumanReadableIntegerProvider>();
             services.TryAddSingleton<ShowDigitsProvider>();
             services.TryAddSingleton<SumOfTwoNumbersProvider>();

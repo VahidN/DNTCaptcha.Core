@@ -202,6 +202,11 @@ namespace DNTCaptcha.Core
                             values: new { data = encryptSerializedValues, area = "" },
                             protocol: ViewContext.HttpContext.Request.Scheme);
 
+            if (string.IsNullOrWhiteSpace(actionUrl))
+            {
+                throw new NullReferenceException("It's not possible to determine the URL of the `DNTCaptchaImageController.Show` method. Please register the `services.AddControllers()` and `endpoints.MapControllerRoute(...)`.");
+            }
+
             var captchaImage = new TagBuilder("img");
             var dntCaptchaImg = "dntCaptchaImg";
             captchaImage.TagRenderMode = TagRenderMode.SelfClosing;

@@ -48,6 +48,7 @@ For bootstrap-3:
              asp-text-box-template="<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
+             asp-use-noise="false"
              />
 ```
 
@@ -69,6 +70,7 @@ For bootstrap-4 (you will need to `npm install components-font-awesome` for the 
              asp-text-box-template="<div class='input-group'><span class='input-group-prepend'><span class='input-group-text'><i class='fas fa-lock'></i></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="fas fa-redo btn-sm"
+             asp-use-noise="false"
              />
 ```
 
@@ -97,7 +99,6 @@ namespace DNTCaptcha.TestWebApp.V3x
 ```csharp
 [HttpPost, ValidateAntiForgeryToken]
 [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
-                    IsNumericErrorMessage = "The input value should be a number.",
                     CaptchaGeneratorLanguage = Language.English,
                     CaptchaGeneratorDisplayMode = DisplayMode.NumberToWord)]
 public IActionResult Index([FromForm]AccountViewModel data)
@@ -110,6 +111,39 @@ public IActionResult Index([FromForm]AccountViewModel data)
     return View();
 }
 ```
+
+Or you can use the `IDNTCaptchaValidatorService` directly:
+
+```csharp
+namespace DNTCaptcha.TestWebApp.Controllers
+{
+    public class HomeController : Controller
+    {
+        private readonly IDNTCaptchaValidatorService _validatorService;
+
+        public HomeController(IDNTCaptchaValidatorService validatorService)
+        {
+            _validatorService = validatorService;
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public IActionResult Login2([FromForm]AccountViewModel data)
+        {
+            if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.SumOfTwoNumbersToWords))
+            {
+                this.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, "Please enter the security code as a number.");
+                return View(nameof(Index));
+            }
+
+            //TODO: Save data
+            return RedirectToAction(nameof(Thanks), new { name = data.Username });
+        }
+```
+
+**Samples:**
+
+- [ASP.NET Core MVC Sample](/src/DNTCaptcha.TestWebApp.V3x)
+- [ASP.NET Core Razor Pages Sample](/src/DNTCaptcha.TestRazorPages)
 
 **Different supported DisplayModes:**
 

@@ -41,6 +41,6 @@ namespace DNTCaptcha.Core.Contracts
         /// <summary>
         /// IsNoise of the captcha's Style
         /// </summary>
-        public bool UseNoise { get; set; } = false;
+        public bool UseNoise { get; set; }
     }
 }
