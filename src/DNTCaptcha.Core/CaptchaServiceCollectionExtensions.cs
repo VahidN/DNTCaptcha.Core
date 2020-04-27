@@ -22,7 +22,11 @@ namespace DNTCaptcha.Core
 
             configOptions(services, options);
 
+            services.AddMemoryCache();
             services.AddHttpContextAccessor();
+            services.AddDataProtection();
+            services.AddAntiforgery();
+            services.AddMvcCore().AddCookieTempDataProvider();
 
             services.TryAddSingleton<HumanReadableIntegerProvider>();
             services.TryAddSingleton<ShowDigitsProvider>();

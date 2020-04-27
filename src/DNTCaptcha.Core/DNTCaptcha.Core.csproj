@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-        <VersionPrefix>2.3.0</VersionPrefix>
+        <VersionPrefix>2.4.0</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
-        <TargetFrameworks>netcoreapp3.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netstandard2.0</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>DNTCaptcha.Core</AssemblyName>
         <PackageId>DNTCaptcha.Core</PackageId>
@@ -30,11 +30,11 @@
     <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <DefineConstants>NETSTANDARD2_0</DefineConstants>
     </PropertyGroup>
-    <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.0') or ('$(TargetFramework)' == 'netcoreapp3.1')">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
         <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
     </ItemGroup>
-    <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
+    <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.0') or ('$(TargetFramework)' == 'netcoreapp3.1')">
         <DefineConstants>NETCOREAPP3_0</DefineConstants>
     </PropertyGroup>
 </Project>

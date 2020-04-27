@@ -20,6 +20,7 @@ namespace DNTCaptcha.Core
     /// <summary>
     /// DNTCaptcha Image Controller
     /// </summary>
+    [Route("[controller]")]
     [AllowAnonymous]
     public class DNTCaptchaImageController : Controller
     {
@@ -66,6 +67,7 @@ namespace DNTCaptcha.Core
         /// Refresh the captcha
         /// </summary>
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+        [HttpGet("[action]"), HttpPost("[action]")]
         public IActionResult Refresh(string data)
         {
             if (string.IsNullOrWhiteSpace(data))
@@ -151,6 +153,7 @@ namespace DNTCaptcha.Core
         /// Creates the captcha image.
         /// </summary>
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+        [HttpGet("[action]"), HttpPost("[action]")]
         public IActionResult Show(string data)
         {
             if (string.IsNullOrWhiteSpace(data))

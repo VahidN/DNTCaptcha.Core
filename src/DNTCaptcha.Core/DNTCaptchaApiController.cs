@@ -8,6 +8,7 @@ namespace DNTCaptcha.Core
     /// <summary>
     /// DNTCaptcha Api
     /// </summary>
+    [Route("[controller]")]
     public class DNTCaptchaApiController : Controller
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
@@ -44,15 +45,20 @@ namespace DNTCaptcha.Core
         /// </summary>
         /// <param name="captchaAttributes">captcha attributes</param>
         /// <returns></returns>
-        [HttpPost]
+        [HttpPost("[action]")]
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
         public IActionResult CreateDNTCaptcha([FromBody]DNTCaptchaTagHelperHtmlAttributes captchaAttributes)
         {
+            if (captchaAttributes == null || !ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var number = _randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max);
             var randomText = _captchaTextProvider(captchaAttributes.DisplayMode).GetText(number, captchaAttributes.Language);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
             var captchaImageUrl = getCaptchaImageUrl(captchaAttributes, encryptedText);
-            var captchaDivId = $"dntCaptcha{Guid.NewGuid().ToString("N")}{_randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max)}";
+            var captchaDivId = $"dntCaptcha{Guid.NewGuid():N}{_randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max)}";
             var cookieToken = $".{captchaDivId}";
             var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
 
@@ -80,13 +86,19 @@ namespace DNTCaptcha.Core
             };
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = captchaAttributes.UseRelativeUrls ?
-             Url.Action(action: nameof(DNTCaptchaImageController.Show),
-               controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-               values: new { data = encryptSerializedValues, area = "" }) :
-             Url.Action(action: nameof(DNTCaptchaImageController.Show),
-               controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
-               values: new { data = encryptSerializedValues, area = "" },
-               protocol: HttpContext.Request.Scheme);
+                Url.Action(action: nameof(DNTCaptchaImageController.Show),
+                            controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
+                            values: new { data = encryptSerializedValues, area = "" }) :
+                Url.Action(action: nameof(DNTCaptchaImageController.Show),
+                            controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
+                            values: new { data = encryptSerializedValues, area = "" },
+                            protocol: HttpContext.Request.Scheme);
+
+            if (string.IsNullOrWhiteSpace(actionUrl))
+            {
+                throw new NullReferenceException("It's not possible to determine the URL of the `DNTCaptchaImageController.Show` method. Please register the `services.AddControllers()` and `endpoints.MapControllerRoute(...)`.");
+            }
+
             return actionUrl;
         }
     }
