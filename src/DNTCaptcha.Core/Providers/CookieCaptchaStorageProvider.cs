@@ -26,8 +26,8 @@ namespace DNTCaptcha.Core.Providers
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
-            
-            _logger.LogInformation("Using the CookieCaptchaStorageProvider.");
+
+            _logger.LogDebug("Using the CookieCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace DNTCaptcha.Core.Providers
         {
             if (!context.Request.Cookies.TryGetValue(token, out var cookieValue))
             {
-                _logger.LogInformation("Couldn't find the captcha cookie in the request.");
+                _logger.LogDebug("Couldn't find the captcha cookie in the request.");
                 return null;
             }
 

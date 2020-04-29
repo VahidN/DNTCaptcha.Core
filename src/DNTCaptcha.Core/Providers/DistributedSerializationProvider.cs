@@ -30,7 +30,7 @@ namespace DNTCaptcha.Core.Providers
             _distributedCache = distributedCache;
             _logger = logger;
             _captchaProtectionProvider = captchaProtectionProvider;
-            _logger.LogInformation("Using the DistributedSerializationProvider.");
+            _logger.LogDebug("Using the DistributedSerializationProvider.");
         }
 
         /// <summary>

@@ -32,7 +32,7 @@ namespace DNTCaptcha.Core.Providers
             _memoryCache = memoryCache;
             _logger = logger;
             _captchaProtectionProvider = captchaProtectionProvider;
-            _logger.LogInformation("Using the InMemorySerializationProvider.");
+            _logger.LogDebug("Using the InMemorySerializationProvider.");
         }
 
         /// <summary>

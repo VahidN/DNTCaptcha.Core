@@ -144,6 +144,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
 
 - [ASP.NET Core MVC Sample](/src/DNTCaptcha.TestWebApp.V3x)
 - [ASP.NET Core Razor Pages Sample](/src/DNTCaptcha.TestRazorPages)
+- [ASP.NET Core Web API sample](/src/DNTCaptcha.TestApiApp)
 
 **Different supported DisplayModes:**
 

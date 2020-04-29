@@ -25,8 +25,8 @@ namespace DNTCaptcha.Core.Providers
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
-            
-            _logger.LogInformation("Using the SessionCaptchaStorageProvider.");
+
+            _logger.LogDebug("Using the SessionCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -58,10 +58,10 @@ namespace DNTCaptcha.Core.Providers
         /// <param name="token">The specified token.</param>
         public string GetValue(HttpContext context, string token)
         {
-            var value  = context.Session.GetString(token);
+            var value = context.Session.GetString(token);
             if (string.IsNullOrWhiteSpace(value))
             {
-                _logger.LogInformation("Couldn't find the captcha's session value in the request.");
+                _logger.LogDebug("Couldn't find the captcha's session value in the request.");
                 return null;
             }
 

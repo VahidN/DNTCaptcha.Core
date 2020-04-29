@@ -1,31 +1,74 @@
-using System;
+﻿using System;
 using DNTCaptcha.Core.Contracts;
 using DNTCaptcha.Core.Providers;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DNTCaptcha.Core
 {
     /// <summary>
+    /// ApiProvider Response
+    /// </summary>
+    public class DNTCaptchaApiResponse
+    {
+        /// <summary>
+        /// The captach's image url
+        /// </summary>
+        /// <value></value>
+        public string DntCaptchaImgUrl { set; get; }
+
+        /// <summary>
+        /// Captcha Id
+        /// </summary>
+        public string DntCaptchaId { set; get; }
+
+        /// <summary>
+        /// Captcha's TextValue
+        /// </summary>
+        public string DntCaptchaTextValue { set; get; }
+
+        /// <summary>
+        /// Captcha's TokenValue
+        /// </summary>
+        public string DntCaptchaTokenValue { set; get; }
+    }
+
+    /// <summary>
     /// DNTCaptcha Api
     /// </summary>
-    [Route("[controller]")]
-    public class DNTCaptchaApiController : Controller
+    public interface IDNTCaptchaApiProvider
+    {
+        /// <summary>
+        /// Creates DNTCaptcha
+        /// </summary>
+        /// <param name="captchaAttributes">captcha attributes</param>
+        DNTCaptchaApiResponse CreateDNTCaptcha(DNTCaptchaTagHelperHtmlAttributes captchaAttributes);
+    }
+
+    /// <summary>
+    /// DNTCaptcha Api
+    /// </summary>
+    public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
         private readonly ISerializationProvider _serializationProvider;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IUrlHelper _urlHelper;
 
         /// <summary>
-        /// DNTCaptcha TagHelper
+        /// DNTCaptcha Api
         /// </summary>
-        public DNTCaptchaApiController(
+        public DNTCaptchaApiProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,
-            ISerializationProvider serializationProvider)
+            ISerializationProvider serializationProvider,
+            IHttpContextAccessor httpContextAccessor,
+            IUrlHelper urlHelper)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             randomNumberProvider.CheckArgumentNull(nameof(randomNumberProvider));
@@ -38,22 +81,16 @@ namespace DNTCaptcha.Core
             _captchaTextProvider = captchaTextProvider;
             _captchaStorageProvider = captchaStorageProvider;
             _serializationProvider = serializationProvider;
+            _httpContextAccessor = httpContextAccessor;
+            _urlHelper = urlHelper;
         }
 
         /// <summary>
         /// Creates DNTCaptcha
         /// </summary>
         /// <param name="captchaAttributes">captcha attributes</param>
-        /// <returns></returns>
-        [HttpPost("[action]")]
-        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-        public IActionResult CreateDNTCaptcha([FromBody]DNTCaptchaTagHelperHtmlAttributes captchaAttributes)
+        public DNTCaptchaApiResponse CreateDNTCaptcha(DNTCaptchaTagHelperHtmlAttributes captchaAttributes)
         {
-            if (captchaAttributes == null || !ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var number = _randomNumberProvider.Next(captchaAttributes.Min, captchaAttributes.Max);
             var randomText = _captchaTextProvider(captchaAttributes.DisplayMode).GetText(number, captchaAttributes.Language);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
@@ -62,15 +99,15 @@ namespace DNTCaptcha.Core
             var cookieToken = $".{captchaDivId}";
             var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
 
-            _captchaStorageProvider.Add(HttpContext, cookieToken, randomText);
+            _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken, randomText);
 
-            return Json(new
+            return new DNTCaptchaApiResponse
             {
-                dntCaptchaImgUrl = captchaImageUrl,
-                dntCaptchaId = captchaDivId,
-                dntCaptchaTextValue = encryptedText,
-                dntCaptchaTokenValue = hiddenInputToken
-            });
+                DntCaptchaImgUrl = captchaImageUrl,
+                DntCaptchaId = captchaDivId,
+                DntCaptchaTextValue = encryptedText,
+                DntCaptchaTokenValue = hiddenInputToken
+            };
         }
 
         private string getCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
@@ -86,13 +123,13 @@ namespace DNTCaptcha.Core
             };
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = captchaAttributes.UseRelativeUrls ?
-                Url.Action(action: nameof(DNTCaptchaImageController.Show),
+                _urlHelper.Action(action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                             values: new { data = encryptSerializedValues, area = "" }) :
-                Url.Action(action: nameof(DNTCaptchaImageController.Show),
+                _urlHelper.Action(action: nameof(DNTCaptchaImageController.Show),
                             controller: nameof(DNTCaptchaImageController).Replace("Controller", string.Empty),
                             values: new { data = encryptSerializedValues, area = "" },
-                            protocol: HttpContext.Request.Scheme);
+                            protocol: _httpContextAccessor.HttpContext.Request.Scheme);
 
             if (string.IsNullOrWhiteSpace(actionUrl))
             {

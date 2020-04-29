@@ -33,7 +33,7 @@ namespace DNTCaptcha.Core.Providers
             _logger = logger;
             _distributedCache = distributedCache;
 
-            _logger.LogInformation("Using the DistributedCacheCaptchaStorageProvider.");
+            _logger.LogDebug("Using the DistributedCacheCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace DNTCaptcha.Core.Providers
             var cookieValueBytes = _distributedCache.Get(token);
             if (cookieValueBytes == null)
             {
-                _logger.LogInformation("Couldn't find the captcha cookie in the request.");
+                _logger.LogDebug("Couldn't find the captcha cookie in the request.");
                 return null;
             }
 

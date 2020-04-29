@@ -12,7 +12,7 @@ import { DNTCaptchaLanguage } from "./dnt-captcha-language";
 @Component({
   selector: "dnt-captcha",
   templateUrl: "./dnt-captcha.component.html",
-  styleUrls: ["./dnt-captcha.component.css"]
+  styleUrls: ["./dnt-captcha.component.css"],
 })
 export class DntCaptchaComponent implements OnInit {
   apiResponse = new DNTCaptchaApiResponse();
@@ -39,7 +39,7 @@ export class DntCaptchaComponent implements OnInit {
   @Input() max: number;
   @Input() min: number;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
     this.doRefresh();
@@ -52,25 +52,21 @@ export class DntCaptchaComponent implements OnInit {
 
   getCaptchaInfo(): Observable<DNTCaptchaApiResponse> {
     return this.http
-      .post<DNTCaptchaApiResponse>(`${this.apiUrl}`, {
-        backColor: this.backColor,
-        fontName: this.fontName,
-        fontSize: this.fontSize,
-        foreColor: this.foreColor,
-        language: this.language,
-        max: this.max,
-        min: this.min
-      }, { withCredentials: true /* For CORS */ })
-      .map(response => response || {})
+      .get<DNTCaptchaApiResponse>(`${this.apiUrl}`, {
+        withCredentials: true /* For CORS */,
+      })
+      .map((response) => response || {})
       .catch(this.handleError);
   }
 
   doRefresh() {
     this.inputText = "";
-    this.getCaptchaInfo().subscribe(data => {
+    this.getCaptchaInfo().subscribe((data) => {
       this.apiResponse = data;
-      this.text = data.dntCaptchaTextValue; this.onTextChange();
-      this.token = data.dntCaptchaTokenValue; this.onTokenChange();
+      this.text = data.dntCaptchaTextValue;
+      this.onTextChange();
+      this.token = data.dntCaptchaTokenValue;
+      this.onTokenChange();
     });
   }
 

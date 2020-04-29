@@ -32,7 +32,7 @@ namespace DNTCaptcha.Core.Providers
             _logger = logger;
             _memoryCache = memoryCache;
 
-            _logger.LogInformation("Using the MemoryCacheCaptchaStorageProvider.");
+            _logger.LogDebug("Using the MemoryCacheCaptchaStorageProvider.");
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace DNTCaptcha.Core.Providers
         {
             if (!_memoryCache.TryGetValue(token, out string cookieValue))
             {
-                _logger.LogInformation("Couldn't find the captcha cookie in the request.");
+                _logger.LogDebug("Couldn't find the captcha cookie in the request.");
                 return null;
             }
 
