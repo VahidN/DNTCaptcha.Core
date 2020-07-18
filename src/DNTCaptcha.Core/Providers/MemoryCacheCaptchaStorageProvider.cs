@@ -3,6 +3,7 @@ using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core.Providers
 {
@@ -13,8 +14,8 @@ namespace DNTCaptcha.Core.Providers
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ILogger<MemoryCacheCaptchaStorageProvider> _logger;
-        private const int LifeTimeInMinutes = 7;
         private readonly IMemoryCache _memoryCache;
+        private readonly DNTCaptchaOptions _options;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
@@ -22,7 +23,8 @@ namespace DNTCaptcha.Core.Providers
         public MemoryCacheCaptchaStorageProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IMemoryCache memoryCache,
-            ILogger<MemoryCacheCaptchaStorageProvider> logger)
+            ILogger<MemoryCacheCaptchaStorageProvider> logger,
+            IOptions<DNTCaptchaOptions> options)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             logger.CheckArgumentNull(nameof(logger));
@@ -31,6 +33,7 @@ namespace DNTCaptcha.Core.Providers
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
             _memoryCache = memoryCache;
+            _options = options.Value;
 
             _logger.LogDebug("Using the MemoryCacheCaptchaStorageProvider.");
         }
@@ -43,7 +46,7 @@ namespace DNTCaptcha.Core.Providers
             value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
             _memoryCache.Set(token, value, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes),
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),
                 Size = 1 // the size limit is the count of entries
             });
         }

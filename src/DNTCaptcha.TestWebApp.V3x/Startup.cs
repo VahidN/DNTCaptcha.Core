@@ -5,11 +5,23 @@ using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Routing;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace DNTCaptcha.TestWebApp
 {
     public class Startup
     {
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        {
+            _env = env;
+            Configuration = configuration;
+        }
+
+        public IConfiguration Configuration { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors(options =>
@@ -38,9 +50,11 @@ namespace DNTCaptcha.TestWebApp
             {
                 // options.UseSessionStorageProvider(); // -> It doesn't rely on the server or client's times. Also it's the safest one.
                 // options.UseMemoryCacheStorageProvider(); // -> It relies on the server's times. It's safer than the CookieStorageProvider.
-                options.UseCookieStorageProvider(); // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
-                // options.UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
-                // options.UseDistributedSerializationProvider();
+                options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+                // .UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+                // .UseDistributedSerializationProvider();
+                .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
+                .AbsoluteExpiration(minutes: 7);
             });
 
             services.AddSession();

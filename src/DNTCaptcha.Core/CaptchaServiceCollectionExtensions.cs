@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core
 {
@@ -73,6 +74,7 @@ namespace DNTCaptcha.Core
             options?.Invoke(captchaOptions);
             setCaptchaStorageProvider(services, captchaOptions);
             setSerializationProvider(services, captchaOptions);
+            services.TryAddSingleton(Options.Create(captchaOptions));
         }
 
         private static void setSerializationProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)

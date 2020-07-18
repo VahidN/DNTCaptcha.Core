@@ -1,3 +1,4 @@
+using System.IO;
 using System.Text.Json.Serialization;
 using DNTCaptcha.Core;
 using Microsoft.AspNetCore.Builder;
@@ -10,8 +11,11 @@ namespace DNTCaptcha.TestApiApp
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
+            _env = env;
             Configuration = configuration;
         }
 
@@ -24,9 +28,11 @@ namespace DNTCaptcha.TestApiApp
             {
                 // options.UseSessionStorageProvider(); // -> It doesn't rely on the server or client's times. Also it's the safest one.
                 // options.UseMemoryCacheStorageProvider(); // -> It relies on the server's times. It's safer than the CookieStorageProvider.
-                options.UseCookieStorageProvider(); // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
-                // options.UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
-                // options.UseDistributedSerializationProvider();
+                options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+                // .UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+                // .UseDistributedSerializationProvider();
+                .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
+                .AbsoluteExpiration(minutes: 7);
             });
 
             services.AddControllers().AddJsonOptions(opt =>

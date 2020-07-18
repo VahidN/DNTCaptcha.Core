@@ -5,6 +5,7 @@ using System.Text;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core.Providers
 {
@@ -13,10 +14,10 @@ namespace DNTCaptcha.Core.Providers
     /// </summary>
     public class DistributedSerializationProvider : ISerializationProvider
     {
-        private const int LifeTimeInMinutes = 7;
         private readonly IDistributedCache _distributedCache;
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ILogger<DistributedSerializationProvider> _logger;
+        private readonly DNTCaptchaOptions _options;
 
         /// <summary>
         /// Serialization Provider
@@ -24,12 +25,14 @@ namespace DNTCaptcha.Core.Providers
         public DistributedSerializationProvider(
             IDistributedCache distributedCache,
             ICaptchaProtectionProvider captchaProtectionProvider,
-            ILogger<DistributedSerializationProvider> logger)
+            ILogger<DistributedSerializationProvider> logger,
+            IOptions<DNTCaptchaOptions> options)
         {
             distributedCache.CheckArgumentNull(nameof(distributedCache));
             _distributedCache = distributedCache;
             _logger = logger;
             _captchaProtectionProvider = captchaProtectionProvider;
+            _options = options.Value;
             _logger.LogDebug("Using the DistributedSerializationProvider.");
         }
 
@@ -42,7 +45,7 @@ namespace DNTCaptcha.Core.Providers
             var token = _captchaProtectionProvider.Hash(Encoding.UTF8.GetString(resultBytes));
             _distributedCache.Set(token, resultBytes, new DistributedCacheEntryOptions
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes)
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes)
             });
             return token;
         }

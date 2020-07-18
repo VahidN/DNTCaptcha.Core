@@ -1,4 +1,5 @@
 ﻿using DNTCaptcha.Core.Contracts;
+using Microsoft.Extensions.Options;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -15,15 +16,19 @@ namespace DNTCaptcha.Core.Providers
     public class CaptchaImageProvider : ICaptchaImageProvider
     {
         private readonly IRandomNumberProvider _randomNumberProvider;
+        private readonly DNTCaptchaOptions _options;
 
         /// <summary>
         /// The default captcha image provider
         /// </summary>
-        public CaptchaImageProvider(IRandomNumberProvider randomNumberProvider)
+        public CaptchaImageProvider(
+            IRandomNumberProvider randomNumberProvider,
+            IOptions<DNTCaptchaOptions> options)
         {
             randomNumberProvider.CheckArgumentNull(nameof(randomNumberProvider));
 
             _randomNumberProvider = randomNumberProvider;
+            _options = options.Value;
         }
 
         /// <summary>
@@ -31,36 +36,34 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public byte[] DrawCaptcha(string message, string foreColor, string backColor, float fontSize, string fontName)
         {
-            var fColor = ColorTranslator.FromHtml(foreColor);
-            var bColor = string.IsNullOrWhiteSpace(backColor) ?
-                Color.Transparent : ColorTranslator.FromHtml(backColor);
-
-            var captchaFont = new Font(fontName, fontSize, FontStyle.Regular, GraphicsUnit.Pixel);
-
-            var captchaSize = measureString(message, captchaFont);
-
-            const int margin = 8;
-            var height = (int)captchaSize.Height + margin;
-            var width = (int)captchaSize.Width + margin;
-
-            var rectF = new Rectangle(0, 0, width: width, height: height);
-            using (var pic = new Bitmap(width: width, height: height))
+            return useFont(fontName, fontSize, captchaFont =>
             {
-                using (var graphics = Graphics.FromImage(pic))
-                {
-                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                    graphics.SmoothingMode = SmoothingMode.HighQuality;
-                    graphics.CompositingQuality = CompositingQuality.HighQuality;
-                    graphics.InterpolationMode = InterpolationMode.High;
-                    graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+                var fColor = ColorTranslator.FromHtml(foreColor);
+                var bColor = string.IsNullOrWhiteSpace(backColor)
+                                ? Color.Transparent : ColorTranslator.FromHtml(backColor);
 
-                    using (var font = captchaFont)
+                var captchaSize = measureString(message, captchaFont);
+
+                const int margin = 8;
+                var height = (int)captchaSize.Height + margin;
+                var width = (int)captchaSize.Width + margin;
+
+                var rectF = new Rectangle(0, 0, width: width, height: height);
+                using (var pic = new Bitmap(width: width, height: height))
+                {
+                    using (var graphics = Graphics.FromImage(pic))
                     {
+                        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                        graphics.SmoothingMode = SmoothingMode.HighQuality;
+                        graphics.CompositingQuality = CompositingQuality.HighQuality;
+                        graphics.InterpolationMode = InterpolationMode.High;
+                        graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+
                         using (var format = new StringFormat())
                         {
                             format.FormatFlags = StringFormatFlags.DirectionRightToLeft;
                             var rect = drawRoundedRectangle(graphics, rectF, 15, new Pen(bColor) { Width = 1.1f }, bColor);
-                            graphics.DrawString(message, font, new SolidBrush(fColor), rect, format);
+                            graphics.DrawString(message, captchaFont, new SolidBrush(fColor), rect, format);
 
                             using (var stream = new MemoryStream())
                             {
@@ -71,7 +74,7 @@ namespace DNTCaptcha.Core.Providers
                         }
                     }
                 }
-            }
+            });
         }
 
         /// <summary>
@@ -79,47 +82,49 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public byte[] DrawCaptcha(string message, string foreColor, float fontSize, string fontName)
         {
-            var fColor = ColorTranslator.FromHtml(foreColor);
-            message = message.Replace(",", string.Empty);
-            const int margin = 8;
-            var captchaFont = new Font(fontName, fontSize, FontStyle.Bold, GraphicsUnit.Pixel);
-            var captchaSize = measureString(message, captchaFont);
-            var height = (int)captchaSize.Height + margin;
-            var width = (int)captchaSize.Width + margin;
-
-            using (var pic = new Bitmap(width, height, PixelFormat.Format24bppRgb))
+            return useFont(fontName, fontSize, captchaFont =>
             {
-                var data = pic.LockBits(new Rectangle(0, 0, pic.Width, pic.Height), ImageLockMode.WriteOnly, pic.PixelFormat);
-                var noise = new byte[data.Width * data.Height * 3];
-                new Random().NextBytes(noise);
-                Marshal.Copy(noise, 0, data.Scan0, noise.Length);
-                pic.UnlockBits(data);
-                using (var graphics = Graphics.FromImage(pic))
+                var fColor = ColorTranslator.FromHtml(foreColor);
+                message = message.Replace(",", string.Empty);
+                const int margin = 8;
+                var captchaSize = measureString(message, captchaFont);
+                var height = (int)captchaSize.Height + margin;
+                var width = (int)captchaSize.Width + margin;
+
+                using (var pic = new Bitmap(width, height, PixelFormat.Format24bppRgb))
                 {
-                    var stringFormat = new StringFormat
+                    var data = pic.LockBits(new Rectangle(0, 0, pic.Width, pic.Height), ImageLockMode.WriteOnly, pic.PixelFormat);
+                    var noise = new byte[data.Width * data.Height * 3];
+                    new Random().NextBytes(noise);
+                    Marshal.Copy(noise, 0, data.Scan0, noise.Length);
+                    pic.UnlockBits(data);
+                    using (var graphics = Graphics.FromImage(pic))
                     {
-                        Alignment = StringAlignment.Center,
-                        LineAlignment = StringAlignment.Center
-                    };
-                    graphics.DrawString(message, captchaFont, new SolidBrush(fColor), new RectangleF(0, 0, pic.Width, pic.Height), stringFormat);
-                    var random = new Random((int)DateTime.Now.Ticks);
-                    for (var i = 0; i < 30; i++)
+                        var stringFormat = new StringFormat
+                        {
+                            Alignment = StringAlignment.Center,
+                            LineAlignment = StringAlignment.Center
+                        };
+                        graphics.DrawString(message, captchaFont, new SolidBrush(fColor), new RectangleF(0, 0, pic.Width, pic.Height), stringFormat);
+                        var random = new Random((int)DateTime.Now.Ticks);
+                        for (var i = 0; i < 30; i++)
+                        {
+                            var x0 = random.Next(0, width);
+                            var y0 = random.Next(0, height);
+                            var x1 = random.Next(0, width);
+                            var y1 = random.Next(0, height);
+                            graphics.DrawLine(Pens.White, x0, y0, x1, x1);
+                        }
+                    }
+
+                    using (var stream = new MemoryStream())
                     {
-                        var x0 = random.Next(0, width);
-                        var y0 = random.Next(0, height);
-                        var x1 = random.Next(0, width);
-                        var y1 = random.Next(0, height);
-                        graphics.DrawLine(Pens.White, x0, y0, x1, x1);
+                        distortImage(height, width, pic);
+                        pic.Save(stream, ImageFormat.Png);
+                        return stream.ToArray();
                     }
                 }
-
-                using (var stream = new MemoryStream())
-                {
-                    distortImage(height, width, pic);
-                    pic.Save(stream, ImageFormat.Png);
-                    return stream.ToArray();
-                }
-            }
+            });
         }
 
         private static Rectangle drawRoundedRectangle(Graphics gfx, Rectangle bounds, int cornerRadius, Pen drawPen, Color fillColor)
@@ -165,6 +170,31 @@ namespace DNTCaptcha.Core.Providers
                         if (newX < 0 || newX >= width) newX = 0;
                         if (newY < 0 || newY >= height) newY = 0;
                         pic.SetPixel(x, y, copy.GetPixel(newX, newY));
+                    }
+                }
+            }
+        }
+
+        private byte[] useFont(string fontName, float fontSize, Func<Font, byte[]> action)
+        {
+            if (string.IsNullOrWhiteSpace(_options.CustomFontPath))
+            {
+                using (var captchaFont = new Font(fontName, fontSize, FontStyle.Regular, GraphicsUnit.Pixel))
+                {
+                    return action(captchaFont);
+                }
+            }
+            else
+            {
+                using (var privateFontCollection = new PrivateFontCollection())
+                {
+                    privateFontCollection.AddFontFile(_options.CustomFontPath);
+                    using (var fontFamily = privateFontCollection.Families[0])
+                    {
+                        using (var captchaFont = new Font(fontFamily, fontSize, FontStyle.Regular, GraphicsUnit.Pixel))
+                        {
+                            return action(captchaFont);
+                        }
                     }
                 }
             }

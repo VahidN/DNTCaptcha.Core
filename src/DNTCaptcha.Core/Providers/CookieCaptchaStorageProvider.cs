@@ -2,6 +2,7 @@
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core.Providers
 {
@@ -12,20 +13,22 @@ namespace DNTCaptcha.Core.Providers
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ILogger<CookieCaptchaStorageProvider> _logger;
-        private const int CookieLifeTimeInMinutes = 7;
+        private readonly DNTCaptchaOptions _options;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
         /// </summary>
         public CookieCaptchaStorageProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
-            ILogger<CookieCaptchaStorageProvider> logger)
+            ILogger<CookieCaptchaStorageProvider> logger,
+            IOptions<DNTCaptchaOptions> options)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             logger.CheckArgumentNull(nameof(logger));
 
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
+            _options = options.Value;
 
             _logger.LogDebug("Using the CookieCaptchaStorageProvider.");
         }
@@ -94,7 +97,7 @@ namespace DNTCaptcha.Core.Providers
                 HttpOnly = true,
                 Path = context.Request.PathBase.HasValue ? context.Request.PathBase.ToString() : "/",
                 Secure = context.Request.IsHttps,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(CookieLifeTimeInMinutes),
+                Expires = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),
 #if NETSTANDARD2_0
                 IsEssential = true
 #endif

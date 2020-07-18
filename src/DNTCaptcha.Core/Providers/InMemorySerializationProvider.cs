@@ -2,6 +2,7 @@ using System;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 #if NETCOREAPP3_0
 using System.Text.Json;
 #else
@@ -15,10 +16,10 @@ namespace DNTCaptcha.Core.Providers
     /// </summary>
     public class InMemorySerializationProvider : ISerializationProvider
     {
-        private const int LifeTimeInMinutes = 7;
         private readonly IMemoryCache _memoryCache;
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ILogger<InMemorySerializationProvider> _logger;
+        private readonly DNTCaptchaOptions _options;
 
         /// <summary>
         /// Serialization Provider
@@ -26,11 +27,13 @@ namespace DNTCaptcha.Core.Providers
         public InMemorySerializationProvider(
             IMemoryCache memoryCache,
             ICaptchaProtectionProvider captchaProtectionProvider,
-            ILogger<InMemorySerializationProvider> logger)
+            ILogger<InMemorySerializationProvider> logger,
+            IOptions<DNTCaptchaOptions> options)
         {
             memoryCache.CheckArgumentNull(nameof(memoryCache));
             _memoryCache = memoryCache;
             _logger = logger;
+            _options = options.Value;
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger.LogDebug("Using the InMemorySerializationProvider.");
         }
@@ -44,7 +47,7 @@ namespace DNTCaptcha.Core.Providers
             var token = _captchaProtectionProvider.Hash(result);
             _memoryCache.Set(token, result, new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes),
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),
                 Size = 1 // the size limit is the count of entries
             });
             return token;

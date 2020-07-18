@@ -4,6 +4,7 @@ using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core.Providers
 {
@@ -14,8 +15,8 @@ namespace DNTCaptcha.Core.Providers
     {
         private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
         private readonly ILogger<DistributedCacheCaptchaStorageProvider> _logger;
-        private const int LifeTimeInMinutes = 7;
         private readonly IDistributedCache _distributedCache;
+        private readonly DNTCaptchaOptions _options;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
@@ -23,7 +24,8 @@ namespace DNTCaptcha.Core.Providers
         public DistributedCacheCaptchaStorageProvider(
             ICaptchaProtectionProvider captchaProtectionProvider,
             IDistributedCache distributedCache,
-            ILogger<DistributedCacheCaptchaStorageProvider> logger)
+            ILogger<DistributedCacheCaptchaStorageProvider> logger,
+            IOptions<DNTCaptchaOptions> options)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
             logger.CheckArgumentNull(nameof(logger));
@@ -32,6 +34,7 @@ namespace DNTCaptcha.Core.Providers
             _captchaProtectionProvider = captchaProtectionProvider;
             _logger = logger;
             _distributedCache = distributedCache;
+            _options = options.Value;
 
             _logger.LogDebug("Using the DistributedCacheCaptchaStorageProvider.");
         }
@@ -44,7 +47,7 @@ namespace DNTCaptcha.Core.Providers
             value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
             _distributedCache.Set(token, Encoding.UTF8.GetBytes(value), new DistributedCacheEntryOptions
             {
-                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(LifeTimeInMinutes)
+                AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes)
             });
         }
 
