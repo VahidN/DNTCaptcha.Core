@@ -31,6 +31,23 @@ namespace DNTCaptcha.Core.Contracts
         public int AbsoluteExpirationMinutes { get; set; } = 7;
 
         /// <summary>
+        /// Shows thousands separators such as 100,100,100 in ShowDigits mode.
+        /// Its default value is true.
+        /// </summary>
+        public bool AllowThousandsSeparators { get; set; } = true;
+
+        /// <summary>
+        /// Shows thousands separators such as 100,100,100 in ShowDigits mode.
+        /// Its default value is true.
+        /// </summary>
+        public DNTCaptchaOptions ShowThousandsSeparators(bool show)
+        {
+            AllowThousandsSeparators = show;
+
+            return this;
+        }
+
+        /// <summary>
         /// Sets an absolute expiration date for the cache entry.
         /// Its default value is 7.
         /// </summary>

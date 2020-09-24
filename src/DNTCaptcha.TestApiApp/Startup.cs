@@ -32,7 +32,8 @@ namespace DNTCaptcha.TestApiApp
                 // .UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
                 // .UseDistributedSerializationProvider();
                 .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
-                .AbsoluteExpiration(minutes: 7);
+                .AbsoluteExpiration(minutes: 7)
+                .ShowThousandsSeparators(false);
             });
 
             services.AddControllers().AddJsonOptions(opt =>
