@@ -90,9 +90,12 @@ namespace DNTCaptcha.TestWebApp.V3x
                 // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
                 options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
                 // options.UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
-
-                // .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "name.ttf"))
-                // .AbsoluteExpiration(minutes: 7);
+                
+                // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
+				// Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
+                // .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "name.ttf")) 
+                // .AbsoluteExpiration(minutes: 7)
+				// .ShowThousandsSeparators(false);
                 );
         }
 ```
