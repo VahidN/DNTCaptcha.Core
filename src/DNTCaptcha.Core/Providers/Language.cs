@@ -23,6 +23,10 @@
         /// <summary>
         /// Italian Language
         /// </summary>
-        Italian
+        Italian,
+        /// <summary>
+        /// Turkish Language
+        /// </summary>
+        Turkish
     }
 }
