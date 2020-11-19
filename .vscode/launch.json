@@ -6,7 +6,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x/bin/Debug/netcoreapp3.1/DNTCaptcha.TestWebApp.dll",
+      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x/bin/Debug/net5.0/DNTCaptcha.TestWebApp.dll",
       "args": [],
       "cwd": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x",
       "stopAtEntry": false,

@@ -3,11 +3,7 @@ using DNTCaptcha.Core.Contracts;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-#if NETCOREAPP3_0
 using System.Text.Json;
-#else
-using Newtonsoft.Json;
-#endif
 
 namespace DNTCaptcha.Core.Providers
 {
@@ -43,7 +39,8 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public string Serialize(object data)
         {
-            var result = serialize(data);
+            var result = JsonSerializer.Serialize(data,
+                        new JsonSerializerOptions { WriteIndented = false, IgnoreNullValues = true });
             var token = _captchaProtectionProvider.Hash(result);
             _memoryCache.Set(token, result, new MemoryCacheEntryOptions
             {
@@ -64,36 +61,7 @@ namespace DNTCaptcha.Core.Providers
             }
 
             _memoryCache.Remove(token);
-            return deserialize<T>(result);
-        }
-
-        private string serialize(object data)
-        {
-#if NETCOREAPP3_0
-            return JsonSerializer.Serialize(data,
-                new JsonSerializerOptions
-                {
-                    WriteIndented = false,
-                    IgnoreNullValues = true
-                });
-#else
-            return JsonConvert.SerializeObject(data,
-                                                new JsonSerializerSettings
-                                                {
-                                                    Formatting = Formatting.None,
-                                                    NullValueHandling = NullValueHandling.Ignore,
-                                                    DefaultValueHandling = DefaultValueHandling.Include
-                                                });
-#endif
-        }
-
-        private T deserialize<T>(string data)
-        {
-#if NETCOREAPP3_0
-            return JsonSerializer.Deserialize<T>(data);
-#else
-            return JsonConvert.DeserializeObject<T>(data);
-#endif
+            return JsonSerializer.Deserialize<T>(result);
         }
     }
 }

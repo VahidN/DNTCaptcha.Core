@@ -1,7 +1,6 @@
 using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using System.Text.Json;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -41,7 +40,8 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public string Serialize(object data)
         {
-            var resultBytes = serialize(data);
+            var resultBytes = JsonSerializer.SerializeToUtf8Bytes(data,
+                    new JsonSerializerOptions { WriteIndented = false, IgnoreNullValues = true });
             var token = _captchaProtectionProvider.Hash(Encoding.UTF8.GetString(resultBytes));
             _distributedCache.Set(token, resultBytes, new DistributedCacheEntryOptions
             {
@@ -62,26 +62,7 @@ namespace DNTCaptcha.Core.Providers
             }
 
             _distributedCache.Remove(token);
-            return deserialize<T>(resultBytes);
-        }
-
-        private byte[] serialize(object value)
-        {
-            var serializer = new BinaryFormatter();
-            using (var stream = new MemoryStream())
-            {
-                serializer.Serialize(stream, value);
-                return stream.ToArray();
-            }
-        }
-
-        private T deserialize<T>(byte[] value)
-        {
-            var serializer = new BinaryFormatter();
-            using (var stream = new MemoryStream(value))
-            {
-                return (T)serializer.Deserialize(stream);
-            }
+            return JsonSerializer.Deserialize<T>(new ReadOnlySpan<byte>(resultBytes));
         }
     }
 }
