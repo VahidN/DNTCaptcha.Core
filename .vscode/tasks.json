@@ -7,7 +7,7 @@
         {
             "taskName": "build",
             "args": [
-                "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x/DNTCaptcha.TestWebApp.V3.csproj"
+                "${workspaceRoot}/src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.csproj"
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"

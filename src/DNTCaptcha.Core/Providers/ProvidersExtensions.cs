@@ -14,14 +14,14 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// The cookie value's bindings.
         /// </summary>
-        public static string GetSalt(this HttpContext context, ICaptchaProtectionProvider captchaProtectionProvider)
+        public static string GetSalt(this HttpContext context, ICaptchaCryptoProvider captchaProtectionProvider)
         {
             var ip = context.Connection.RemoteIpAddress;
             var userAgent = (string)context.Request.Headers[HeaderNames.UserAgent];
             var issueDate = DateTime.Now.ToString("yyyy_MM_dd", CultureInfo.InvariantCulture);
             var name = typeof(ProvidersExtensions).Name;
             var salt = $"::{issueDate}::{name}::{ip}::{userAgent}";
-            return captchaProtectionProvider.Hash(salt);
+            return captchaProtectionProvider.Hash(salt).HashString;
         }
     }
 }

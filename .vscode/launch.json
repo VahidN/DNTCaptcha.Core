@@ -6,40 +6,9 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "build",
-      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x/bin/Debug/net5.0/DNTCaptcha.TestWebApp.dll",
+      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp/bin/Debug/net5.0/DNTCaptcha.TestWebApp.dll",
       "args": [],
-      "cwd": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V3x",
-      "stopAtEntry": false,
-      "internalConsoleOptions": "openOnSessionStart",
-      "launchBrowser": {
-        "enabled": true,
-        "args": "${auto-detect-url}",
-        "windows": {
-          "command": "cmd.exe",
-          "args": "/C start ${auto-detect-url}"
-        },
-        "osx": {
-          "command": "open"
-        },
-        "linux": {
-          "command": "xdg-open"
-        }
-      },
-      "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "sourceFileMap": {
-        "/Views": "${workspaceRoot}/Views"
-      }
-    },
-    {
-      "name": ".NET Core 2x Launch (web)",
-      "type": "coreclr",
-      "request": "launch",
-      "preLaunchTask": "build",
-      "program": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V2x/bin/Debug/netcoreapp2.2/DNTCaptcha.TestWebApp.dll",
-      "args": [],
-      "cwd": "${workspaceRoot}/src/DNTCaptcha.TestWebApp.V2x",
+      "cwd": "${workspaceRoot}/src/DNTCaptcha.TestWebApp",
       "stopAtEntry": false,
       "internalConsoleOptions": "openOnSessionStart",
       "launchBrowser": {

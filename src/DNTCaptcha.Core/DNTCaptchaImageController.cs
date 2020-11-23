@@ -25,7 +25,7 @@ namespace DNTCaptcha.Core
     public class DNTCaptchaImageController : Controller
     {
         private readonly ICaptchaImageProvider _captchaImageProvider;
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly ILogger<DNTCaptchaImageController> _logger;
@@ -36,7 +36,7 @@ namespace DNTCaptcha.Core
         /// </summary>
         public DNTCaptchaImageController(
             ICaptchaImageProvider captchaImageProvider,
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             ITempDataProvider tempDataProvider,
             ICaptchaStorageProvider captchaStorageProvider,
             ILogger<DNTCaptchaImageController> logger,

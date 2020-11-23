@@ -10,14 +10,14 @@ namespace DNTCaptcha.Core.Providers
     /// </summary>
     public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
     {
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ILogger<SessionCaptchaStorageProvider> _logger;
 
         /// <summary>
         /// Represents the storage to save the captcha tokens.
         /// </summary>
         public SessionCaptchaStorageProvider(
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             ILogger<SessionCaptchaStorageProvider> logger)
         {
             captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));

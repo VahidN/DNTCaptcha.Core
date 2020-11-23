@@ -32,7 +32,7 @@ namespace DNTCaptcha.Core.Providers
     public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
     {
         private readonly ILogger<DNTCaptchaValidatorService> _logger;
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -43,7 +43,7 @@ namespace DNTCaptcha.Core.Providers
         public DNTCaptchaValidatorService(
             IHttpContextAccessor contextAccessor,
             ILogger<DNTCaptchaValidatorService> logger,
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             ICaptchaStorageProvider captchaStorageProvider,
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider
         )

@@ -11,7 +11,7 @@ namespace DNTCaptcha.Core.Providers
     /// </summary>
     public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
     {
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ILogger<CookieCaptchaStorageProvider> _logger;
         private readonly DNTCaptchaOptions _options;
 
@@ -19,7 +19,7 @@ namespace DNTCaptcha.Core.Providers
         /// Represents the storage to save the captcha tokens.
         /// </summary>
         public CookieCaptchaStorageProvider(
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             ILogger<CookieCaptchaStorageProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {

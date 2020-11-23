@@ -13,7 +13,7 @@ namespace DNTCaptcha.Core.Providers
     /// </summary>
     public class DistributedCacheCaptchaStorageProvider : ICaptchaStorageProvider
     {
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ILogger<DistributedCacheCaptchaStorageProvider> _logger;
         private readonly IDistributedCache _distributedCache;
         private readonly DNTCaptchaOptions _options;
@@ -22,7 +22,7 @@ namespace DNTCaptcha.Core.Providers
         /// Represents the storage to save the captcha tokens.
         /// </summary>
         public DistributedCacheCaptchaStorageProvider(
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             IDistributedCache distributedCache,
             ILogger<DistributedCacheCaptchaStorageProvider> logger,
             IOptions<DNTCaptchaOptions> options)

@@ -34,7 +34,7 @@ namespace DNTCaptcha.Core
         public static readonly string CaptchaInputName = "DNTCaptchaInputText";
 
         private const string DataAjaxBeginFunctionName = "onRefreshButtonDataAjaxBegin";
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
@@ -46,7 +46,7 @@ namespace DNTCaptcha.Core
         /// DNTCaptcha TagHelper
         /// </summary>
         public DNTCaptchaTagHelper(
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,

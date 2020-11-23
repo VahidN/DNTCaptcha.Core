@@ -13,7 +13,7 @@ namespace DNTCaptcha.Core.Providers
     public class InMemorySerializationProvider : ISerializationProvider
     {
         private readonly IMemoryCache _memoryCache;
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ILogger<InMemorySerializationProvider> _logger;
         private readonly DNTCaptchaOptions _options;
 
@@ -22,7 +22,7 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public InMemorySerializationProvider(
             IMemoryCache memoryCache,
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             ILogger<InMemorySerializationProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
@@ -41,7 +41,7 @@ namespace DNTCaptcha.Core.Providers
         {
             var result = JsonSerializer.Serialize(data,
                         new JsonSerializerOptions { WriteIndented = false, IgnoreNullValues = true });
-            var token = _captchaProtectionProvider.Hash(result);
+            var token = _captchaProtectionProvider.Hash(result).HashString;
             _memoryCache.Set(token, result, new MemoryCacheEntryOptions
             {
                 AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),

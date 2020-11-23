@@ -25,6 +25,11 @@ namespace DNTCaptcha.Core.Contracts
         public string CustomFontPath { get; set; }
 
         /// <summary>
+        /// The encryption key
+        /// </summary>
+        public string EncryptionKey { get; set; }
+
+        /// <summary>
         /// Gets or sets an absolute expiration date for the cache entry.
         /// Its default value is 7.
         /// </summary>
@@ -54,6 +59,17 @@ namespace DNTCaptcha.Core.Contracts
         public DNTCaptchaOptions AbsoluteExpiration(int minutes)
         {
             AbsoluteExpirationMinutes = minutes;
+
+            return this;
+        }
+
+        /// <summary>
+        /// The encryption key.
+        /// If you don't specify it, a random value will be used.
+        /// </summary>
+        public DNTCaptchaOptions WithEncryptionKey(string key)
+        {
+            EncryptionKey = key;
 
             return this;
         }

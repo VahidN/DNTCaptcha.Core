@@ -8,7 +8,7 @@
 
 `DNTCaptcha.Core` is a captcha generator and validator for ASP.NET Core applications.
 
-![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/dntcaptcha.png)
+![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/dntcaptcha.png)
 
 ## Install via NuGet
 
@@ -22,13 +22,13 @@ You can also view the [package page](http://www.nuget.org/packages/DNTCaptcha.Co
 
 ## Usage:
 
-- After installing the DNTCaptcha.Core package, add the following definition to the [\_ViewImports.cshtml](/src/DNTCaptcha.TestWebApp.V3x/Views/_ViewImports.cshtml) file:
+- After installing the DNTCaptcha.Core package, add the following definition to the [\_ViewImports.cshtml](/src/DNTCaptcha.TestWebApp/Views/_ViewImports.cshtml) file:
 
 ```csharp
 @addTagHelper *, DNTCaptcha.Core
 ```
 
-- Then to use it, add its new tag-helper to [your view](/src/DNTCaptcha.TestWebApp.V3x/Views/Home/_LoginFormBody.cshtml):
+- Then to use it, add its new tag-helper to [your view](/src/DNTCaptcha.TestWebApp/Views/Home/_LoginFormBody.cshtml):
 
 For bootstrap-3:
 
@@ -74,12 +74,12 @@ For bootstrap-4 (you will need to `npm install components-font-awesome` for the 
              />
 ```
 
-- To register its default providers, call `services.AddDNTCaptcha();` method in your [Startup class](/src/DNTCaptcha.TestWebApp.V3x/Startup.cs).
+- To register its default providers, call `services.AddDNTCaptcha();` method in your [Startup class](/src/DNTCaptcha.TestWebApp/Startup.cs).
 
 ```csharp
 using DNTCaptcha.Core;
 
-namespace DNTCaptcha.TestWebApp.V3x
+namespace DNTCaptcha.TestWebApp
 {
     public class Startup
     {
@@ -90,17 +90,18 @@ namespace DNTCaptcha.TestWebApp.V3x
                 // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
                 options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
                 // options.UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
-                
+
                 // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
 				// Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
-                // .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "name.ttf")) 
+                // .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "name.ttf"))
                 // .AbsoluteExpiration(minutes: 7)
 				// .ShowThousandsSeparators(false);
+                   .WithEncryptionKey("This is my secure key!")
                 );
         }
 ```
 
-- Now you can add the `ValidateDNTCaptcha` attribute [to your action method](/src/DNTCaptcha.TestWebApp.V3x/Controllers/HomeController.cs) to verify the entered security code:
+- Now you can add the `ValidateDNTCaptcha` attribute [to your action method](/src/DNTCaptcha.TestWebApp/Controllers/HomeController.cs) to verify the entered security code:
 
 ```csharp
 [HttpPost, ValidateAntiForgeryToken]
@@ -148,31 +149,31 @@ namespace DNTCaptcha.TestWebApp.Controllers
 
 **Samples:**
 
-- [ASP.NET Core MVC Sample](/src/DNTCaptcha.TestWebApp.V3x)
+- [ASP.NET Core MVC Sample](/src/DNTCaptcha.TestWebApp)
 - [ASP.NET Core Razor Pages Sample](/src/DNTCaptcha.TestRazorPages)
 - [ASP.NET Core Web API sample](/src/DNTCaptcha.TestApiApp)
 
 **Different supported DisplayModes:**
 
-| DisplayMode            | Output                                                          |
-| ---------------------- | --------------------------------------------------------------- |
-| NumberToWord           | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode1.png) |
-| ShowDigits             | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode2.png) |
-| SumOfTwoNumbers        | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode3.png) |
-| SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp.V3x/Content/mode4.png) |
+| DisplayMode            | Output                                                      |
+| ---------------------- | ----------------------------------------------------------- |
+| NumberToWord           | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode1.png) |
+| ShowDigits             | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode2.png) |
+| SumOfTwoNumbers        | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode3.png) |
+| SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode4.png) |
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
-  - Add required files using the NPM. To do it add [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/package.json#L14-L17) file and then run the `npm install` command
-  - It's better to [bundle](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/DNTCaptcha.TestWebApp.V3.csproj#L18) the installed dependencies using `dotnet bundle` [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp.V3x/bundleconfig.json#L17)
+  - Add required files using the NPM. To do it add [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/package.json#L14-L17) file and then run the `npm install` command
+  - It's better to [bundle](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.V3.csproj#L18) the installed dependencies using `dotnet bundle` [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/bundleconfig.json#L17)
   - Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/releases
 
-Please follow the [DNTCaptcha.TestWebApp.V3x](/src/DNTCaptcha.TestWebApp.V3x) sample for more details.
+Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
 
 ## SPA Usage:
 
 It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample to demonstrate it:
 
-- [The server side controller](/src/DNTCaptcha.TestWebApp.V3x/Controllers/NgxController.cs)
+- [The server side controller](/src/DNTCaptcha.TestWebApp/Controllers/NgxController.cs)
 - [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
 - [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
 

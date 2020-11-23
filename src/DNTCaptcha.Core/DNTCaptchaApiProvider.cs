@@ -50,7 +50,7 @@ namespace DNTCaptcha.Core
     /// </summary>
     public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
     {
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IRandomNumberProvider _randomNumberProvider;
@@ -62,7 +62,7 @@ namespace DNTCaptcha.Core
         /// DNTCaptcha Api
         /// </summary>
         public DNTCaptchaApiProvider(
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             IRandomNumberProvider randomNumberProvider,
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,

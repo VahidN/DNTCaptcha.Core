@@ -28,7 +28,6 @@ namespace DNTCaptcha.Core
 
             services.AddMemoryCache();
             services.AddHttpContextAccessor();
-            services.AddDataProtection();
             services.AddAntiforgery();
             services.AddMvcCore().AddCookieTempDataProvider();
 
@@ -55,7 +54,7 @@ namespace DNTCaptcha.Core
 
             services.TryAddSingleton<IRandomNumberProvider, RandomNumberProvider>();
             services.TryAddSingleton<ICaptchaImageProvider, CaptchaImageProvider>();
-            services.TryAddSingleton<ICaptchaProtectionProvider, CaptchaProtectionProvider>();
+            services.TryAddSingleton<ICaptchaCryptoProvider, CaptchaCryptoProvider>();
             services.TryAddTransient<DNTCaptchaTagHelper>();
             services.TryAddTransient<IDNTCaptchaValidatorService, DNTCaptchaValidatorService>();
             services.TryAddScoped<IDNTCaptchaApiProvider, DNTCaptchaApiProvider>();

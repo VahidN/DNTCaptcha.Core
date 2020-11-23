@@ -14,7 +14,7 @@ namespace DNTCaptcha.Core.Providers
     public class DistributedSerializationProvider : ISerializationProvider
     {
         private readonly IDistributedCache _distributedCache;
-        private readonly ICaptchaProtectionProvider _captchaProtectionProvider;
+        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ILogger<DistributedSerializationProvider> _logger;
         private readonly DNTCaptchaOptions _options;
 
@@ -23,7 +23,7 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public DistributedSerializationProvider(
             IDistributedCache distributedCache,
-            ICaptchaProtectionProvider captchaProtectionProvider,
+            ICaptchaCryptoProvider captchaProtectionProvider,
             ILogger<DistributedSerializationProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
@@ -42,7 +42,7 @@ namespace DNTCaptcha.Core.Providers
         {
             var resultBytes = JsonSerializer.SerializeToUtf8Bytes(data,
                     new JsonSerializerOptions { WriteIndented = false, IgnoreNullValues = true });
-            var token = _captchaProtectionProvider.Hash(Encoding.UTF8.GetString(resultBytes));
+            var token = _captchaProtectionProvider.Hash(Encoding.UTF8.GetString(resultBytes)).HashString;
             _distributedCache.Set(token, resultBytes, new DistributedCacheEntryOptions
             {
                 AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes)
