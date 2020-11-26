@@ -157,7 +157,7 @@ namespace DNTCaptcha.Core.Providers
 
         private void distortImage(int height, int width, Bitmap pic)
         {
-            using (var copy = (Bitmap)pic.Clone())
+            using (var copy = new Bitmap(pic))
             {
                 double distort = _randomNumberProvider.Next(1, 6) * (_randomNumberProvider.Next(10) == 1 ? 1 : -1);
                 for (int y = 0; y < height; y++)
