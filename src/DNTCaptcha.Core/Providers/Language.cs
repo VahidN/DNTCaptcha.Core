@@ -24,9 +24,15 @@
         /// Italian Language
         /// </summary>
         Italian,
+        
         /// <summary>
         /// Turkish Language
         /// </summary>
-        Turkish
+        Turkish,
+        
+        /// <summary>
+        /// Arabic Language
+        /// </summary>
+        Arabic
     }
 }
