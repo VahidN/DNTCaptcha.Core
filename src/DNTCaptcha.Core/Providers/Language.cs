@@ -2,6 +2,7 @@
 {
     /// <summary>
     /// Number to word languages
+    /// Kindly add more languages to the bottom only and don't rearrange to reorder the enum.
     /// </summary>
     public enum Language
     {
