@@ -177,6 +177,11 @@ It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample t
 - [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
 - [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
 
+## Supported Languages
+Find all currently supported languages [here](/src/DNTCaptcha.Core/Providers/Language.cs). To add new language, kindly contribute by editing the following files:
+- [Language.cs](/src/DNTCaptcha.Core/Providers/Language.cs)
+- [HumanReadableIntegerProvider.cs](/src/DNTCaptcha.Core/Providers/HumanReadableIntegerProvider.cs)
+
 ## Note:
 
 To run this project on non-Windows-based operating systems, you will need to install `libgdiplus` too:
