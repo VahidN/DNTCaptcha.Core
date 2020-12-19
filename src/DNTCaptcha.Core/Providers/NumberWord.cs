@@ -20,6 +20,6 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Equivalent names
         /// </summary>
-        public IList<string> Names { set; get; }
+        public IReadOnlyList<string> Names { set; get; } = new List<string>();
     }
 }

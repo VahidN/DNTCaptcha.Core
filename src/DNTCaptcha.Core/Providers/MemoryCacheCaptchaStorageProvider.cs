@@ -26,14 +26,10 @@ namespace DNTCaptcha.Core.Providers
             ILogger<MemoryCacheCaptchaStorageProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
-            captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
-            logger.CheckArgumentNull(nameof(logger));
-            memoryCache.CheckArgumentNull(nameof(memoryCache));
-
-            _captchaProtectionProvider = captchaProtectionProvider;
-            _logger = logger;
-            _memoryCache = memoryCache;
-            _options = options.Value;
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
             _logger.LogDebug("Using the MemoryCacheCaptchaStorageProvider.");
         }
@@ -69,7 +65,7 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="token">The specified token.</param>
-        public string GetValue(HttpContext context, string token)
+        public string? GetValue(HttpContext context, string token)
         {
             if (!_memoryCache.TryGetValue(token, out string cookieValue))
             {
@@ -79,7 +75,7 @@ namespace DNTCaptcha.Core.Providers
 
             _memoryCache.Remove(token);
             var decryptedValue = _captchaProtectionProvider.Decrypt(cookieValue);
-            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
+            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty, StringComparison.Ordinal);
         }
 
         /// <summary>

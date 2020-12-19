@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.AspNetCore.Http;
@@ -20,11 +21,8 @@ namespace DNTCaptcha.Core.Providers
             ICaptchaCryptoProvider captchaProtectionProvider,
             ILogger<SessionCaptchaStorageProvider> logger)
         {
-            captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
-            logger.CheckArgumentNull(nameof(logger));
-
-            _captchaProtectionProvider = captchaProtectionProvider;
-            _logger = logger;
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _logger.LogDebug("Using the SessionCaptchaStorageProvider.");
         }
@@ -48,6 +46,11 @@ namespace DNTCaptcha.Core.Providers
         /// </returns>
         public bool Contains(HttpContext context, string token)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             return context.Session.Keys.Any(key => key == token);
         }
 
@@ -56,8 +59,13 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="token">The specified token.</param>
-        public string GetValue(HttpContext context, string token)
+        public string? GetValue(HttpContext context, string token)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             var value = context.Session.GetString(token);
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -68,7 +76,7 @@ namespace DNTCaptcha.Core.Providers
             Remove(context, token);
 
             var decryptedValue = _captchaProtectionProvider.Decrypt(value);
-            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
+            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty, StringComparison.Ordinal);
         }
 
         /// <summary>

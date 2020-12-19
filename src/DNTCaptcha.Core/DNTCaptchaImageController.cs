@@ -42,26 +42,19 @@ namespace DNTCaptcha.Core
             ILogger<DNTCaptchaImageController> logger,
             ISerializationProvider serializationProvider)
         {
-            captchaImageProvider.CheckArgumentNull(nameof(captchaImageProvider));
-            captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
-            tempDataProvider.CheckArgumentNull(nameof(tempDataProvider));
-            captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
-            logger.CheckArgumentNull(nameof(logger));
-            serializationProvider.CheckArgumentNull(nameof(serializationProvider));
-
-            _captchaImageProvider = captchaImageProvider;
-            _captchaProtectionProvider = captchaProtectionProvider;
-            _tempDataProvider = tempDataProvider;
-            _captchaStorageProvider = captchaStorageProvider;
-            _logger = logger;
-            _serializationProvider = serializationProvider;
+            _captchaImageProvider = captchaImageProvider ?? throw new ArgumentNullException(nameof(captchaImageProvider));
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _tempDataProvider = tempDataProvider ?? throw new ArgumentNullException(nameof(tempDataProvider));
+            _captchaStorageProvider = captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _serializationProvider = serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
         }
 
         /// <summary>
         /// The ViewContext Provider
         /// </summary>
         [ViewContext]
-        public ViewContext ViewContext { get; set; }
+        public ViewContext? ViewContext { get; set; }
 
         /// <summary>
         /// Refresh the captcha
@@ -179,19 +172,9 @@ namespace DNTCaptcha.Core
                 return BadRequest();
             }
 
-            byte[] image;
-            try
-            {
-                if (model.UseNoise)
-                    image = _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName);
-                else
-                    image = _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical(1001, ex, "DrawCaptcha error.");
-                return BadRequest(ex.Message);
-            }
+            var image = model.UseNoise ?
+                _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName) :
+                _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
             return new FileContentResult(image, "image/png");
         }
     }

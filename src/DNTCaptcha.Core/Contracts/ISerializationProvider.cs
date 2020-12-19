@@ -13,6 +13,6 @@ namespace DNTCaptcha.Core.Contracts
         /// <summary>
         /// Deserialize the given string to an object.
         /// </summary>
-        T Deserialize<T>(string data);
+        T? Deserialize<T>(string data);
     }
 }

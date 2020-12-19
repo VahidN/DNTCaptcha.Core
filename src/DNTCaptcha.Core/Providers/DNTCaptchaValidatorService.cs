@@ -23,11 +23,11 @@ namespace DNTCaptcha.Core.Providers
         /// </param>
         bool HasRequestValidCaptchaEntry(Language captchaGeneratorLanguage,
             DisplayMode captchaGeneratorDisplayMode,
-            DNTCaptchaBase model = null);
+            DNTCaptchaBase? model = null);
     }
 
     /// <summary>
-    ///
+    /// Validates the input number.
     /// </summary>
     public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
     {
@@ -38,7 +38,7 @@ namespace DNTCaptcha.Core.Providers
         private readonly IHttpContextAccessor _contextAccessor;
 
         /// <summary>
-        ///
+        /// Validates the input number.
         /// </summary>
         public DNTCaptchaValidatorService(
             IHttpContextAccessor contextAccessor,
@@ -48,32 +48,28 @@ namespace DNTCaptcha.Core.Providers
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider
         )
         {
-            logger.CheckArgumentNull(nameof(logger));
-            _logger = logger;
-
-            captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
-            _captchaProtectionProvider = captchaProtectionProvider;
-
-            captchaStorageProvider.CheckArgumentNull(nameof(captchaStorageProvider));
-            _captchaStorageProvider = captchaStorageProvider;
-
-            captchaTextProvider.CheckArgumentNull(nameof(captchaTextProvider));
-            _captchaTextProvider = captchaTextProvider;
-
-            contextAccessor.CheckArgumentNull(nameof(contextAccessor));
-            _contextAccessor = contextAccessor;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _captchaStorageProvider = captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+            _captchaTextProvider = captchaTextProvider ?? throw new ArgumentNullException(nameof(captchaTextProvider));
+            _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
         }
 
         /// <summary>
-        ///
+        /// Validates the input number.
         /// </summary>
         /// <returns></returns>
         public bool HasRequestValidCaptchaEntry(
             Language captchaGeneratorLanguage,
             DisplayMode captchaGeneratorDisplayMode,
-            DNTCaptchaBase model = null)
+            DNTCaptchaBase? model = null)
         {
             var httpContext = _contextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return false;
+            }
+
             if (!shouldValidate(httpContext))
             {
                 _logger.LogDebug($"Ignoring ValidateDNTCaptcha during `{httpContext.Request.Method}`.");
@@ -109,7 +105,7 @@ namespace DNTCaptcha.Core.Providers
             var decryptedText = _captchaProtectionProvider.Decrypt(captchaText);
 
             var numberToText = _captchaTextProvider(captchaGeneratorDisplayMode).GetText(inputNumber, captchaGeneratorLanguage);
-            if (decryptedText?.Equals(numberToText) != true)
+            if (decryptedText?.Equals(numberToText, StringComparison.Ordinal) != true)
             {
                 _logger.LogDebug($"{decryptedText} != {numberToText}");
                 return false;
@@ -123,7 +119,7 @@ namespace DNTCaptcha.Core.Providers
             return true;
         }
 
-        private bool isValidCookie(HttpContext httpContext, string decryptedText, string cookieToken)
+        private bool isValidCookie(HttpContext httpContext, string decryptedText, string? cookieToken)
         {
             if (string.IsNullOrEmpty(cookieToken))
             {
@@ -145,7 +141,7 @@ namespace DNTCaptcha.Core.Providers
                 return false;
             }
 
-            var areEqual = cookieValue.Equals(decryptedText);
+            var areEqual = cookieValue.Equals(decryptedText, StringComparison.Ordinal);
             if (!areEqual)
             {
                 _logger.LogDebug($"isValidCookie:: {cookieValue} != {decryptedText}");
@@ -158,13 +154,11 @@ namespace DNTCaptcha.Core.Providers
             return areEqual;
         }
 
-        private (string captchaText, string inputText, string cookieToken) getFormValues(HttpContext httpContext, DNTCaptchaBase model)
+        private static (string captchaText, string inputText, string cookieToken) getFormValues(HttpContext httpContext, DNTCaptchaBase? model)
         {
             if (httpContext.Request.HasFormContentType)
             {
-                var form = httpContext.Request.Form;
-                form.CheckArgumentNull(nameof(form));
-
+                var form = httpContext.Request.Form ?? throw new InvalidOperationException("`httpContext.Request.Form` is null.");
                 var captchaText = (string)form[DNTCaptchaTagHelper.CaptchaHiddenInputName];
                 var inputText = (string)form[DNTCaptchaTagHelper.CaptchaInputName];
                 var cookieToken = (string)form[DNTCaptchaTagHelper.CaptchaHiddenTokenName];
@@ -174,7 +168,7 @@ namespace DNTCaptcha.Core.Providers
 
             if (model == null)
             {
-                throw new NullReferenceException("Your ViewModel should implement the DNTCaptchaBase class (public class AccountViewModel : DNTCaptchaBase {}).");
+                throw new InvalidOperationException("Your ViewModel should implement the DNTCaptchaBase class (public class AccountViewModel : DNTCaptchaBase {}).");
             }
             return (model.DNTCaptchaText, model.DNTCaptchaInputText, model.DNTCaptchaToken);
         }

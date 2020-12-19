@@ -27,14 +27,10 @@ namespace DNTCaptcha.Core.Providers
             ILogger<DistributedCacheCaptchaStorageProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
-            captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
-            logger.CheckArgumentNull(nameof(logger));
-            distributedCache.CheckArgumentNull(nameof(distributedCache));
-
-            _captchaProtectionProvider = captchaProtectionProvider;
-            _logger = logger;
-            _distributedCache = distributedCache;
-            _options = options.Value;
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
+            _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
             _logger.LogDebug("Using the DistributedCacheCaptchaStorageProvider.");
         }
@@ -69,7 +65,7 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="token">The specified token.</param>
-        public string GetValue(HttpContext context, string token)
+        public string? GetValue(HttpContext context, string token)
         {
             var cookieValueBytes = _distributedCache.Get(token);
             if (cookieValueBytes == null)
@@ -80,7 +76,7 @@ namespace DNTCaptcha.Core.Providers
 
             _distributedCache.Remove(token);
             var decryptedValue = _captchaProtectionProvider.Decrypt(Encoding.UTF8.GetString(cookieValueBytes));
-            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
+            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty, StringComparison.Ordinal);
         }
 
         /// <summary>

@@ -14,7 +14,7 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Generates a random non-negative number.
         /// </summary>
-        public int Next()
+        public int NextNumber()
         {
             var randb = new byte[4];
             _rand.GetBytes(randb);
@@ -22,11 +22,21 @@ namespace DNTCaptcha.Core.Providers
             if (value < 0) value = -value;
             return value;
         }
+
+        /// <summary>
+        /// Fills an array of bytes with a cryptographically strong random sequence of values.
+        /// </summary>
+        /// <param name="randomBytes"></param>
+        public void NextBytes(byte[] randomBytes)
+        {
+            _rand.GetBytes(randomBytes);
+        }
+
         /// <summary>
         /// Generates a random non-negative number less than or equal to max.
         /// </summary>
         /// <param name="max">The maximum possible value.</param>
-        public int Next(int max)
+        public int NextNumber(int max)
         {
             var randb = new byte[4];
             _rand.GetBytes(randb);
@@ -35,15 +45,16 @@ namespace DNTCaptcha.Core.Providers
             if (value < 0) value = -value;
             return value;
         }
+
         /// <summary>
         /// Generates a random non-negative number bigger than or equal to min and less than or
         ///  equal to max.
         /// </summary>
         /// <param name="min">The minimum possible value.</param>
         /// <param name="max">The maximum possible value.</param>
-        public int Next(int min, int max)
+        public int NextNumber(int min, int max)
         {
-            var value = Next(max - min) + min;
+            var value = NextNumber(max - min) + min;
             return value;
         }
     }

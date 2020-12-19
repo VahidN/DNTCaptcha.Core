@@ -1,3 +1,4 @@
+using System;
 using DNTCaptcha.Core.Contracts;
 
 namespace DNTCaptcha.Core.Providers
@@ -17,7 +18,12 @@ namespace DNTCaptcha.Core.Providers
             IRandomNumberProvider randomNumberProvider,
             HumanReadableIntegerProvider humanReadableIntegerProvider)
         {
-            _randomNumber = randomNumberProvider.Next(1, 7);
+            if (randomNumberProvider == null)
+            {
+                throw new ArgumentNullException(nameof(randomNumberProvider));
+            }
+
+            _randomNumber = randomNumberProvider.NextNumber(1, 7);
             _humanReadableIntegerProvider = humanReadableIntegerProvider;
         }
 

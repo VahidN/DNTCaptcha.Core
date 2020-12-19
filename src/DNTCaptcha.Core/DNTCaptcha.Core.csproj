@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-        <VersionPrefix>2.9.2</VersionPrefix>
+        <VersionPrefix>3.0.0</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -9,6 +9,8 @@
         <PackageId>DNTCaptcha.Core</PackageId>
         <PackageTags>MVC;aspnetcore;captcha;.NET Core</PackageTags>
         <PackageProjectUrl>https://github.com/VahidN/DNTCaptcha.Core</PackageProjectUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/VahidN/DNTCaptcha.Core</RepositoryUrl>
         <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
         <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -17,6 +19,23 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <DebugType>embedded</DebugType>
+        <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    </PropertyGroup>
+    <PropertyGroup>
+        <LangVersion>9</LangVersion>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+        <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+        <EnableNETAnalyzers>true</EnableNETAnalyzers>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+        <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+        <Deterministic>true</Deterministic>
+        <Features>strict</Features>
+        <ReportAnalyzer>true</ReportAnalyzer>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <PlatformTarget>anycpu</PlatformTarget>

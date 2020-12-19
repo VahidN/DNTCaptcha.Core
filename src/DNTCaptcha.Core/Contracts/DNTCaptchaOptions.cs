@@ -12,22 +12,22 @@ namespace DNTCaptcha.Core.Contracts
         /// <summary>
         /// You can introduce a custom ICaptchaStorageProvider to be used as an StorageProvider.
         /// </summary>
-        public Type CaptchaStorageProvider { get; set; }
+        public Type? CaptchaStorageProvider { get; set; }
 
         /// <summary>
         /// You can introduce a custom SerializationProvider here.
         /// </summary>
-        public Type CaptchaSerializationProvider { get; set; }
+        public Type? CaptchaSerializationProvider { get; set; }
 
         /// <summary>
         /// You can introduce a custom font here.
         /// </summary>
-        public string CustomFontPath { get; set; }
+        public string? CustomFontPath { get; set; }
 
         /// <summary>
         /// The encryption key
         /// </summary>
-        public string EncryptionKey { get; set; }
+        public string? EncryptionKey { get; set; }
 
         /// <summary>
         /// Gets or sets an absolute expiration date for the cache entry.

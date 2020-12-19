@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using DNTCaptcha.Core.Contracts;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,11 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public ShowDigitsProvider(IOptions<DNTCaptchaOptions> options)
         {
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _captchaOptions = options.Value;
         }
 

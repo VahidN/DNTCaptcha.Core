@@ -32,29 +32,38 @@ namespace DNTCaptcha.Core
         /// <summary>
         /// Captcha validator.
         /// </summary>
-        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        public override void OnActionExecuting(ActionExecutingContext context)
         {
-            filterContext.CheckArgumentNull(nameof(filterContext));
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
 
-            var httpContext = filterContext.HttpContext;
-            httpContext.CheckArgumentNull(nameof(httpContext));
+            var httpContext = context.HttpContext;
+            if (httpContext == null)
+            {
+                throw new InvalidOperationException("httpContext is null.");
+            }
 
 
-            var validatorService = httpContext.RequestServices.GetService<IDNTCaptchaValidatorService>();
+            var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();
             if (validatorService.HasRequestValidCaptchaEntry(
                     CaptchaGeneratorLanguage,
                     CaptchaGeneratorDisplayMode,
-                    filterContext.ActionArguments.Select(item => item.Value).OfType<DNTCaptchaBase>().FirstOrDefault()))
+                    context.ActionArguments.Select(item => item.Value).OfType<DNTCaptchaBase>().FirstOrDefault()))
             {
-                base.OnActionExecuting(filterContext);
+                base.OnActionExecuting(context);
                 return;
             }
 
-            var controllerBase = filterContext.Controller as ControllerBase;
-            controllerBase.CheckArgumentNull(nameof(controllerBase));
+            var controllerBase = context.Controller as ControllerBase;
+            if (controllerBase == null)
+            {
+                throw new InvalidOperationException("controllerBase is null.");
+            }
 
             controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, ErrorMessage);
-            base.OnActionExecuting(filterContext);
+            base.OnActionExecuting(context);
         }
     }
 }

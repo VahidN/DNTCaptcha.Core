@@ -20,9 +20,12 @@ namespace DNTCaptcha.Core
         /// </summary>
         public static void AddDNTCaptcha(
             this IServiceCollection services,
-            Action<DNTCaptchaOptions> options = null)
+            Action<DNTCaptchaOptions>? options = null)
         {
-            services.CheckArgumentNull(nameof(services));
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
 
             configOptions(services, options);
 
@@ -67,7 +70,7 @@ namespace DNTCaptcha.Core
             });
         }
 
-        private static void configOptions(IServiceCollection services, Action<DNTCaptchaOptions> options)
+        private static void configOptions(IServiceCollection services, Action<DNTCaptchaOptions>? options)
         {
             var captchaOptions = new DNTCaptchaOptions();
             options?.Invoke(captchaOptions);

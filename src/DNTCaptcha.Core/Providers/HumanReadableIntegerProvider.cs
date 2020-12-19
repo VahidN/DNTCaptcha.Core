@@ -42,7 +42,7 @@ namespace DNTCaptcha.Core.Providers
                 new List<string> { "ti", "elleve", "tolv", "tretten", "fjorten", "femten", "seksten", "sytten", "atten", "nitten" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Italian, Names=
                 new List<string> { "Dieci", "Undici", "Dodici", "Tredici", "Quattordici", "Quindici", "Sedici", "Diciassette", "Diciotto", "Diciannove" }},
-              new NumberWord { Group= DigitGroup.Teens, Language= Language.Turkish, Names=
+                new NumberWord { Group= DigitGroup.Teens, Language= Language.Turkish, Names=
                 new List<string> { "On", "Onbir", "Oniki", "Onüç", "Ondört", "Onbeş", "Onaltı", "Onyedi", "Onsekiz", "Ondokuz" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Arabic, Names=
                 new List<string> { "عشرة", "احدى عشر", "اثني عشر", "ثلاثة عشر", "اربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر" }},
@@ -55,7 +55,7 @@ namespace DNTCaptcha.Core.Providers
                 new List<string> { "tjue", "tretti", "førti", "femti", "seksti", "sytti", "åtti", "nitti" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Italian, Names=
                 new List<string> { "Venti", "Trenta", "Quaranta", "Cinquanta", "Sessanta", "Settanta", "Ottanta", "Novanta" }},
-                   new NumberWord { Group= DigitGroup.Tens, Language= Language.Turkish, Names=
+                new NumberWord { Group= DigitGroup.Tens, Language= Language.Turkish, Names=
                 new List<string> { "Yirmi", "Otuz", "Kırk", "Elli", "Altmış", "Yetmiş", "Seksen", "Doksan" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Arabic, Names=
                 new List<string> { "عشرون", "ثلاثون", "اربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون" }},
@@ -69,7 +69,7 @@ namespace DNTCaptcha.Core.Providers
                 new List<string> {string.Empty, "ett hundre", "to hundre", "tre hundre", "fire hundre", "fem hundre", "seks hundre", "syv hundre", "åtte hundre", "ni hundre" }},
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Italian, Names=
                 new List<string> {string.Empty, "Cento", "Duecento", "Trecento", "Quattrocento", "Cinquecento", "Seicento", "Settecento", "Ottocento", "Novecento" }},
-                  new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Turkish, Names=
+                new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Turkish, Names=
             new List<string> {string.Empty, "Yüz", "İki Yüz", "Üç Yüz", "Dört Yüz",
                     "Beş Yüz", "Altı Yüz", "Yedi Yüz", "Sekiz Yüz", "Dokuz Yüz" }},
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Arabic, Names=

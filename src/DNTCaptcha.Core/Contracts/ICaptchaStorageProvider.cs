@@ -27,7 +27,7 @@ namespace DNTCaptcha.Core.Contracts
         /// </summary>
         /// <param name="context"></param>
         /// <param name="token">The specified token.</param>
-        string GetValue(HttpContext context, string token);
+        string? GetValue(HttpContext context, string token);
 
         /// <summary>
         ///  Removes the specified token from the storage.

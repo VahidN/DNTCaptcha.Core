@@ -27,11 +27,10 @@ namespace DNTCaptcha.Core.Providers
             ILogger<DistributedSerializationProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
-            distributedCache.CheckArgumentNull(nameof(distributedCache));
-            _distributedCache = distributedCache;
-            _logger = logger;
-            _captchaProtectionProvider = captchaProtectionProvider;
-            _options = options.Value;
+            _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
             _logger.LogDebug("Using the DistributedSerializationProvider.");
         }
 
@@ -53,15 +52,15 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Deserialize the given string to an object.
         /// </summary>
-        public T Deserialize<T>(string token)
+        public T? Deserialize<T>(string data)
         {
-            var resultBytes = _distributedCache.Get(token);
+            var resultBytes = _distributedCache.Get(data);
             if (resultBytes == null)
             {
                 return default;
             }
 
-            _distributedCache.Remove(token);
+            _distributedCache.Remove(data);
             return JsonSerializer.Deserialize<T>(new ReadOnlySpan<byte>(resultBytes));
         }
     }

@@ -26,11 +26,10 @@ namespace DNTCaptcha.Core.Providers
             ILogger<InMemorySerializationProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
-            memoryCache.CheckArgumentNull(nameof(memoryCache));
-            _memoryCache = memoryCache;
-            _logger = logger;
-            _options = options.Value;
-            _captchaProtectionProvider = captchaProtectionProvider;
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
             _logger.LogDebug("Using the InMemorySerializationProvider.");
         }
 
@@ -53,14 +52,14 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Deserialize the given string to an object.
         /// </summary>
-        public T Deserialize<T>(string token)
+        public T? Deserialize<T>(string data)
         {
-            if (!_memoryCache.TryGetValue(token, out string result))
+            if (!_memoryCache.TryGetValue(data, out string result))
             {
                 return default;
             }
 
-            _memoryCache.Remove(token);
+            _memoryCache.Remove(data);
             return JsonSerializer.Deserialize<T>(result);
         }
     }

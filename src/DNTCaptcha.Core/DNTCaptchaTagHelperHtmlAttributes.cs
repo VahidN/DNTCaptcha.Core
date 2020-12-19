@@ -71,6 +71,12 @@ namespace DNTCaptcha.Core
         public string Placeholder { set; get; } = "کد امنیتی به رقم";
 
         /// <summary>
+        /// The direction of the input box. It's default value is `ltr`.
+        /// </summary>
+        [HtmlAttributeName("asp-dir")]
+        public string Dir { set; get; } = "ltr";
+
+        /// <summary>
         /// The css class of the captcha. It's default value is `text-box single-line form-control col-md-4`.
         /// </summary>
         [HtmlAttributeName("asp-text-box-class")]
@@ -111,6 +117,6 @@ namespace DNTCaptcha.Core
         /// The Captcha Token
         /// </summary>
         [HtmlAttributeNotBound]
-        public string CaptchaToken { set; get; }
+        public string CaptchaToken { set; get; } = default!;
     }
 }

@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -17,7 +20,7 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Decrypts the message
         /// </summary>
-        string Decrypt(string inputText);
+        string? Decrypt(string inputText);
 
         /// <summary>
         /// Encrypts the message
@@ -47,7 +50,17 @@ namespace DNTCaptcha.Core.Providers
             ILogger<CaptchaCryptoProvider> logger)
         {
             _logger = logger;
-            _keyBytes = getDesKey(options.Value.EncryptionKey, randomNumberProvider.Next().ToString());
+            if (randomNumberProvider == null)
+            {
+                throw new ArgumentNullException(nameof(randomNumberProvider));
+            }
+
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            _keyBytes = getDesKey(options.Value.EncryptionKey, randomNumberProvider.NextNumber().ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -65,9 +78,12 @@ namespace DNTCaptcha.Core.Providers
         /// <summary>
         /// Decrypts the message
         /// </summary>
-        public string Decrypt(string inputText)
+        public string? Decrypt(string inputText)
         {
-            inputText.CheckArgumentNull(nameof(inputText));
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                throw new ArgumentNullException(nameof(inputText));
+            }
 
             try
             {
@@ -92,50 +108,71 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         public string Encrypt(string inputText)
         {
-            inputText.CheckArgumentNull(nameof(inputText));
+            if (string.IsNullOrWhiteSpace(inputText))
+            {
+                throw new ArgumentNullException(nameof(inputText));
+            }
 
             var inputBytes = Encoding.UTF8.GetBytes(inputText);
             var bytes = encrypt(inputBytes);
             return WebEncoders.Base64UrlEncode(bytes);
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
+                        Justification = "That's enough for our usecase!")]
         private byte[] encrypt(byte[] data)
         {
             using (var des = new TripleDESCryptoServiceProvider
             {
                 Key = _keyBytes,
-                Mode = CipherMode.ECB,
+                Mode = CipherMode.CBC,
                 Padding = PaddingMode.PKCS7
             })
             {
-                using (var cTransform = des.CreateEncryptor())
+                using var encryptor = des.CreateEncryptor();
+                using var cipherStream = new MemoryStream();
+                using (var cryptoStream = new CryptoStream(cipherStream, encryptor, CryptoStreamMode.Write))
+                using (var binaryWriter = new BinaryWriter(cryptoStream))
                 {
-                    var result = cTransform.TransformFinalBlock(data, 0, data.Length);
-                    des.Clear();
-                    return result;
+                    // prepend IV to data
+                    cipherStream.Write(des.IV); // This is an auto-generated random key
+                    binaryWriter.Write(data);
+                    cryptoStream.FlushFinalBlock();
                 }
+                return cipherStream.ToArray();
             }
         }
 
+        [SuppressMessage("Microsoft.Usage", "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
+                        Justification = "That's enough for our usecase!")]
         private byte[] decrypt(byte[] data)
         {
             using (var des = new TripleDESCryptoServiceProvider
             {
                 Key = _keyBytes,
-                Mode = CipherMode.ECB,
+                Mode = CipherMode.CBC,
                 Padding = PaddingMode.PKCS7
             })
             {
-                using (var cTransform = des.CreateDecryptor())
+                var iv = new byte[8]; // 3DES-IV is always 8 bytes/64 bits because block size is always 64 bits
+                Array.Copy(data, 0, iv, 0, iv.Length);
+
+                using var ms = new MemoryStream();
+                using (var decryptor = new CryptoStream(ms, des.CreateDecryptor(_keyBytes, iv), CryptoStreamMode.Write))
+                using (var binaryWriter = new BinaryWriter(decryptor))
                 {
-                    var result = cTransform.TransformFinalBlock(data, 0, data.Length);
-                    des.Clear();
-                    return result;
+                    // decrypt cipher text from data, starting just past the IV
+                    binaryWriter.Write(
+                        data,
+                        iv.Length,
+                        data.Length - iv.Length
+                    );
                 }
+                return ms.ToArray();
             }
         }
 
-        private byte[] getDesKey(string key, string randomKey)
+        private byte[] getDesKey(string? key, string randomKey)
         {
             if (string.IsNullOrWhiteSpace(key))
             {

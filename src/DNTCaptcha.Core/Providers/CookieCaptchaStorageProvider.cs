@@ -23,12 +23,9 @@ namespace DNTCaptcha.Core.Providers
             ILogger<CookieCaptchaStorageProvider> logger,
             IOptions<DNTCaptchaOptions> options)
         {
-            captchaProtectionProvider.CheckArgumentNull(nameof(captchaProtectionProvider));
-            logger.CheckArgumentNull(nameof(logger));
-
-            _captchaProtectionProvider = captchaProtectionProvider;
-            _logger = logger;
-            _options = options.Value;
+            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
             _logger.LogDebug("Using the CookieCaptchaStorageProvider.");
         }
@@ -52,6 +49,11 @@ namespace DNTCaptcha.Core.Providers
         /// </returns>
         public bool Contains(HttpContext context, string token)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             return context.Request.Cookies.ContainsKey(token);
         }
 
@@ -60,8 +62,13 @@ namespace DNTCaptcha.Core.Providers
         /// </summary>
         /// <param name="context"></param>
         /// <param name="token">The specified token.</param>
-        public string GetValue(HttpContext context, string token)
+        public string? GetValue(HttpContext context, string token)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
             if (!context.Request.Cookies.TryGetValue(token, out var cookieValue))
             {
                 _logger.LogDebug("Couldn't find the captcha cookie in the request.");
@@ -70,8 +77,14 @@ namespace DNTCaptcha.Core.Providers
 
             Remove(context, token);
 
+            if (string.IsNullOrWhiteSpace(cookieValue))
+            {
+                _logger.LogDebug("Couldn't find the captcha cookie's value in the request.");
+                return null;
+            }
+
             var decryptedValue = _captchaProtectionProvider.Decrypt(cookieValue);
-            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty);
+            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty, StringComparison.Ordinal);
         }
 
         /// <summary>

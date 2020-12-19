@@ -11,12 +11,12 @@ namespace DNTCaptcha.Core.Contracts
         /// <summary>
         /// The encrypted text
         /// </summary>
-        public string Text { set; get; }
+        public string Text { set; get; } = default!;
 
         /// <summary>
         /// A random number
         /// </summary>
-        public string RndDate { set; get; }
+        public string RndDate { set; get; } = default!;
 
         /// <summary>
         /// ForeColor of the captcha's text

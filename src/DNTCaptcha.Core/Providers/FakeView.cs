@@ -10,23 +10,21 @@ namespace DNTCaptcha.Core.Providers
     /// </summary>
     public class FakeView : IView
     {
-        string IView.Path
+        /// <summary>
+        /// Gets the path of the view as resolved by the Microsoft.AspNetCore.Mvc.ViewEngines.IViewEngine.
+        /// </summary>
+        public string Path
         {
             get
             {
-                throw new NotImplementedException();
+                throw new InvalidOperationException();
             }
         }
 
         /// <summary>
         /// A fake view provider for rendering tag helpers
         /// </summary>
-        public Task RenderAsync(ViewContext viewContext)
-        {
-            throw new InvalidOperationException();
-        }
-
-        Task IView.RenderAsync(ViewContext context)
+        public Task RenderAsync(ViewContext context)
         {
             throw new NotImplementedException();
         }
