@@ -2,14 +2,14 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using DNTCaptcha.Core.Contracts;
-using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Options;
+using static System.FormattableString;
 
 namespace DNTCaptcha.Core
 {
@@ -19,21 +19,6 @@ namespace DNTCaptcha.Core
     [HtmlTargetElement("dnt-captcha")]
     public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
     {
-        /// <summary>
-        /// The default hidden input name of the captcha.
-        /// </summary>
-        public static readonly string CaptchaHiddenInputName = "DNTCaptchaText";
-
-        /// <summary>
-        /// The default hidden input name of the captcha's cookie token.
-        /// </summary>
-        public static readonly string CaptchaHiddenTokenName = "DNTCaptchaToken";
-
-        /// <summary>
-        /// The default input name of the captcha.
-        /// </summary>
-        public static readonly string CaptchaInputName = "DNTCaptchaInputText";
-
         private const string DataAjaxBeginFunctionName = "onRefreshButtonDataAjaxBegin";
         private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
@@ -42,6 +27,7 @@ namespace DNTCaptcha.Core
         private readonly IAntiforgery _antiforgery;
         private IUrlHelper? _urlHelper;
         private readonly ISerializationProvider _serializationProvider;
+        private readonly DNTCaptchaOptions _captchaOptions;
 
         /// <summary>
         /// DNTCaptcha TagHelper
@@ -52,7 +38,8 @@ namespace DNTCaptcha.Core
             Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
             ICaptchaStorageProvider captchaStorageProvider,
             IAntiforgery antiforgery,
-            ISerializationProvider serializationProvider
+            ISerializationProvider serializationProvider,
+            IOptions<DNTCaptchaOptions> options
             )
         {
             _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
@@ -61,6 +48,7 @@ namespace DNTCaptcha.Core
             _captchaStorageProvider = captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
             _antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
             _serializationProvider = serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
+            _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         }
 
         /// <summary>
@@ -74,9 +62,13 @@ namespace DNTCaptcha.Core
         [ViewContext, HtmlAttributeNotBound]
         public ViewContext? ViewContext { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes the ITagHelperComponent with the given context. Additions to TagHelperContext.Items
+        /// should be done within this method to ensure they're added prior to executing the children.
+        /// </summary>
         public void Init(TagHelperContext context)
         {
+            // Part of the definition of the tag helper
         }
 
         /// <summary>
@@ -102,8 +94,8 @@ namespace DNTCaptcha.Core
             setUrlHelper(ViewContext);
 
             output.TagName = "div";
-            output.Attributes.Add("class", "dntCaptcha");
-            var captchaDivId = $"dntCaptcha{context.UniqueId}{_randomNumberProvider.NextNumber(Min, Max)}";
+            output.Attributes.Add("class", _captchaOptions.CaptchaClass);
+            var captchaDivId = Invariant($"{_captchaOptions.CaptchaClass}{context.UniqueId}{_randomNumberProvider.NextNumber(Min, Max)}");
             output.Attributes.Add("id", captchaDivId);
             output.TagMode = TagMode.StartTagAndEndTag;
 
@@ -159,27 +151,27 @@ namespace DNTCaptcha.Core
             return Task.CompletedTask;
         }
 
-        private static TagBuilder getHiddenInputTagBuilder(string encryptedText)
+        private TagBuilder getHiddenInputTagBuilder(string encryptedText)
         {
             var hiddenInput = new TagBuilder("input")
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            hiddenInput.Attributes.Add("id", CaptchaHiddenInputName);
-            hiddenInput.Attributes.Add("name", CaptchaHiddenInputName);
+            hiddenInput.Attributes.Add("id", _captchaOptions.CaptchaComponent.CaptchaHiddenInputName);
+            hiddenInput.Attributes.Add("name", _captchaOptions.CaptchaComponent.CaptchaHiddenInputName);
             hiddenInput.Attributes.Add("type", "hidden");
             hiddenInput.Attributes.Add("value", encryptedText);
             return hiddenInput;
         }
 
-        private static TagBuilder getHiddenInputTokenTagBuilder(string token)
+        private TagBuilder getHiddenInputTokenTagBuilder(string token)
         {
             var hiddenInput = new TagBuilder("input")
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            hiddenInput.Attributes.Add("id", CaptchaHiddenTokenName);
-            hiddenInput.Attributes.Add("name", CaptchaHiddenTokenName);
+            hiddenInput.Attributes.Add("id", _captchaOptions.CaptchaComponent.CaptchaHiddenTokenName);
+            hiddenInput.Attributes.Add("name", _captchaOptions.CaptchaComponent.CaptchaHiddenTokenName);
             hiddenInput.Attributes.Add("type", "hidden");
             hiddenInput.Attributes.Add("value", token);
             return hiddenInput;
@@ -216,7 +208,7 @@ namespace DNTCaptcha.Core
             }
 
             var captchaImage = new TagBuilder("img");
-            var dntCaptchaImg = "dntCaptchaImg";
+            var dntCaptchaImg = $"{_captchaOptions.CaptchaClass}Img";
             captchaImage.TagRenderMode = TagRenderMode.SelfClosing;
             captchaImage.Attributes.Add("id", dntCaptchaImg);
             captchaImage.Attributes.Add("name", dntCaptchaImg);
@@ -263,7 +255,7 @@ namespace DNTCaptcha.Core
                 protocol: viewContext.HttpContext.Request.Scheme);
 
             var refreshButton = new TagBuilder("a");
-            var dntCaptchaRefreshButton = "dntCaptchaRefreshButton";
+            var dntCaptchaRefreshButton = $"{_captchaOptions.CaptchaClass}RefreshButton";
             refreshButton.Attributes.Add("id", dntCaptchaRefreshButton);
             refreshButton.Attributes.Add("name", dntCaptchaRefreshButton);
             refreshButton.Attributes.Add("href", "#refresh");
@@ -293,8 +285,8 @@ namespace DNTCaptcha.Core
             {
                 TagRenderMode = TagRenderMode.SelfClosing
             };
-            textInput.Attributes.Add("id", CaptchaInputName);
-            textInput.Attributes.Add("name", CaptchaInputName);
+            textInput.Attributes.Add("id", _captchaOptions.CaptchaComponent.CaptchaInputName);
+            textInput.Attributes.Add("name", _captchaOptions.CaptchaComponent.CaptchaInputName);
             textInput.Attributes.Add("autocomplete", "off");
             textInput.Attributes.Add("class", TextBoxClass);
             textInput.Attributes.Add("data-val", "true");
@@ -312,23 +304,19 @@ namespace DNTCaptcha.Core
         {
             var validationMessage = new TagBuilder("span");
             validationMessage.Attributes.Add("class", ValidationMessageClass);
-            validationMessage.Attributes.Add("data-valmsg-for", CaptchaInputName);
+            validationMessage.Attributes.Add("data-valmsg-for", _captchaOptions.CaptchaComponent.CaptchaInputName);
             validationMessage.Attributes.Add("data-valmsg-replace", "true");
 
-            if (!viewContext.ModelState.IsValid)
+            if (!viewContext.ModelState.IsValid
+                && viewContext.ModelState.TryGetValue(_captchaOptions.CaptchaComponent.CaptchaInputName, out var captchaInputNameValidationState)
+                && captchaInputNameValidationState.ValidationState == ModelValidationState.Invalid)
             {
-                if (viewContext.ModelState.TryGetValue(CaptchaInputName, out var captchaInputNameValidationState))
+                var error = captchaInputNameValidationState.Errors.FirstOrDefault();
+                if (error != null)
                 {
-                    if (captchaInputNameValidationState.ValidationState == ModelValidationState.Invalid)
-                    {
-                        var error = captchaInputNameValidationState.Errors.FirstOrDefault();
-                        if (error != null)
-                        {
-                            var errorSpan = new TagBuilder("span");
-                            errorSpan.InnerHtml.AppendHtml(error.ErrorMessage);
-                            validationMessage.InnerHtml.AppendHtml(errorSpan);
-                        }
-                    }
+                    var errorSpan = new TagBuilder("span");
+                    errorSpan.InnerHtml.AppendHtml(error.ErrorMessage);
+                    validationMessage.InnerHtml.AppendHtml(errorSpan);
                 }
             }
 

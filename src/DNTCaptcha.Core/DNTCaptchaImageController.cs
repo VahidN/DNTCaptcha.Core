@@ -1,6 +1,4 @@
-﻿using DNTCaptcha.Core.Contracts;
-using DNTCaptcha.Core.Providers;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -130,7 +128,7 @@ namespace DNTCaptcha.Core
             var attrs = new StringBuilder();
             foreach (var attr in tagHelperOutput.Attributes)
             {
-                attrs.Append($" {attr.Name}='{attr.Value}'");
+                attrs.Append(' ').Append(attr.Name).Append("='").Append(attr.Value).Append('\'');
             }
 
             var content = $"<div {attrs}>{tagHelperOutput.Content.GetContent()}</div>";

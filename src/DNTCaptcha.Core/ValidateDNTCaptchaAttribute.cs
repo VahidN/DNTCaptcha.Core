@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
-using DNTCaptcha.Core.Contracts;
-using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core
 {
@@ -45,24 +43,20 @@ namespace DNTCaptcha.Core
                 throw new InvalidOperationException("httpContext is null.");
             }
 
-
             var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();
-            if (validatorService.HasRequestValidCaptchaEntry(
-                    CaptchaGeneratorLanguage,
-                    CaptchaGeneratorDisplayMode,
-                    context.ActionArguments.Select(item => item.Value).OfType<DNTCaptchaBase>().FirstOrDefault()))
+            if (validatorService.HasRequestValidCaptchaEntry(CaptchaGeneratorLanguage, CaptchaGeneratorDisplayMode))
             {
                 base.OnActionExecuting(context);
                 return;
             }
 
-            var controllerBase = context.Controller as ControllerBase;
-            if (controllerBase == null)
+            if (context.Controller is not ControllerBase controllerBase)
             {
                 throw new InvalidOperationException("controllerBase is null.");
             }
 
-            controllerBase.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, ErrorMessage);
+            var options = httpContext.RequestServices.GetRequiredService<IOptions<DNTCaptchaOptions>>();
+            controllerBase.ModelState.AddModelError(options.Value.CaptchaComponent.CaptchaInputName, ErrorMessage);
             base.OnActionExecuting(context);
         }
     }

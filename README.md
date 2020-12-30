@@ -85,19 +85,27 @@ namespace DNTCaptcha.TestWebApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDNTCaptcha(options =>
                 // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
                 // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
                 options.UseCookieStorageProvider() // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
-                // options.UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+                                                   // .UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+                                                   // .UseDistributedSerializationProvider()
 
                 // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
-				// Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
-                // .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "name.ttf"))
-                // .AbsoluteExpiration(minutes: 7)
-				// .ShowThousandsSeparators(false);
-                   .WithEncryptionKey("This is my secure key!")
-                );
+                // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
+                .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
+                .AbsoluteExpiration(minutes: 7)
+                .ShowThousandsSeparators(false)
+                .WithEncryptionKey("This is my secure key!")
+                .InputNames(// This optional. Change it if you don't like the default names.
+                    new DNTCaptchaComponent
+                    {
+                        CaptchaHiddenInputName = "DNTCaptchaText",
+                        CaptchaHiddenTokenName = "DNTCaptchaToken",
+                        CaptchaInputName = "DNTCaptchaInputText"
+                    })
+                .Identifier("dntCaptcha")// This optional. Change it if you don't like its default name.
+                ;
         }
 ```
 
@@ -127,10 +135,12 @@ namespace DNTCaptcha.TestWebApp.Controllers
     public class HomeController : Controller
     {
         private readonly IDNTCaptchaValidatorService _validatorService;
+        private readonly DNTCaptchaOptions _captchaOptions;
 
-        public HomeController(IDNTCaptchaValidatorService validatorService)
+        public HomeController(IDNTCaptchaValidatorService validatorService, IOptions<DNTCaptchaOptions> options)
         {
             _validatorService = validatorService;
+            _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -138,7 +148,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
         {
             if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.SumOfTwoNumbersToWords))
             {
-                this.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, "Please enter the security code as a number.");
+                this.ModelState.AddModelError(_captchaOptions.CaptchaComponent.CaptchaInputName, "Please enter the security code as a number.");
                 return View(nameof(Index));
             }
 
@@ -163,8 +173,8 @@ namespace DNTCaptcha.TestWebApp.Controllers
 | SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode4.png) |
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
-  - Add required files using the NPM. To do it add [package.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/package.json#L14-L17) file and then run the `npm install` command
-  - It's better to [bundle](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.V3.csproj#L18) the installed dependencies using `dotnet bundle` [bundleconfig.json](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/bundleconfig.json#L17)
+  - Add required files using the NPM. To do it add [package.json](/src/DNTCaptcha.TestWebApp/package.json#L14-L17) file and then run the `npm install` command
+  - It's better to [bundle](/src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.V3.csproj#L18) the installed dependencies using `dotnet bundle` [bundleconfig.json](/src/DNTCaptcha.TestWebApp/bundleconfig.json#L17)
   - Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/releases
 
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
@@ -178,9 +188,11 @@ It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample t
 - [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
 
 ## Supported Languages
-Find all currently supported languages [here](/src/DNTCaptcha.Core/Providers/Language.cs). To add new language, kindly contribute by editing the following files:
-- [Language.cs](/src/DNTCaptcha.Core/Providers/Language.cs)
-- [HumanReadableIntegerProvider.cs](/src/DNTCaptcha.Core/Providers/HumanReadableIntegerProvider.cs)
+
+Find all currently supported languages [here](/src/DNTCaptcha.Core/Language.cs). To add new language, kindly contribute by editing the following files:
+
+- [Language.cs](/src/DNTCaptcha.Core/Language.cs)
+- [HumanReadableIntegerProvider.cs](/src/DNTCaptcha.Core/HumanReadableIntegerProvider.cs)
 
 ## Note:
 

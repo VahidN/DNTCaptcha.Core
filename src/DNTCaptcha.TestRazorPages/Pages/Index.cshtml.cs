@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using DNTCaptcha.Core;
-using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.TestRazorPages.Pages
 {
@@ -12,6 +13,7 @@ namespace DNTCaptcha.TestRazorPages.Pages
     {
         private readonly ILogger<IndexModel> _logger;
         private readonly IDNTCaptchaValidatorService _validatorService;
+        private readonly DNTCaptchaOptions _captchaOptions;
 
         [Display(Name = "User name")]
         [Required(ErrorMessage = "User name is empty")]
@@ -22,17 +24,22 @@ namespace DNTCaptcha.TestRazorPages.Pages
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        public IndexModel(ILogger<IndexModel> logger, IDNTCaptchaValidatorService validatorService)
+        public IndexModel(
+            ILogger<IndexModel> logger,
+            IDNTCaptchaValidatorService validatorService,
+            IOptions<DNTCaptchaOptions> options
+            )
         {
             _logger = logger;
             _validatorService = validatorService;
+            _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         }
 
         public IActionResult OnPost()
         {
             if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.SumOfTwoNumbersToWords))
             {
-                this.ModelState.AddModelError(DNTCaptchaTagHelper.CaptchaInputName, "Please enter the security code as a number.");
+                this.ModelState.AddModelError(_captchaOptions.CaptchaComponent.CaptchaInputName, "Please enter the security code as a number.");
                 return Page();
             }
 

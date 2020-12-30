@@ -1,5 +1,4 @@
 using DNTCaptcha.Core;
-using DNTCaptcha.Core.Providers;
 using DNTCaptcha.TestApiApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +19,7 @@ namespace DNTCaptcha.TestApiApp.Controllers
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                     CaptchaGeneratorLanguage = Language.English,
                     CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbers)]
-        public IActionResult Login([FromBody]AccountViewModel data)
+        public IActionResult Login([FromForm] AccountViewModel data) //NOTE: It's a [FromForm] data or `application/x-www-form-urlencoded` data.
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
             {

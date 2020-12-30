@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using DNTCaptcha.Core.Contracts;
 
 namespace DNTCaptcha.TestWebApp.Models
 {
-    public class AccountViewModel : DNTCaptchaBase
+    public class AccountViewModel
     {
         [Display(Name = "User name")]
         [Required(ErrorMessage = "User name is empty")]

@@ -11,6 +11,14 @@
             ],
             "isBuildCommand": true,
             "problemMatcher": "$msCompile"
+        },
+        {
+            "taskName": "build",
+            "args": [
+                "${workspaceRoot}/src/DNTCaptcha.TestApiApp/DNTCaptcha.TestApiApp.csproj"
+            ],
+            "isBuildCommand": true,
+            "problemMatcher": "$msCompile"
         }
     ]
 }

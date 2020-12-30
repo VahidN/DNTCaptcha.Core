@@ -59,7 +59,16 @@ namespace DNTCaptcha.TestWebApp
                 .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
                 .AbsoluteExpiration(minutes: 7)
                 .ShowThousandsSeparators(false)
-                .WithEncryptionKey("This is my secure key!");
+                .WithEncryptionKey("This is my secure key!")
+                .InputNames(// This optional. Change it if you don't like the default names.
+                    new DNTCaptchaComponent
+                    {
+                        CaptchaHiddenInputName = "DNT_CaptchaText",
+                        CaptchaHiddenTokenName = "DNT_CaptchaToken",
+                        CaptchaInputName = "DNT_CaptchaInputText"
+                    })
+                .Identifier("dnt_Captcha")// This optional. Change it if you don't like its default name.
+                ;
             });
 
             services.AddSession();

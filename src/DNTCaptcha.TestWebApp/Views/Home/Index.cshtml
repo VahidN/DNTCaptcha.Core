@@ -1,7 +1,11 @@
 @using DNTCaptcha.TestWebApp.Models
+@using Microsoft.Extensions.Options
+@using DNTCaptcha.Core
 @model AccountViewModel
+@inject IOptions<DNTCaptchaOptions> Options
 @{
     ViewBag.Title = "Login";
+    var refreshButtonId = Options.Value.CaptchaClass + "RefreshButton";
 }
 <div>
     <!-- Nav tabs -->
@@ -47,12 +51,12 @@
   <script type="text/javascript">
     function dataAjaxSuccess(data, status, xhr) {
         alert('Success!');
-        $("#loginForm3 #dntCaptchaRefreshButton").click(); // refresh captcha
+        $("#loginForm3 #@refreshButtonId").click(); // refresh captcha
     }
 
     function dataAjaxFailure(xhr, status, error) {
         alert('Failure! Try Again!');
-        $("#loginForm3 #dntCaptchaRefreshButton").click(); // refresh captcha
+        $("#loginForm3 #@refreshButtonId").click(); // refresh captcha
     }
   </script>
 }

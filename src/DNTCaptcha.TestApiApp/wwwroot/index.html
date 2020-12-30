@@ -26,11 +26,11 @@
             alt="captcha"
             id="dntCaptchaImg"
             name="dntCaptchaImg"
-            style="margin-bottom: 4px;"
+            style="margin-bottom: 4px"
           />
           <a
             class="glyphicon glyphicon-refresh btn-sm"
-            style="cursor: pointer;"
+            style="cursor: pointer"
             id="dntCaptchaRefreshButton"
             name="dntCaptchaRefreshButton"
             onclick="doRefreshCaptcha()"
@@ -59,7 +59,7 @@
 
         <div
           class="alert alert-warning"
-          style="display: none;"
+          style="display: none"
           id="validationErrorMessage"
         ></div>
       </form>
@@ -144,9 +144,14 @@
           $.ajax({
             url: loginUrl,
             type: "POST",
+            data: $(loginFormId).serialize(), // serializes the form's elements as a form-urlencoded data.
+            /*
+            NOTE: Don't post it as a JSON data. Its `Content-Type` should be `application/x-www-form-urlencoded`.
+
             dataType: "json",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(getFormDataAsJsonObject($(loginFormId))),
+            */
             success: function (result) {
               console.log(result);
               alert("Succeed!");

@@ -1,5 +1,4 @@
 ﻿using System;
-using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 
 namespace DNTCaptcha.Core
@@ -87,7 +86,7 @@ namespace DNTCaptcha.Core
         /// </summary>
         [HtmlAttributeName("asp-text-box-template")]
         public string TextBoxTemplate { set; get; } =
-            @"<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>";
+            "<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>";
 
         /// <summary>
         /// The validation-error-message of the captcha. It's default value is `لطفا کد امنیتی را به رقم وارد نمائید`.

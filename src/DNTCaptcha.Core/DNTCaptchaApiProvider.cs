@@ -1,51 +1,12 @@
 ﻿using System;
 using System.Globalization;
-using DNTCaptcha.Core.Contracts;
-using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using static System.FormattableString;
 
 namespace DNTCaptcha.Core
 {
-    /// <summary>
-    /// ApiProvider Response
-    /// </summary>
-    public class DNTCaptchaApiResponse
-    {
-        /// <summary>
-        /// The captach's image url
-        /// </summary>
-        /// <value></value>
-        public string DntCaptchaImgUrl { set; get; } = default!;
-
-        /// <summary>
-        /// Captcha Id
-        /// </summary>
-        public string DntCaptchaId { set; get; } = default!;
-
-        /// <summary>
-        /// Captcha's TextValue
-        /// </summary>
-        public string DntCaptchaTextValue { set; get; } = default!;
-
-        /// <summary>
-        /// Captcha's TokenValue
-        /// </summary>
-        public string DntCaptchaTokenValue { set; get; } = default!;
-    }
-
-    /// <summary>
-    /// DNTCaptcha Api
-    /// </summary>
-    public interface IDNTCaptchaApiProvider
-    {
-        /// <summary>
-        /// Creates DNTCaptcha
-        /// </summary>
-        /// <param name="captchaAttributes">captcha attributes</param>
-        DNTCaptchaApiResponse CreateDNTCaptcha(DNTCaptchaTagHelperHtmlAttributes captchaAttributes);
-    }
-
     /// <summary>
     /// DNTCaptcha Api
     /// </summary>
@@ -58,6 +19,7 @@ namespace DNTCaptcha.Core
         private readonly ISerializationProvider _serializationProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUrlHelper _urlHelper;
+        private readonly DNTCaptchaOptions _captchaOptions;
 
         /// <summary>
         /// DNTCaptcha Api
@@ -69,7 +31,8 @@ namespace DNTCaptcha.Core
             ICaptchaStorageProvider captchaStorageProvider,
             ISerializationProvider serializationProvider,
             IHttpContextAccessor httpContextAccessor,
-            IUrlHelper urlHelper)
+            IUrlHelper urlHelper,
+            IOptions<DNTCaptchaOptions> options)
         {
             _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
             _randomNumberProvider = randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
@@ -78,6 +41,7 @@ namespace DNTCaptcha.Core
             _serializationProvider = serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _urlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
+            _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         }
 
         /// <summary>
@@ -100,7 +64,7 @@ namespace DNTCaptcha.Core
             var randomText = _captchaTextProvider(captchaAttributes.DisplayMode).GetText(number, captchaAttributes.Language);
             var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
             var captchaImageUrl = getCaptchaImageUrl(captchaAttributes, encryptedText);
-            var captchaDivId = $"dntCaptcha{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}";
+            var captchaDivId = Invariant($"{_captchaOptions.CaptchaClass}{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}");
             var cookieToken = $".{captchaDivId}";
             var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
 

@@ -1,6 +1,4 @@
 ﻿using System;
-using DNTCaptcha.Core.Contracts;
-using DNTCaptcha.Core.Providers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -40,19 +38,14 @@ namespace DNTCaptcha.Core
             services.TryAddSingleton<SumOfTwoNumbersToWordsProvider>();
             services.TryAddSingleton<Func<DisplayMode, ICaptchaTextProvider>>(serviceProvider => key =>
             {
-                switch (key)
+                return key switch
                 {
-                    case DisplayMode.NumberToWord:
-                        return serviceProvider.GetRequiredService<HumanReadableIntegerProvider>();
-                    case DisplayMode.ShowDigits:
-                        return serviceProvider.GetRequiredService<ShowDigitsProvider>();
-                    case DisplayMode.SumOfTwoNumbers:
-                        return serviceProvider.GetRequiredService<SumOfTwoNumbersProvider>();
-                    case DisplayMode.SumOfTwoNumbersToWords:
-                        return serviceProvider.GetRequiredService<SumOfTwoNumbersToWordsProvider>();
-                    default:
-                        throw new NotImplementedException($"Service of type {key} is not implemented.");
-                }
+                    DisplayMode.NumberToWord => serviceProvider.GetRequiredService<HumanReadableIntegerProvider>(),
+                    DisplayMode.ShowDigits => serviceProvider.GetRequiredService<ShowDigitsProvider>(),
+                    DisplayMode.SumOfTwoNumbers => serviceProvider.GetRequiredService<SumOfTwoNumbersProvider>(),
+                    DisplayMode.SumOfTwoNumbersToWords => serviceProvider.GetRequiredService<SumOfTwoNumbersToWordsProvider>(),
+                    _ => throw new InvalidOperationException($"Service of type {key} is not implemented."),
+                };
             });
 
             services.TryAddSingleton<IRandomNumberProvider, RandomNumberProvider>();
