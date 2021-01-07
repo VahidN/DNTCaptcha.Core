@@ -15,7 +15,8 @@ namespace DNTCaptcha.Core
             { Language.Norwegian, " og " },
             { Language.Italian, " " },
             { Language.Turkish, " " },
-            { Language.Arabic, " و " }
+            { Language.Arabic, " و " },
+            { Language.Russian, " " }
         };
 
         private readonly IList<NumberWord> _numberWords = new List<NumberWord>
@@ -32,6 +33,9 @@ namespace DNTCaptcha.Core
                 new List<string> { string.Empty, "Bir", "İki", "Üç", "Dört", "Beş", "Altı", "Yedi", "Sekiz", "Dokuz" }},
             new NumberWord { Group= DigitGroup.Ones, Language= Language.Arabic, Names=
                 new List<string> { string.Empty, "واحد", "اثنان", "ثلاثة", "اربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة" }},
+            new NumberWord { Group= DigitGroup.Ones, Language= Language.Russian, Names=
+                new List<string> { string.Empty, "Один", "Два", "Три", "Четыре", "Пять", "Шесть", "Семь", "Восемь", "Девять" }},
+
 
             new NumberWord { Group= DigitGroup.Teens, Language= Language.English, Names=
                 new List<string> { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" }},
@@ -45,6 +49,8 @@ namespace DNTCaptcha.Core
                 new List<string> { "On", "Onbir", "Oniki", "Onüç", "Ondört", "Onbeş", "Onaltı", "Onyedi", "Onsekiz", "Ondokuz" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Arabic, Names=
                 new List<string> { "عشرة", "احدى عشر", "اثني عشر", "ثلاثة عشر", "اربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر" }},
+            new NumberWord { Group= DigitGroup.Teens, Language= Language.Russian, Names=
+                new List<string> { "Десять", "Одинадцать", "Двенадцать", "Тринадцать", "Четырнадцать", "Пятнадцать", "Шестнадцать", "Семнадцать", "Восемнадцать", "Девятнадцать" }},
 
             new NumberWord { Group= DigitGroup.Tens, Language= Language.English, Names=
                 new List<string> { "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" }},
@@ -58,6 +64,8 @@ namespace DNTCaptcha.Core
                 new List<string> { "Yirmi", "Otuz", "Kırk", "Elli", "Altmış", "Yetmiş", "Seksen", "Doksan" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Arabic, Names=
                 new List<string> { "عشرون", "ثلاثون", "اربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون" }},
+           new NumberWord { Group= DigitGroup.Tens, Language= Language.Russian, Names=
+                new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятдесят", "Шестдесят", "Семдесят", "Восемдесят", "Девяносто" }},
 
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.English, Names=
                 new List<string> {string.Empty, "One Hundred", "Two Hundred", "Three Hundred", "Four Hundred",
@@ -74,6 +82,9 @@ namespace DNTCaptcha.Core
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Arabic, Names=
                 new List<string> {string.Empty, "مائة", "مائتان", "ثلاثمائة", "اربعمائة",
                     "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة" }},
+            new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Russian, Names=
+                new List<string> {string.Empty, "Сто", "Двести", "Триста", "Четыреста",
+                    "Пятьсот", "Шестьсот", "Семьсот", "Восемьсот", "Девятьсот" }},
 
             new NumberWord { Group= DigitGroup.Thousands, Language= Language.English, Names=
               new List<string> { string.Empty, " Thousand", " Million", " Billion"," Trillion", " Quadrillion", " Quintillion", " Sextillian",
@@ -113,6 +124,13 @@ namespace DNTCaptcha.Core
             " سيتليار", " ويتليون", " ويتليار", " تيفليون", " تيفليار", " ديشليون",
             " ديشليار", " Unvigintillion", " Duovigintillion", " 10^72", " 10^75", " 10^78", " 10^81", " 10^84", " 10^87",
             " Vigintinonillion", " 10^93", " 10^96", " Duotrigintillion", " Trestrigintillion" }},
+            new NumberWord { Group= DigitGroup.Thousands, Language= Language.Russian, Names=
+              new List<string> { string.Empty, " Тысяча", " Миллион", " Миллиард", " Триллион", " Квадриллион", " Квинтиллион", " Секстиллиан",
+            " Септиллион", " Октиллион", " Нониллион", " Дециллион", " Ундециллион", " Дуодециллион", " Тредециллион",
+            " Кваттуордециллион", " Квиндециллион", " Сексдециллион", " Септдециллион", " Октодециллион", " Новемдециллион",
+            " Вигинтиллион", " Унвигинтиллион", " Дуовигинтиллион", " 10 ^ 72", " 10 ^ 75", " 10 ^ 78", " 10 ^ 81", " 10 ^ 84", " 10 ^ 87",
+            " Вигинтинониллион", " 10 ^ 93", " 10 ^ 96", " Дуотригинтиллион", " Трестригинтиллион"
+             }},
         };
 
         private readonly IDictionary<Language, string> _negative = new Dictionary<Language, string>
@@ -123,6 +141,7 @@ namespace DNTCaptcha.Core
             { Language.Italian, "Negativo" },
             { Language.Turkish, "Eksi" },
             { Language.Arabic, "سالب " },
+            { Language.Russian, "Минус " },
         };
 
         private readonly IDictionary<Language, string> _zero = new Dictionary<Language, string>
@@ -133,6 +152,7 @@ namespace DNTCaptcha.Core
             { Language.Italian, "Zero" },
             { Language.Turkish, "Sıfır" },
             { Language.Arabic, "صفر" },
+            { Language.Russian, "Ноль" },
         };
 
         /// <summary>
