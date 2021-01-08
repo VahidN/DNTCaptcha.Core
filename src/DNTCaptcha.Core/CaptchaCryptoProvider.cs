@@ -100,6 +100,8 @@ namespace DNTCaptcha.Core
                         Justification = "That's enough for our usecase!")]
         [SuppressMessage("Microsoft.Usage", "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
                         Justification = "That's enough for our usecase!")]
+        [SuppressMessage("Microsoft.Usage", "SCS0011:encrypt uses a weak cryptographic algorithm TripleDES",
+                        Justification = "That's enough for our usecase!")]
         private byte[] encrypt(byte[] data)
         {
             using (var des = new TripleDESCryptoServiceProvider
@@ -126,6 +128,8 @@ namespace DNTCaptcha.Core
         [SuppressMessage("Microsoft.Usage", "S5547:encrypt uses a weak cryptographic algorithm TripleDES",
                         Justification = "That's enough for our usecase!")]
         [SuppressMessage("Microsoft.Usage", "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
+                        Justification = "That's enough for our usecase!")]
+        [SuppressMessage("Microsoft.Usage", "SCS0011:encrypt uses a weak cryptographic algorithm TripleDES",
                         Justification = "That's enough for our usecase!")]
         private byte[] decrypt(byte[] data)
         {
