@@ -34,6 +34,11 @@
         /// <summary>
         /// Arabic Language
         /// </summary>
-        Arabic
+        Arabic,
+
+        /// <summary>
+        /// Russian Language
+        /// </summary>
+        Russian
     }
 }
