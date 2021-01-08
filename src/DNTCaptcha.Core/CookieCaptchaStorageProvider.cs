@@ -110,7 +110,8 @@ namespace DNTCaptcha.Core
                 Path = context.Request.PathBase.HasValue ? context.Request.PathBase.ToString() : "/",
                 Secure = context.Request.IsHttps,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),
-                IsEssential = true
+                IsEssential = true,
+                SameSite = SameSiteMode.Strict
             };
         }
     }
