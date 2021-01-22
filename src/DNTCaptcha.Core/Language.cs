@@ -40,5 +40,10 @@
         /// Russian Language
         /// </summary>
         Russian
+
+         /// <summary>
+        /// Chinese Language
+        /// </summary>
+        Chinese
     }
 }

@@ -17,6 +17,7 @@ namespace DNTCaptcha.Core
             { Language.Turkish, " " },
             { Language.Arabic, " و " },
             { Language.Russian, " " }
+            { Language.Chinese, " " }
         };
 
         private readonly IList<NumberWord> _numberWords = new List<NumberWord>
@@ -35,7 +36,8 @@ namespace DNTCaptcha.Core
                 new List<string> { string.Empty, "واحد", "اثنان", "ثلاثة", "اربعة", "خمسة", "ستة", "سبعة", "ثمانية", "تسعة" }},
             new NumberWord { Group= DigitGroup.Ones, Language= Language.Russian, Names=
                 new List<string> { string.Empty, "Один", "Два", "Три", "Четыре", "Пять", "Шесть", "Семь", "Восемь", "Девять" }},
-
+            new NumberWord { Group= DigitGroup.Ones, Language= Language.Chinese, Names=
+                new List<string> { string.Empty, "一", "二", "三", "四", "五", "六", "七", "八", "九" }},
 
             new NumberWord { Group= DigitGroup.Teens, Language= Language.English, Names=
                 new List<string> { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" }},
@@ -51,6 +53,8 @@ namespace DNTCaptcha.Core
                 new List<string> { "عشرة", "احدى عشر", "اثني عشر", "ثلاثة عشر", "اربعة عشر", "خمسة عشر", "ستة عشر", "سبعة عشر", "ثمانية عشر", "تسعة عشر" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Russian, Names=
                 new List<string> { "Десять", "Одинадцать", "Двенадцать", "Тринадцать", "Четырнадцать", "Пятнадцать", "Шестнадцать", "Семнадцать", "Восемнадцать", "Девятнадцать" }},
+            new NumberWord { Group= DigitGroup.Teens, Language= Language.Chinese, Names=
+                new List <string> {“十”,“十一”,“十二”,“十三”,“十四”,“十五”,“十六”,“十七”,“十八”,“十九”}},    
 
             new NumberWord { Group= DigitGroup.Tens, Language= Language.English, Names=
                 new List<string> { "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" }},
@@ -66,6 +70,9 @@ namespace DNTCaptcha.Core
                 new List<string> { "عشرون", "ثلاثون", "اربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون" }},
            new NumberWord { Group= DigitGroup.Tens, Language= Language.Russian, Names=
                 new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятдесят", "Шестдесят", "Семдесят", "Восемдесят", "Девяносто" }},
+            new NumberWord { Group= DigitGroup.Tens, Language= Language.Chinese, Names=
+                new List<string> {“二十”,“三十”,“四十”,“五十”,“六十”,“七十”,“八十”,“九十”}}
+
 
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.English, Names=
                 new List<string> {string.Empty, "One Hundred", "Two Hundred", "Three Hundred", "Four Hundred",
@@ -85,6 +92,8 @@ namespace DNTCaptcha.Core
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Russian, Names=
                 new List<string> {string.Empty, "Сто", "Двести", "Триста", "Четыреста",
                     "Пятьсот", "Шестьсот", "Семьсот", "Восемьсот", "Девятьсот" }},
+            new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Chinese, Names=
+                new List<string> {string.Empty, “一百”,“两百”,“三百”,“四百”,“五百”,“六百”,“七百”,“八百”,“九百” }},
 
             new NumberWord { Group= DigitGroup.Thousands, Language= Language.English, Names=
               new List<string> { string.Empty, " Thousand", " Million", " Billion"," Trillion", " Quadrillion", " Quintillion", " Sextillian",
@@ -131,6 +140,13 @@ namespace DNTCaptcha.Core
             " Вигинтиллион", " Унвигинтиллион", " Дуовигинтиллион", " 10 ^ 72", " 10 ^ 75", " 10 ^ 78", " 10 ^ 81", " 10 ^ 84", " 10 ^ 87",
             " Вигинтинониллион", " 10 ^ 93", " 10 ^ 96", " Дуотригинтиллион", " Трестригинтиллион"
              }},
+
+            new NumberWord { Group= DigitGroup.Thousands, Language= Language.Chinese, Names=
+              new List<string> { string.Empty, "千", "百万", "十亿","万亿", "千万亿", "百亿亿", "亿亿亿",
+            " 千亿亿亿", "十亿亿亿亿", "10^30", "10^33", "10^36", "10^39", "10^42",
+            "10^45", "10^48", "10^51", "10^54", "10^57", "10^60",
+            "10^63", " 10^66", " 10^69", " 10^72", " 10^75", " 10^78", " 10^81", " 10^84", " 10^87",
+            "10^90", " 10^93", " 10^96", "10^99", "10^102" }},
         };
 
         private readonly IDictionary<Language, string> _negative = new Dictionary<Language, string>
@@ -142,6 +158,7 @@ namespace DNTCaptcha.Core
             { Language.Turkish, "Eksi" },
             { Language.Arabic, "سالب " },
             { Language.Russian, "Минус " },
+            { Language.Chinese, "负" },
         };
 
         private readonly IDictionary<Language, string> _zero = new Dictionary<Language, string>
@@ -153,6 +170,7 @@ namespace DNTCaptcha.Core
             { Language.Turkish, "Sıfır" },
             { Language.Arabic, "صفر" },
             { Language.Russian, "Ноль" },
+            { Language.Chinese, "零" },
         };
 
         /// <summary>
