@@ -16,7 +16,7 @@ namespace DNTCaptcha.Core
             { Language.Italian, " " },
             { Language.Turkish, " " },
             { Language.Arabic, " و " },
-            { Language.Russian, " " }
+            { Language.Russian, " " },
             { Language.Chinese, " " }
         };
 
@@ -54,7 +54,7 @@ namespace DNTCaptcha.Core
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Russian, Names=
                 new List<string> { "Десять", "Одинадцать", "Двенадцать", "Тринадцать", "Четырнадцать", "Пятнадцать", "Шестнадцать", "Семнадцать", "Восемнадцать", "Девятнадцать" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Chinese, Names=
-                new List <string> {“十”,“十一”,“十二”,“十三”,“十四”,“十五”,“十六”,“十七”,“十八”,“十九”}},    
+                new List <string> {"十","十一","十二","十三","十四","十五","十六","十七","十八","十九"}},    
 
             new NumberWord { Group= DigitGroup.Tens, Language= Language.English, Names=
                 new List<string> { "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" }},
@@ -71,7 +71,7 @@ namespace DNTCaptcha.Core
            new NumberWord { Group= DigitGroup.Tens, Language= Language.Russian, Names=
                 new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятдесят", "Шестдесят", "Семдесят", "Восемдесят", "Девяносто" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Chinese, Names=
-                new List<string> {“二十”,“三十”,“四十”,“五十”,“六十”,“七十”,“八十”,“九十”}}
+                new List<string> {"二十","三十","四十","五十","六十","七十","八十","九十"}}
 
 
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.English, Names=
@@ -93,7 +93,7 @@ namespace DNTCaptcha.Core
                 new List<string> {string.Empty, "Сто", "Двести", "Триста", "Четыреста",
                     "Пятьсот", "Шестьсот", "Семьсот", "Восемьсот", "Девятьсот" }},
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Chinese, Names=
-                new List<string> {string.Empty, “一百”,“两百”,“三百”,“四百”,“五百”,“六百”,“七百”,“八百”,“九百” }},
+                new List<string> {string.Empty, "一百","两百","三百","四百","五百","六百","七百","八百","九百" }},
 
             new NumberWord { Group= DigitGroup.Thousands, Language= Language.English, Names=
               new List<string> { string.Empty, " Thousand", " Million", " Billion"," Trillion", " Quadrillion", " Quintillion", " Sextillian",
