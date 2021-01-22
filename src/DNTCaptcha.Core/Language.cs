@@ -39,9 +39,9 @@
         /// <summary>
         /// Russian Language
         /// </summary>
-        Russian
+        Russian,
 
-         /// <summary>
+        /// <summary>
         /// Chinese Language
         /// </summary>
         Chinese

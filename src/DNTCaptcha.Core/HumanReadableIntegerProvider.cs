@@ -71,7 +71,7 @@ namespace DNTCaptcha.Core
            new NumberWord { Group= DigitGroup.Tens, Language= Language.Russian, Names=
                 new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятдесят", "Шестдесят", "Семдесят", "Восемдесят", "Девяносто" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Chinese, Names=
-                new List<string> {"二十","三十","四十","五十","六十","七十","八十","九十"}}
+                new List<string> {"二十","三十","四十","五十","六十","七十","八十","九十"}},
 
 
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.English, Names=
