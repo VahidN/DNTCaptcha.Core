@@ -17,7 +17,8 @@ namespace DNTCaptcha.Core
             { Language.Turkish, " " },
             { Language.Arabic, " و " },
             { Language.Russian, " " },
-            { Language.Chinese, " " }
+            { Language.Chinese, " " },
+            { Language.Spanish, " " }
         };
 
         private readonly IList<NumberWord> _numberWords = new List<NumberWord>
@@ -38,6 +39,8 @@ namespace DNTCaptcha.Core
                 new List<string> { string.Empty, "Один", "Два", "Три", "Четыре", "Пять", "Шесть", "Семь", "Восемь", "Девять" }},
             new NumberWord { Group= DigitGroup.Ones, Language= Language.Chinese, Names=
                 new List<string> { string.Empty, "一", "二", "三", "四", "五", "六", "七", "八", "九" }},
+            new NumberWord { Group= DigitGroup.Ones, Language= Language.Spanish, Names=
+                new List<string> { string.Empty, "Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve" }},
 
             new NumberWord { Group= DigitGroup.Teens, Language= Language.English, Names=
                 new List<string> { "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen" }},
@@ -54,7 +57,9 @@ namespace DNTCaptcha.Core
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Russian, Names=
                 new List<string> { "Десять", "Одинадцать", "Двенадцать", "Тринадцать", "Четырнадцать", "Пятнадцать", "Шестнадцать", "Семнадцать", "Восемнадцать", "Девятнадцать" }},
             new NumberWord { Group= DigitGroup.Teens, Language= Language.Chinese, Names=
-                new List <string> {"十","十一","十二","十三","十四","十五","十六","十七","十八","十九"}},    
+                new List <string> {"十","十一","十二","十三","十四","十五","十六","十七","十八","十九"}},
+            new NumberWord { Group= DigitGroup.Teens, Language= Language.Spanish, Names=
+                new List<string> { string.Empty, "Diez", "Once", "Doce", "Trece", "Catorce", "Quince", "Dieciséis", "Diecisiete", "Dieciocho", "Diecineve" }},
 
             new NumberWord { Group= DigitGroup.Tens, Language= Language.English, Names=
                 new List<string> { "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" }},
@@ -72,6 +77,8 @@ namespace DNTCaptcha.Core
                 new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятдесят", "Шестдесят", "Семдесят", "Восемдесят", "Девяносто" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Chinese, Names=
                 new List<string> {"二十","三十","四十","五十","六十","七十","八十","九十"}},
+            new NumberWord { Group= DigitGroup.Tens, Language= Language.Spanish, Names=
+                new List<string> {"Veinte","Treinta","Cuarenta","Cincuenta","Sesenta","Setenta","Ochenta","Noventa"}},
 
 
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.English, Names=
@@ -94,6 +101,8 @@ namespace DNTCaptcha.Core
                     "Пятьсот", "Шестьсот", "Семьсот", "Восемьсот", "Девятьсот" }},
             new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Chinese, Names=
                 new List<string> {string.Empty, "一百","两百","三百","四百","五百","六百","七百","八百","九百" }},
+            new NumberWord { Group= DigitGroup.Hundreds, Language= Language.Spanish, Names=
+                new List<string> {string.Empty, "Cien","Doscientos","Trescientos","Cuatrocientos","Quinientos","Seiscientos","Setecientos","Ochocientos","Novecientos" }},
 
             new NumberWord { Group= DigitGroup.Thousands, Language= Language.English, Names=
               new List<string> { string.Empty, " Thousand", " Million", " Billion"," Trillion", " Quadrillion", " Quintillion", " Sextillian",
@@ -146,6 +155,11 @@ namespace DNTCaptcha.Core
             "十万秭", "穰", "千穰", "百万穰", "十沟", "万沟",
             "千万沟", " 百涧", "十万涧", "正", "千正", "百万正", "十载", "万载", "千万载",
             "百极", "十万极", "恒河沙", "千恒河沙", "百万恒河沙" }},
+            new NumberWord { Group= DigitGroup.Thousands, Language= Language.Spanish, Names=
+              new List<string> { string.Empty, " Mil", " Millón", " Billón", " Trillón", " Cuatrillón", " Quintrillón",
+            " Sextillón", " Septillón", " Octrillón", " Nonillón", " Decillión", " Undecillón", " Duodecillón",
+            " 10^72", " 10^75", " 10^78", " 10^81", " 10^84", " 10^87",
+            " Vigintillón", " 10^93", " 10^96", " Duotrigintillón", " Trestrigintillón" }},
         };
 
         private readonly IDictionary<Language, string> _negative = new Dictionary<Language, string>
@@ -158,6 +172,7 @@ namespace DNTCaptcha.Core
             { Language.Arabic, "سالب " },
             { Language.Russian, "Минус " },
             { Language.Chinese, "负" },
+            { Language.Spanish, "Negativo" },
         };
 
         private readonly IDictionary<Language, string> _zero = new Dictionary<Language, string>
@@ -170,6 +185,7 @@ namespace DNTCaptcha.Core
             { Language.Arabic, "صفر" },
             { Language.Russian, "Ноль" },
             { Language.Chinese, "零" },
+            { Language.Spanish, "Cero" },
         };
 
         /// <summary>

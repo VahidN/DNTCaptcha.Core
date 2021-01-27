@@ -44,6 +44,11 @@
         /// <summary>
         /// Chinese Language
         /// </summary>
-        Chinese
+        Chinese,
+
+        /// <summary>
+        /// Spanish Language
+        /// </summary>
+        Spanish,
     }
 }
