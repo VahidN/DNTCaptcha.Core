@@ -50,5 +50,10 @@
         /// Spanish Language
         /// </summary>
         Spanish,
+
+        /// <summary>
+        /// Spanish Language
+        /// </summary>
+        Portuguese
     }
 }
