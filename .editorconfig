@@ -13,6 +13,9 @@ dotnet_diagnostic.MA0007.severity = none
 # S101 : Rename class name to match pascal case naming rules
 dotnet_diagnostic.S101.severity = suggestion
 
+# SCS0013 : Potential usage of weak AES mode.
+dotnet_diagnostic.SCS0013.severity = suggestion
+
 # CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability. 
 dotnet_diagnostic.CA1010.severity = suggestion
 
