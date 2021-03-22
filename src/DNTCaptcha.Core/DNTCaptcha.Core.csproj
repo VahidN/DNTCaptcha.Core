@@ -38,7 +38,7 @@
     <ReportAnalyzer>true</ReportAnalyzer>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SecurityCodeScan.VS2019" Version="5.0.0">
+    <PackageReference Include="SecurityCodeScan.VS2019" Version="5.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
