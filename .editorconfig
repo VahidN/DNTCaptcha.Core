@@ -16,7 +16,12 @@ dotnet_diagnostic.S101.severity = suggestion
 # SCS0013 : Potential usage of weak AES mode.
 dotnet_diagnostic.SCS0013.severity = suggestion
 
-# CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability. 
+dotnet_diagnostic.SCS0008.severity = suggestion
+dotnet_diagnostic.SCS0009.severity = suggestion
+dotnet_diagnostic.SCS0015.severity = suggestion
+dotnet_diagnostic.CA1031.severity = suggestion
+
+# CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability.
 dotnet_diagnostic.CA1010.severity = suggestion
 
 # MA0051 : Method is too long. maximum allowed: 60.

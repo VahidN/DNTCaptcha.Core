@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-    <VersionPrefix>3.5.0</VersionPrefix>
+    <VersionPrefix>3.6.0</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -38,15 +38,15 @@
     <ReportAnalyzer>true</ReportAnalyzer>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="SecurityCodeScan.VS2019" Version="5.0.0">
+    <PackageReference Include="SecurityCodeScan.VS2019" Version="5.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Meziantou.Analyzer" Version="1.0.646">
+    <PackageReference Include="Meziantou.Analyzer" Version="1.0.660">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.8.55">
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.9.60">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -58,7 +58,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.18.0.27296">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.21.0.30542">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -71,7 +71,7 @@
   </ItemGroup>
   <ItemGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1') or ('$(TargetFramework)' == 'net5.0')">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
   <PropertyGroup Condition="('$(TargetFramework)' == 'netcoreapp3.1') or ('$(TargetFramework)' == 'net5.0')">
     <DefineConstants>NETCOREAPP3_0</DefineConstants>

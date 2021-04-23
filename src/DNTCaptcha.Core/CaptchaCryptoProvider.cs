@@ -1,12 +1,10 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core
@@ -17,28 +15,17 @@ namespace DNTCaptcha.Core
     public class CaptchaCryptoProvider : ICaptchaCryptoProvider
     {
         private readonly byte[] _keyBytes;
-        private readonly ILogger<CaptchaCryptoProvider> _logger;
 
         /// <summary>
         /// The default captcha protection provider
         /// </summary>
-        public CaptchaCryptoProvider(
-            IOptions<DNTCaptchaOptions> options,
-            IRandomNumberProvider randomNumberProvider,
-            ILogger<CaptchaCryptoProvider> logger)
+        public CaptchaCryptoProvider(IOptions<DNTCaptchaOptions> options)
         {
-            _logger = logger;
-            if (randomNumberProvider == null)
-            {
-                throw new ArgumentNullException(nameof(randomNumberProvider));
-            }
-
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
-
-            _keyBytes = getDesKey(options.Value.EncryptionKey, randomNumberProvider.NextNumber().ToString(CultureInfo.InvariantCulture));
+            _keyBytes = getDesKey(options.Value.EncryptionKey);
         }
 
         /// <summary>
@@ -63,22 +50,9 @@ namespace DNTCaptcha.Core
                 throw new ArgumentNullException(nameof(inputText));
             }
 
-            try
-            {
-                var inputBytes = WebEncoders.Base64UrlDecode(inputText);
-                var bytes = decrypt(inputBytes);
-                return Encoding.UTF8.GetString(bytes);
-            }
-            catch (FormatException ex)
-            {
-                _logger.LogError(ex.Message, "Invalid base 64 string. Fall through.");
-            }
-            catch (CryptographicException ex)
-            {
-                _logger.LogError(ex.Message, "Invalid protected payload. Fall through.");
-            }
-
-            return null;
+            var inputBytes = WebEncoders.Base64UrlDecode(inputText);
+            var bytes = decrypt(inputBytes);
+            return Encoding.UTF8.GetString(bytes);
         }
 
         /// <summary>
@@ -158,12 +132,11 @@ namespace DNTCaptcha.Core
             }
         }
 
-        private byte[] getDesKey(string? key, string randomKey)
+        private byte[] getDesKey(string? key)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
-                key = randomKey;
-                _logger.LogWarning("A random key was generated. You can change it by setting the `options.WithEncryptionKey(...)` method.");
+                throw new InvalidOperationException("Please set the `options.WithEncryptionKey(...)`.");
             }
             // The key size of TripleDES is 168 bits, its len in byte is 24 Bytes (or 192 bits).
             // Last bit of each byte is not used (or used as version in some hardware).

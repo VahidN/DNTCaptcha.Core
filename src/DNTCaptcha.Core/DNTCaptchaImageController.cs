@@ -61,78 +61,86 @@ namespace DNTCaptcha.Core
         [HttpGet("[action]"), HttpPost("[action]")]
         public IActionResult Refresh(string data)
         {
-            if (string.IsNullOrWhiteSpace(data))
+            try
             {
-                return BadRequest();
-            }
-
-            var decryptedModel = _captchaProtectionProvider.Decrypt(data);
-            if (decryptedModel == null)
-            {
-                return BadRequest();
-            }
-
-            var model = _serializationProvider.Deserialize<DNTCaptchaTagHelperHtmlAttributes>(decryptedModel);
-            if (model == null)
-            {
-                return BadRequest();
-            }
-
-            invalidateToken(model);
-
-            var tagHelper = HttpContext.RequestServices.GetRequiredService<DNTCaptchaTagHelper>();
-            tagHelper.BackColor = model.BackColor;
-            tagHelper.FontName = model.FontName;
-            tagHelper.FontSize = model.FontSize;
-            tagHelper.ForeColor = model.ForeColor;
-            tagHelper.Language = model.Language;
-            tagHelper.Max = model.Max;
-            tagHelper.Min = model.Min;
-            tagHelper.Placeholder = model.Placeholder;
-            tagHelper.TextBoxClass = model.TextBoxClass;
-            tagHelper.TextBoxTemplate = model.TextBoxTemplate;
-            tagHelper.ValidationErrorMessage = model.ValidationErrorMessage;
-            tagHelper.ValidationMessageClass = model.ValidationMessageClass;
-            tagHelper.RefreshButtonClass = model.RefreshButtonClass;
-            tagHelper.DisplayMode = model.DisplayMode;
-            tagHelper.UseRelativeUrls = model.UseRelativeUrls;
-            tagHelper.UseNoise = model.UseNoise;
-
-            var tagHelperContext = new TagHelperContext(
-                allAttributes: new TagHelperAttributeList(),
-                items: new Dictionary<object, object> { { typeof(IUrlHelper), this.Url } },
-                uniqueId: Guid.NewGuid().ToString("N"));
-
-            var tagHelperOutput = new TagHelperOutput(
-                tagName: "div",
-                attributes: new TagHelperAttributeList(),
-                getChildContentAsync: (useCachedResult, encoder) =>
+                if (string.IsNullOrWhiteSpace(data))
                 {
-                    var tagHelperContent = new DefaultTagHelperContent();
-                    tagHelperContent.SetContent(string.Empty);
-                    return Task.FromResult<TagHelperContent>(tagHelperContent);
-                });
-            tagHelper.ViewContext = ViewContext ?? new ViewContext(
-                    new ActionContext(this.HttpContext, HttpContext.GetRouteData(), ControllerContext.ActionDescriptor),
-                    new FakeView(),
-                    new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                    return BadRequest("The data is null or empty.");
+                }
+
+                var decryptedModel = _captchaProtectionProvider.Decrypt(data);
+                if (decryptedModel == null)
+                {
+                    return BadRequest("Couldn't decrypt the data.");
+                }
+
+                var model = _serializationProvider.Deserialize<DNTCaptchaTagHelperHtmlAttributes>(decryptedModel);
+                if (model == null)
+                {
+                    return BadRequest("Couldn't deserialize the model.");
+                }
+
+                invalidateToken(model);
+
+                var tagHelper = HttpContext.RequestServices.GetRequiredService<DNTCaptchaTagHelper>();
+                tagHelper.BackColor = model.BackColor;
+                tagHelper.FontName = model.FontName;
+                tagHelper.FontSize = model.FontSize;
+                tagHelper.ForeColor = model.ForeColor;
+                tagHelper.Language = model.Language;
+                tagHelper.Max = model.Max;
+                tagHelper.Min = model.Min;
+                tagHelper.Placeholder = model.Placeholder;
+                tagHelper.TextBoxClass = model.TextBoxClass;
+                tagHelper.TextBoxTemplate = model.TextBoxTemplate;
+                tagHelper.ValidationErrorMessage = model.ValidationErrorMessage;
+                tagHelper.ValidationMessageClass = model.ValidationMessageClass;
+                tagHelper.RefreshButtonClass = model.RefreshButtonClass;
+                tagHelper.DisplayMode = model.DisplayMode;
+                tagHelper.UseRelativeUrls = model.UseRelativeUrls;
+                tagHelper.UseNoise = model.UseNoise;
+
+                var tagHelperContext = new TagHelperContext(
+                    allAttributes: new TagHelperAttributeList(),
+                    items: new Dictionary<object, object> { { typeof(IUrlHelper), this.Url } },
+                    uniqueId: Guid.NewGuid().ToString("N"));
+
+                var tagHelperOutput = new TagHelperOutput(
+                    tagName: "div",
+                    attributes: new TagHelperAttributeList(),
+                    getChildContentAsync: (useCachedResult, encoder) =>
                     {
-                        Model = null
-                    },
-                    new TempDataDictionary(this.HttpContext, _tempDataProvider),
-                    TextWriter.Null,
-                    new HtmlHelperOptions());
+                        var tagHelperContent = new DefaultTagHelperContent();
+                        tagHelperContent.SetContent(string.Empty);
+                        return Task.FromResult<TagHelperContent>(tagHelperContent);
+                    });
+                tagHelper.ViewContext = ViewContext ?? new ViewContext(
+                        new ActionContext(this.HttpContext, HttpContext.GetRouteData(), ControllerContext.ActionDescriptor),
+                        new FakeView(),
+                        new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
+                        {
+                            Model = null
+                        },
+                        new TempDataDictionary(this.HttpContext, _tempDataProvider),
+                        TextWriter.Null,
+                        new HtmlHelperOptions());
 
-            tagHelper.Process(tagHelperContext, tagHelperOutput);
+                tagHelper.Process(tagHelperContext, tagHelperOutput);
 
-            var attrs = new StringBuilder();
-            foreach (var attr in tagHelperOutput.Attributes)
-            {
-                attrs.Append(' ').Append(attr.Name).Append("='").Append(attr.Value).Append('\'');
+                var attrs = new StringBuilder();
+                foreach (var attr in tagHelperOutput.Attributes)
+                {
+                    attrs.Append(' ').Append(attr.Name).Append("='").Append(attr.Value).Append('\'');
+                }
+
+                var content = $"<div {attrs}>{tagHelperOutput.Content.GetContent()}</div>";
+                return Content(content);
             }
-
-            var content = $"<div {attrs}>{tagHelperOutput.Content.GetContent()}</div>";
-            return Content(content);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to refresh the captcha image.");
+                return BadRequest(ex.ToString());
+            }
         }
 
         private void invalidateToken(DNTCaptchaTagHelperHtmlAttributes model)
@@ -147,33 +155,41 @@ namespace DNTCaptcha.Core
         [HttpGet("[action]"), HttpPost("[action]")]
         public IActionResult Show(string data)
         {
-            if (string.IsNullOrWhiteSpace(data))
+            try
             {
-                return BadRequest();
-            }
+                if (string.IsNullOrWhiteSpace(data))
+                {
+                    return BadRequest("The data is null or empty.");
+                }
 
-            var decryptedModel = _captchaProtectionProvider.Decrypt(data);
-            if (decryptedModel == null)
+                var decryptedModel = _captchaProtectionProvider.Decrypt(data);
+                if (decryptedModel == null)
+                {
+                    return BadRequest("Couldn't decrypt the data.");
+                }
+
+                var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
+                if (model == null)
+                {
+                    return BadRequest("Couldn't deserialize the model.");
+                }
+
+                var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
+                if (decryptedText == null)
+                {
+                    return BadRequest("Couldn't decrypt the text.");
+                }
+
+                var image = model.UseNoise ?
+                    _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName) :
+                    _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
+                return new FileContentResult(image, "image/png");
+            }
+            catch (Exception ex)
             {
-                return BadRequest();
+                _logger.LogError(ex, "Failed to show the captcha image.");
+                return BadRequest(ex.ToString());
             }
-
-            var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
-            if (model == null)
-            {
-                return BadRequest();
-            }
-
-            var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
-            if (decryptedText == null)
-            {
-                return BadRequest();
-            }
-
-            var image = model.UseNoise ?
-                _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName) :
-                _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
-            return new FileContentResult(image, "image/png");
         }
     }
 }
