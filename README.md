@@ -198,12 +198,59 @@ Find all currently supported languages [here](/src/DNTCaptcha.Core/Language.cs).
 
 To run this project on non-Windows-based operating systems, you will need to install `libgdiplus` too:
 
-- Ubuntu 16.04 and above: - apt-get install libgdiplus - cd /usr/lib - ln -s libgdiplus.so gdiplus.dll
-- Fedora 23 and above: - dnf install libgdiplus - cd /usr/lib64/ - ln -s libgdiplus.so.0 gdiplus.dll
-- CentOS 7 and above: - yum install autoconf automake libtool - yum install freetype-devel fontconfig libXft-devel - yum install libjpeg-turbo-devel libpng-devel giflib-devel libtiff-devel libexif-devel - yum install glib2-devel cairo-devel - git clone https://github.com/mono/libgdiplus - cd libgdiplus - ./autogen.sh - make - make install - cd /usr/lib64/ - ln -s /usr/local/lib/libgdiplus.so libgdiplus.so
-- Docker - RUN apt-get update \\
+- Ubuntu 16.04 and above:
 
-      && apt-get install -y libgdiplus
+```bash
+  apt-get install libgdiplus
+  cd /usr/lib
+  ln -s libgdiplus.so gdiplus.dll
+```
+
+- Fedora 23 and above:
+
+```bash
+  dnf install libgdiplus
+  cd /usr/lib64/
+  ln -s libgdiplus.so.0 gdiplus.dll
+```
+
+- CentOS 7 and above:
+
+```bash
+  yum install autoconf automake libtool
+  yum install freetype-devel fontconfig libXft-devel
+  yum install libjpeg-turbo-devel libpng-devel giflib-devel libtiff-devel libexif-devel
+  yum install glib2-devel cairo-devel
+  git clone https://github.com/mono/libgdiplus
+  cd libgdiplus
+  ./autogen.sh
+  make
+  make install
+  cd /usr/lib64/
+  ln -s /usr/local/lib/libgdiplus.so libgdiplus.so
+```
+
+- Docker
+
+```bash
+  RUN apt-get update \
+         && apt-get install -y --allow-unauthenticated \
+          libgdiplus \
+          libc6-dev \
+         && apt-get clean \
+         && rm -rf /var/lib/apt/lists/\*
+
+  RUN apt-get update && apt-get install  -y --allow-unauthenticated \
+       libgif-dev autoconf libtool automake build-essential gettext libglib2.0-dev libcairo2-dev libtiff-dev libexif-dev
+  RUN apt-get update && apt-get install -y libpango1.0-dev
+
+  RUN apt-get install -y --allow-unauthenticated git
+  RUN git clone https://github.com/mono/libgdiplus.git /libgdiplus
+  WORKDIR /libgdiplus
+  RUN ./autogen.sh --with-pango --prefix=/usr
+  RUN make  
+  RUN make install
+```
 
 - MacOS - brew install mono-libgdiplus
 
