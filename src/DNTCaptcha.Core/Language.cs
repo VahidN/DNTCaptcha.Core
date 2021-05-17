@@ -25,12 +25,12 @@
         /// Italian Language
         /// </summary>
         Italian,
-        
+
         /// <summary>
         /// Turkish Language
         /// </summary>
         Turkish,
-        
+
         /// <summary>
         /// Arabic Language
         /// </summary>
@@ -54,6 +54,16 @@
         /// <summary>
         /// Spanish Language
         /// </summary>
-        Portuguese
+        Portuguese,
+
+        /// <summary>
+        /// French Language
+        /// </summary>
+        French,
+
+        /// <summary>
+        /// German Language
+        /// </summary>
+        German
     }
 }
