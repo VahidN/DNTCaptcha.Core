@@ -20,6 +20,7 @@ dotnet_diagnostic.SCS0008.severity = suggestion
 dotnet_diagnostic.SCS0009.severity = suggestion
 dotnet_diagnostic.SCS0015.severity = suggestion
 dotnet_diagnostic.CA1031.severity = suggestion
+dotnet_diagnostic.CA1813.severity = suggestion
 
 # CA1010 Type directly or indirectly inherits 'IEnumerable' without implementing 'IEnumerable<T>'. Publicly-visible types should implement the generic version to broaden usability.
 dotnet_diagnostic.CA1010.severity = suggestion

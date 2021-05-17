@@ -10,7 +10,7 @@ namespace DNTCaptcha.Core
     /// Validate DNTCaptcha Attribute
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public sealed class ValidateDNTCaptchaAttribute : ActionFilterAttribute
+    public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
     {
         /// <summary>
         /// The language of captcha generator. It's default value is Persian.
