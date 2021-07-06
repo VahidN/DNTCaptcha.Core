@@ -93,7 +93,8 @@ namespace DNTCaptcha.Core
                 ForeColor = captchaAttributes.ForeColor,
                 BackColor = captchaAttributes.BackColor,
                 FontSize = captchaAttributes.FontSize,
-                FontName = captchaAttributes.FontName
+                FontName = captchaAttributes.FontName,
+                UseNoise = captchaAttributes.UseNoise
             };
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
             var actionUrl = captchaAttributes.UseRelativeUrls ?
