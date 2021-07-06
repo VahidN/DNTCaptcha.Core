@@ -107,8 +107,11 @@ namespace DNTCaptcha.Core
             output.Content.AppendHtml(captchaImage);
 
             var cookieToken = $".{captchaDivId}";
-            var refreshButton = getRefreshButtonTagBuilder(ViewContext, captchaDivId, cookieToken);
-            output.Content.AppendHtml(refreshButton);
+            if (ShowRefreshButton)
+            {
+                var refreshButton = getRefreshButtonTagBuilder(ViewContext, captchaDivId, cookieToken);
+                output.Content.AppendHtml(refreshButton);
+            }
 
             var hiddenInput = getHiddenInputTagBuilder(encryptedText);
             output.Content.AppendHtml(hiddenInput);
@@ -239,7 +242,8 @@ namespace DNTCaptcha.Core
                 RefreshButtonClass = RefreshButtonClass,
                 DisplayMode = DisplayMode,
                 UseRelativeUrls = UseRelativeUrls,
-                UseNoise = UseNoise
+                UseNoise = UseNoise,
+                ShowRefreshButton = ShowRefreshButton
             };
             var serializedValues = _serializationProvider.Serialize(values);
             var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);

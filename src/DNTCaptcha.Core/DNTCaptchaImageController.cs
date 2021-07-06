@@ -99,6 +99,7 @@ namespace DNTCaptcha.Core
                 tagHelper.DisplayMode = model.DisplayMode;
                 tagHelper.UseRelativeUrls = model.UseRelativeUrls;
                 tagHelper.UseNoise = model.UseNoise;
+                tagHelper.ShowRefreshButton = model.ShowRefreshButton;
 
                 var tagHelperContext = new TagHelperContext(
                     allAttributes: new TagHelperAttributeList(),

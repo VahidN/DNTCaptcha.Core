@@ -117,5 +117,11 @@ namespace DNTCaptcha.Core
         /// </summary>
         [HtmlAttributeNotBound]
         public string CaptchaToken { set; get; } = default!;
+
+        /// <summary>
+        /// Its default value is true.
+        /// </summary>
+        [HtmlAttributeName("asp-show-refresh-button")]
+        public bool ShowRefreshButton { set; get; } = true;
     }
 }

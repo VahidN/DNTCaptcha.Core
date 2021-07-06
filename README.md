@@ -49,6 +49,7 @@ For bootstrap-3:
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
              asp-use-noise="false"
+             asp-show-refresh-button="true"
              />
 ```
 
@@ -71,6 +72,7 @@ For bootstrap-4 (you will need to `npm install components-font-awesome` for the 
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="fas fa-redo btn-sm"
              asp-use-noise="false"
+             asp-show-refresh-button="true"
              />
 ```
 
