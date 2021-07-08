@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace DNTCaptcha.Core
 {
@@ -8,6 +9,12 @@ namespace DNTCaptcha.Core
     /// </summary>
     public class DNTCaptchaOptions
     {
+        /// <summary>
+        /// Gets or sets the value for the SameSite attribute of the cookie.
+        /// Its default value is `SameSiteMode.Strict`. If you are using CORS, set it to `None`.
+        /// </summary>
+        public SameSiteMode SameSiteMode { get; set; } = SameSiteMode.Strict;
+
         /// <summary>
         /// You can introduce a custom ICaptchaStorageProvider to be used as an StorageProvider.
         /// </summary>
@@ -161,8 +168,13 @@ namespace DNTCaptcha.Core
         /// <summary>
         /// Introduces the built-in `CookieCaptchaStorageProvider` to be used as an StorageProvider.
         /// </summary>
-        public DNTCaptchaOptions UseCookieStorageProvider()
+        /// <param name="sameSite">
+        /// Sets the value for the SameSite attribute of the cookie.
+        /// Its default value is `SameSiteMode.Strict`. If you are using CORS, set it to `None`.
+        /// </param>
+        public DNTCaptchaOptions UseCookieStorageProvider(SameSiteMode sameSite = SameSiteMode.Strict)
         {
+            SameSiteMode = sameSite;
             CaptchaStorageProvider = typeof(CookieCaptchaStorageProvider);
             return this;
         }

@@ -133,6 +133,8 @@
       }
 
       $(function () {
+        $.ajaxSetup({ xhrFields: { withCredentials: true } }); // Set this if you are using `CORS`.
+
         getCaptchaInfo();
 
         // Post login form to the server

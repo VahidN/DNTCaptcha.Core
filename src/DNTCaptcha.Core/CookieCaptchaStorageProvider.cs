@@ -111,7 +111,7 @@ namespace DNTCaptcha.Core
                 Secure = context.Request.IsHttps,
                 Expires = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),
                 IsEssential = true,
-                SameSite = SameSiteMode.Strict
+                SameSite = _options.SameSiteMode
             };
         }
     }
