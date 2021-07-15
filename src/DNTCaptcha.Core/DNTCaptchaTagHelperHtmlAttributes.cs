@@ -107,12 +107,6 @@ namespace DNTCaptcha.Core
         public string RefreshButtonClass { set; get; } = "glyphicon glyphicon-refresh btn-sm";
 
         /// <summary>
-        /// IsNoise of the captcha's Style
-        /// </summary>
-        [HtmlAttributeName("asp-use-noise")]
-        public bool UseNoise { set; get; }
-
-        /// <summary>
         /// The Captcha Token
         /// </summary>
         [HtmlAttributeNotBound]

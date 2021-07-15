@@ -37,10 +37,5 @@ namespace DNTCaptcha.Core
         /// FontName of the captcha's text
         /// </summary>
         public string FontName { set; get; } = "Tahoma";
-
-        /// <summary>
-        /// IsNoise of the captcha's Style
-        /// </summary>
-        public bool UseNoise { get; set; }
     }
 }

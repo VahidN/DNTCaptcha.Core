@@ -5,7 +5,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace DNTCaptcha.Core
 {
@@ -62,53 +61,7 @@ namespace DNTCaptcha.Core
                 graphics.DrawString(message, captchaFont, new SolidBrush(fColor), rect, format);
 
                 using var stream = new MemoryStream();
-                distortImage(height, width, pic);
-                pic.Save(stream, ImageFormat.Png);
-                return stream.ToArray();
-            });
-        }
-
-        /// <summary>
-        /// Creates the captcha image.
-        /// </summary>
-        public byte[] DrawCaptcha(string message, string foreColor, float fontSize, string fontName)
-        {
-            return useFont(fontName, fontSize, captchaFont =>
-            {
-                var fColor = ColorTranslator.FromHtml(foreColor);
-                message = message.Replace(",", string.Empty, StringComparison.Ordinal);
-                const int margin = 8;
-                var captchaSize = measureString(message, captchaFont);
-                var height = (int)captchaSize.Height + margin;
-                var width = (int)captchaSize.Width + margin;
-
-                using var pic = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-                var data = pic.LockBits(new Rectangle(0, 0, pic.Width, pic.Height), ImageLockMode.WriteOnly, pic.PixelFormat);
-                var noise = new byte[data.Width * data.Height * 3];
-                _randomNumberProvider.NextBytes(noise);
-                Marshal.Copy(noise, 0, data.Scan0, noise.Length);
-                pic.UnlockBits(data);
-                using (var graphics = Graphics.FromImage(pic))
-                {
-                    var stringFormat = new StringFormat
-                    {
-                        Alignment = StringAlignment.Center,
-                        LineAlignment = StringAlignment.Center
-                    };
-                    graphics.DrawString(message, captchaFont, new SolidBrush(fColor), new RectangleF(0, 0, pic.Width, pic.Height), stringFormat);
-
-                    for (var i = 0; i < 30; i++)
-                    {
-                        var x0 = _randomNumberProvider.NextNumber(0, width);
-                        var y0 = _randomNumberProvider.NextNumber(0, height);
-                        var x1 = _randomNumberProvider.NextNumber(0, width);
-                        var y1 = _randomNumberProvider.NextNumber(0, height);
-                        graphics.DrawLine(Pens.White, x0, y0, x1, y1);
-                    }
-                }
-
-                using var stream = new MemoryStream();
-                distortImage(height, width, pic);
+                distortImage(fontName, height, width, pic);
                 pic.Save(stream, ImageFormat.Png);
                 return stream.ToArray();
             });
@@ -138,10 +91,16 @@ namespace DNTCaptcha.Core
             return g.MeasureString(text, f);
         }
 
-        private void distortImage(int height, int width, Bitmap pic)
+        private void distortImage(string fontName, int height, int width, Bitmap pic)
+        {
+            addWaves(height, width, pic);
+            drawRandomLines(fontName, height, width, pic);
+        }
+
+        private void addWaves(int height, int width, Bitmap pic)
         {
             using var copy = new Bitmap(pic);
-            double distort = _randomNumberProvider.NextNumber(1, 6) * (_randomNumberProvider.NextNumber(10) == 1 ? 1 : -1);
+            double distort = _randomNumberProvider.NextNumber(1, 6) * (_randomNumberProvider.NextNumber(2) == 1 ? 1 : -1);
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
@@ -154,6 +113,35 @@ namespace DNTCaptcha.Core
                     pic.SetPixel(x, y, copy.GetPixel(newX, newY));
                 }
             }
+        }
+
+        private void drawRandomLines(string fontName, int height, int width, Bitmap pic)
+        {
+            using var graphics = Graphics.FromImage(pic);
+            using var hatchBrush = new HatchBrush(HatchStyle.LargeConfetti, Color.LightGray, Color.DarkGray);
+            useFont(fontName, 2, captchaFont =>
+            {
+                const int distanceFromEdge = 10;
+                float density = _randomNumberProvider.NextNumber(10, 50);
+                for (var i = 0; i < (int)(width * height / density); i++)
+                {
+                    var x = _randomNumberProvider.NextNumber(distanceFromEdge, width - distanceFromEdge);
+                    var y = _randomNumberProvider.NextNumber(distanceFromEdge, height - distanceFromEdge);
+                    graphics.DrawString("*", captchaFont, hatchBrush, x, y);
+                }
+
+                var linesCount = _randomNumberProvider.NextNumber(10, 30);
+                for (var i = 0; i < linesCount; i++)
+                {
+                    var x0 = _randomNumberProvider.NextNumber(distanceFromEdge, width - distanceFromEdge);
+                    var y0 = _randomNumberProvider.NextNumber(distanceFromEdge, height - distanceFromEdge);
+                    var x1 = _randomNumberProvider.NextNumber(distanceFromEdge, width - distanceFromEdge);
+                    var y1 = _randomNumberProvider.NextNumber(distanceFromEdge, height - distanceFromEdge);
+                    graphics.DrawLine(Pens.White, x0, y0, x1, y1);
+                }
+
+                return Array.Empty<byte>();
+            });
         }
 
         private byte[] useFont(string fontName, float fontSize, Func<Font, byte[]> action)

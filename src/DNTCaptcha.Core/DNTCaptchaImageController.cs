@@ -98,7 +98,6 @@ namespace DNTCaptcha.Core
                 tagHelper.RefreshButtonClass = model.RefreshButtonClass;
                 tagHelper.DisplayMode = model.DisplayMode;
                 tagHelper.UseRelativeUrls = model.UseRelativeUrls;
-                tagHelper.UseNoise = model.UseNoise;
                 tagHelper.ShowRefreshButton = model.ShowRefreshButton;
 
                 var tagHelperContext = new TagHelperContext(
@@ -181,9 +180,7 @@ namespace DNTCaptcha.Core
                     return BadRequest("Couldn't decrypt the text.");
                 }
 
-                var image = model.UseNoise ?
-                    _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.FontSize, model.FontName) :
-                    _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
+                var image = _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor, model.FontSize, model.FontName);
                 return new FileContentResult(image, "image/png");
             }
             catch (Exception ex)

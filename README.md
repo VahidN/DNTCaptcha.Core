@@ -48,7 +48,6 @@ For bootstrap-3:
              asp-text-box-template="<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
-             asp-use-noise="false"
              asp-show-refresh-button="true"
              />
 ```
@@ -71,7 +70,6 @@ For bootstrap-4 (you will need to `npm install components-font-awesome` for the 
              asp-text-box-template="<div class='input-group'><span class='input-group-prepend'><span class='input-group-text'><i class='fas fa-lock'></i></span></span>{0}</div>"
              asp-validation-message-class="text-danger"
              asp-refresh-button-class="fas fa-redo btn-sm"
-             asp-use-noise="false"
              asp-show-refresh-button="true"
              />
 ```
