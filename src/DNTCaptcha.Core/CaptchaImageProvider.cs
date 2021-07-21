@@ -122,7 +122,7 @@ namespace DNTCaptcha.Core
             useFont(fontName, 2, captchaFont =>
             {
                 const int distanceFromEdge = 10;
-                float density = _randomNumberProvider.NextNumber(10, 50);
+                float density = _options.CaptchaNoise.NoisePixelsDensity;
                 for (var i = 0; i < (int)(width * height / density); i++)
                 {
                     var x = _randomNumberProvider.NextNumber(distanceFromEdge, width - distanceFromEdge);
@@ -130,7 +130,7 @@ namespace DNTCaptcha.Core
                     graphics.DrawString("*", captchaFont, hatchBrush, x, y);
                 }
 
-                var linesCount = _randomNumberProvider.NextNumber(10, 30);
+                var linesCount = _options.CaptchaNoise.NoiseLinesCount;
                 for (var i = 0; i < linesCount; i++)
                 {
                     var x0 = _randomNumberProvider.NextNumber(distanceFromEdge, width - distanceFromEdge);

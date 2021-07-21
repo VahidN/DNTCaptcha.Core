@@ -10,6 +10,11 @@ namespace DNTCaptcha.Core
     public class DNTCaptchaOptions
     {
         /// <summary>
+        /// Defines options of the captcha's noise
+        /// </summary>
+        public DNTCaptchaNoise CaptchaNoise { get; set; } = new();
+
+        /// <summary>
         /// Gets or sets the value for the SameSite attribute of the cookie.
         /// Its default value is `SameSiteMode.Strict`. If you are using CORS, set it to `None`.
         /// </summary>
@@ -109,6 +114,19 @@ namespace DNTCaptcha.Core
         {
             EncryptionKey = key;
 
+            return this;
+        }
+
+        /// <summary>
+        /// Defines options of the captcha's noise.
+        /// </summary>
+        public DNTCaptchaOptions WithNoise(float pixelsDensity, int linesCount)
+        {
+            CaptchaNoise = new DNTCaptchaNoise
+            {
+                NoiseLinesCount = linesCount,
+                NoisePixelsDensity = pixelsDensity
+            };
             return this;
         }
 

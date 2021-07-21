@@ -29,7 +29,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                             CaptchaGeneratorLanguage = Language.English,
-                            CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbersToWords)]
+                            CaptchaGeneratorDisplayMode = DisplayMode.NumberToWord)]
         public IActionResult Index([FromForm] AccountViewModel data)
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
@@ -44,7 +44,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult Login2([FromForm] AccountViewModel data)
         {
-            if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.SumOfTwoNumbersToWords))
+            if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.NumberToWord))
             {
                 this.ModelState.AddModelError(_captchaOptions.CaptchaComponent.CaptchaInputName, "Please enter the security code as a number.");
                 return View(nameof(Index));
@@ -57,7 +57,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
                             CaptchaGeneratorLanguage = Language.English,
-                            CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbersToWords)]
+                            CaptchaGeneratorDisplayMode = DisplayMode.NumberToWord)]
         public IActionResult Login3([FromForm] AccountViewModel data) // For Ajax Forms
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
