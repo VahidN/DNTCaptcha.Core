@@ -109,7 +109,7 @@ namespace DNTCaptcha.TestWebApp
                     })
                 .Identifier("dntCaptcha")// This is optional. Change it if you don't like its default name.
                 ;
-     	    }
+     	    });
         }
 ```
 
