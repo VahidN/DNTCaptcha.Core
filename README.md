@@ -85,7 +85,7 @@ namespace DNTCaptcha.TestWebApp
     {
         public void ConfigureServices(IServiceCollection services)
         {
-			services.AddDNTCaptcha(options =>
+	    services.AddDNTCaptcha(options =>
             {		
                 // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
                 // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
@@ -109,7 +109,7 @@ namespace DNTCaptcha.TestWebApp
                     })
                 .Identifier("dntCaptcha")// This is optional. Change it if you don't like its default name.
                 ;
-			}
+     	    }
         }
 ```
 
