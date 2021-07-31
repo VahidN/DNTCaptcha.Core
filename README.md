@@ -198,6 +198,14 @@ Find all currently supported languages [here](/src/DNTCaptcha.Core/Language.cs).
 - [Language.cs](/src/DNTCaptcha.Core/Language.cs)
 - [HumanReadableIntegerProvider.cs](/src/DNTCaptcha.Core/HumanReadableIntegerProvider.cs)
 
+## How to use/create a different image provider
+
+If you want to use another drawings library, you just need to implement the [ICaptchaImageProvider](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.Core/ICaptchaImageProvider.cs#L6) service and register it as a singleton before adding `services.AddDNTCaptcha`. Your custom implementation will be used instead of the original one.
+```C#
+services.AddSingleton<ICaptchaImageProvider, MyCustomCaptchaImageProvider>();
+services.AddDNTCaptcha();
+```
+
 ## Note:
 
 To run this project on non-Windows-based operating systems, you will need to install `libgdiplus` too:
