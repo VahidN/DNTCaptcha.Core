@@ -165,6 +165,12 @@ namespace DNTCaptcha.TestWebApp.Controllers
 
 If your environment is distributed and you are using a `Session (UseSessionStorageProvider())` or `Memory (UseMemoryCacheStorageProvider())` storage providers to store some temporary values, these values will not be distributed at all. By default, ASP.NET's session is maintained in the RAM of the running web server. However, for instance Windows Azure is a stateless platform, web role instances have no local storage; at any time the web role instance could be moved to a different server in the data center. When the web role instance is moved, the session state **is lost**. To have a perceived sense of state with a stateless protocol on a stateless web server, you need permanent server side storage that persists even if the web role instance is moved. In this case you should `UseDistributedCacheStorageProvider()` or at first try using the `UseCookieStorageProvider()`.
 
+**Tips**
+
+- If you are using the `UseCookieStorageProvider()` and also the `CORS` is activated, you should set the `SameSiteMode` to `None`: `options.UseCookieStorageProvider(SameSiteMode.None)` otherwise its default mode effectively disables `CORS`.
+- If you are using the `Cloudflare`, it doesn't like the SameSite cookies. So in this case try setting the `SameSiteMode.None` if the `CookieStorageProvider` is in use.
+- If your app is behind a reverse proxy, don't forget to add the [forwarded headers middleware](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#forwarded-headers-middleware-order).
+
 
 **Samples:**
 
@@ -195,13 +201,6 @@ It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample t
 - [The server side controller](/src/DNTCaptcha.TestWebApp/Controllers/NgxController.cs)
 - [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
 - [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
-
-
-**Tip**
-
-If you are using the `UseCookieStorageProvider()` in this case and also the `CORS` is activated, you should set the `SameSiteMode` to `None`: `options.UseCookieStorageProvider(SameSiteMode.None)` otherwise its default mode effectively disables `CORS`.
-
-
 
 ## Supported Languages
 
