@@ -196,6 +196,7 @@ It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample t
 - [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
 - [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
 
+
 ** Tip **
 
 If you are using the `UseCookieStorageProvider()` in this case and also the `CORS` is activated, you should set the `SameSiteMode` to `None`: `options.UseCookieStorageProvider(SameSiteMode.None)` otherwise its default mode effectively disables `CORS`.
