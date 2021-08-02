@@ -161,6 +161,11 @@ namespace DNTCaptcha.TestWebApp.Controllers
         }
 ```
 
+## How to choose a correct storage mode
+
+If your environment is distributed and you are using a `Session (UseSessionStorageProvider())` or `Memory (UseMemoryCacheStorageProvider())` storage providers to store some temporary values, these values will not be distributed at all. By default, ASP.NET's session is maintained in the RAM of the running web server. However, for instance Windows Azure is a stateless platform, web role instances have no local storage; at any time the web role instance could be moved to a different server in the data center. When the web role instance is moved, the session state **is lost**. To have a perceived sense of state with a stateless protocol on a stateless web server, you need permanent server side storage that persists even if the web role instance is moved. In this case you should `UseDistributedCacheStorageProvider()` or at first try using the `UseCookieStorageProvider()`.
+
+
 **Samples:**
 
 - [ASP.NET Core MVC Sample](/src/DNTCaptcha.TestWebApp)
