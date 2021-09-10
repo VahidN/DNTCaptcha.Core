@@ -171,6 +171,14 @@ If your environment is distributed and you are using a `Session (UseSessionStora
 - If you are using the `Cloudflare`, it doesn't like the SameSite cookies. So in this case try setting the `SameSiteMode.None` if the `CookieStorageProvider` is in use.
 - If your app is behind a reverse proxy, don't forget to add the [forwarded headers middleware](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-5.0#forwarded-headers-middleware-order).
 
+```C#
+services.Configure<ForwardedHeadersOptions>(options =>
+{ 
+  options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto; 
+  options.KnownProxies.Add(IPAddress.Parse("my load balancer ip 1")); 
+  options.KnownProxies.Add(IPAddress.Parse("my load balancer ip 2")); 
+});
+```
 
 **Samples:**
 
