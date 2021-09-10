@@ -25,11 +25,10 @@ namespace DNTCaptcha.Core
                 throw new ArgumentNullException(nameof(captchaProtectionProvider));
             }
 
-            var ip = context.Connection.RemoteIpAddress;
             var userAgent = (string)context.Request.Headers[HeaderNames.UserAgent];
             var issueDate = DateTime.Now.ToString("yyyy_MM_dd", CultureInfo.InvariantCulture);
             var name = typeof(ProvidersExtensions).Name;
-            var salt = $"::{issueDate}::{name}::{ip}::{userAgent}";
+            var salt = $"::{issueDate}::{name}::{userAgent}";
             return captchaProtectionProvider.Hash(salt).HashString;
         }
     }
