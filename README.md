@@ -8,7 +8,7 @@
 
 `DNTCaptcha.Core` is a captcha generator and validator for ASP.NET Core applications.
 
-![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/dntcaptcha.png)
+![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/dntcaptcha.png)
 
 ## Install via NuGet
 
@@ -213,10 +213,10 @@ services.Configure<ForwardedHeadersOptions>(options =>
 
 | DisplayMode            | Output                                                      |
 | ---------------------- | ----------------------------------------------------------- |
-| NumberToWord           | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode1.png) |
-| ShowDigits             | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode2.png) |
-| SumOfTwoNumbers        | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode3.png) |
-| SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode4.png) |
+| NumberToWord           | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode1.png) |
+| ShowDigits             | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode2.png) |
+| SumOfTwoNumbers        | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode3.png) |
+| SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode4.png) |
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
   - Add required files using the libman. To do it add [libman.json](/src/DNTCaptcha.TestWebApp/libman.json) file and then run the `libman restore` command.  
