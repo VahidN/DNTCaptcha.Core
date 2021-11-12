@@ -1,41 +1,40 @@
 ﻿@using DNTCaptcha.TestWebApp.Models
 @model AccountViewModel
 
-<div asp-validation-summary="All" class="text-danger alert alert-block"></div>
-<div class="panel panel-default top30">
-    <div class="panel-heading">
-        <h3 class="panel-title">Login</h3>
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">Login</h3>
     </div>
-    <div class="panel-body form-horizontal">
-        <div class="form-group">
-            <label asp-for="Username" class="col col-md-2 control-label"></label>
-            <div class="controls col col-md-10">
-                <div class="input-group col-md-4">
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-user"></span>
+    <div class="card-body">
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label"></label>
+            <div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <span class="bi-person"></span>
                     </span>
-                    <input asp-for="Username" class="form-control col-md-4" dir="ltr" AutoCompleteType="Disabled" />
+                    <input asp-for="Username" class="form-control" dir="ltr" AutoCompleteType="Disabled" />
                 </div>
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
-            <label asp-for="Password" class="col col-md-2 control-label"></label>
-            <div class="controls col col-md-10">
-                <div class="input-group col-md-4">
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-asterisk"></span>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <span class="bi-key"></span>
                     </span>
-                    <input asp-for="Password" class="form-control col-md-4" dir="ltr" />
+                    <input asp-for="Password" class="form-control" dir="ltr" />
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
         </div>
-        <div class="form-group">
-            <label class="col col-md-2 control-label">
+        <div class="mb-3">
+            <label class="form-label">
                 Security code
             </label>
-            <div class="controls col col-md-10">
+            <div>
                 <dnt-captcha asp-captcha-generator-max="30"
                              asp-captcha-generator-min="1"
                              asp-captcha-generator-language="English"
@@ -46,18 +45,19 @@
                              asp-font-name="Tahoma"
                              asp-font-size="20"
                              asp-fore-color="#333333"
-                             asp-back-color="#ccc"
-                             asp-text-box-class="text-box single-line form-control col-md-4"
-                             asp-text-box-template="<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>"
+                             asp-back-color="#FCF6F5FF"
+                             asp-text-box-class="form-control"
+                             asp-text-box-template="<div class='input-group'><span class='input-group-text'><span class='bi-lock'></span></span>{0}</div>"
                              asp-validation-message-class="text-danger"
-                             asp-refresh-button-class="glyphicon glyphicon-refresh btn-sm"
+                             asp-refresh-button-class="bi-arrow-counterclockwise btn-lg"
                              asp-show-refresh-button="true"
                              asp-dir="ltr"
                              />
             </div>
         </div>
     </div>
-    <footer class="panel-footer">
-        <input type="submit" class="btn btn-info" value="Login" />
+    <footer class="card-footer">
+        <input type="submit" class="btn btn-secondary" value="Login" />
     </footer>
 </div>
+<div asp-validation-summary="All" class="text-danger alert alert-block"></div>

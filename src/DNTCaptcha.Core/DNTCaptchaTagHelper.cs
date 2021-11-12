@@ -182,6 +182,11 @@ namespace DNTCaptcha.Core
 
         private TagBuilder getCaptchaImageTagBuilder(ViewContext viewContext, string encryptedText)
         {
+            if (_urlHelper == null)
+            {
+                throw new InvalidOperationException("Failed to find the IUrlHelper of ViewContext.HttpContext.");
+            }
+
             var values = new CaptchaImageParams
             {
                 Text = encryptedText,
@@ -222,6 +227,11 @@ namespace DNTCaptcha.Core
 
         private TagBuilder getRefreshButtonTagBuilder(ViewContext viewContext, string captchaDivId, string captchaToken)
         {
+            if (_urlHelper == null)
+            {
+                throw new InvalidOperationException("Failed to find the IUrlHelper of ViewContext.HttpContext.");
+            }
+
             var values = new RefreshData
             {
                 RndDate = DateTime.Now.Ticks,

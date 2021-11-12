@@ -58,6 +58,10 @@ namespace DNTCaptcha.Core
             services.TryAddScoped<IUrlHelper>(serviceProvider =>
             {
                 var actionContext = serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext;
+                if (actionContext is null)
+                {
+                    throw new InvalidOperationException("actionContext is null");
+                }
                 var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
                 return factory.GetUrlHelper(actionContext);
             });

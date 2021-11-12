@@ -4,24 +4,31 @@
     <title>DNTCaptcha.Core</title>
     <meta charset="utf-8" />
 
-    <link href="css/site.min.css" rel="stylesheet" />
-    <script src="js/site.min.js" type="text/javascript"></script>
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+	<link href="/content/site.css" rel="stylesheet" />
+	
+    <script src="/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
+    <script src="/lib/jquery-validation/dist/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js" type="text/javascript"></script>
+    <script src="/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.min.js" type="text/javascript"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>	
   </head>
 
   <body>
     <div class="container">
       <h3>Login Form</h3>
       <form id="loginForm" action="" method="post" novalidate>
-        <div class="form-group">
-          <label class="control-label">User Name</label>
+        <div class="mb-3">
+          <label class="form-label">User Name</label>
           <input type="text" class="form-control" name="username" />
         </div>
-        <div class="form-group">
+        <div class="mb-3">
           <label>Password</label>
           <input type="password" class="form-control" name="password" />
         </div>
 
-        <div class="dntCaptcha">
+        <div class="dntCaptcha mb-3">
           <img
             alt="captcha"
             id="dntCaptchaImg"
@@ -29,20 +36,20 @@
             style="margin-bottom: 4px"
           />
           <a
-            class="glyphicon glyphicon-refresh btn-sm"
+            class="bi-arrow-counterclockwise btn-lg"
             style="cursor: pointer"
             id="dntCaptchaRefreshButton"
             name="dntCaptchaRefreshButton"
             onclick="doRefreshCaptcha()"
           ></a>
           <input id="DNTCaptchaText" name="DNTCaptchaText" type="hidden" />
-          <div class="input-group col-md-4">
-            <span class="input-group-addon">
-              <span class="glyphicon glyphicon-lock"></span>
+          <div class="input-group">
+            <span class="input-group-text">
+              <span class="bi-lock"></span>
             </span>
             <input
               autocomplete="off"
-              class="text-box single-line form-control col-md-4"
+              class="form-control"
               dir="ltr"
               id="DNTCaptchaInputText"
               name="DNTCaptchaInputText"
@@ -53,7 +60,7 @@
           <input id="DNTCaptchaToken" name="DNTCaptchaToken" type="hidden" />
         </div>
 
-        <button id="submitLogin" class="btn btn-primary" type="submit">
+        <button id="submitLogin" class="btn btn-secondary" type="submit">
           Submit
         </button>
 

@@ -10,31 +10,40 @@
 <div>
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" role="tablist">
-        <li role="presentation" class="active">
-            <a href="#login1" aria-controls="login1" role="tab" data-toggle="tab">Instance 1</a>
+        <li role="presentation" class="nav-item">
+		    <button class="nav-link active" id="home-tab" 
+				data-bs-toggle="tab" data-bs-target="#login1" 
+				type="button" role="tab" aria-controls="login1" 
+				aria-selected="true">Instance 1</button>            
         </li>
-        <li role="presentation">
-            <a href="#login2" aria-controls="login2" role="tab" data-toggle="tab">Instance 2</a>
+        <li role="presentation" class="nav-item">
+		    <button class="nav-link" id="home-tab" 
+				data-bs-toggle="tab" data-bs-target="#login2" 
+				type="button" role="tab" aria-controls="login2" 
+				aria-selected="true">Instance 2</button>            
         </li>
-        <li role="presentation">
-            <a href="#login3" aria-controls="login3" role="tab" data-toggle="tab">Instance 3/Ajax Form</a>
+        <li role="presentation" class="nav-item">		
+		    <button class="nav-link" id="home-tab" 
+				data-bs-toggle="tab" data-bs-target="#login3" 
+				type="button" role="tab" aria-controls="login3" 
+				aria-selected="true">Instance 3/Ajax Form</button>            			
         </li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="login1">
+        <div role="tabpanel" class="tab-pane fade show active" id="login1">
             <form asp-controller="Home" asp-action="Index" asp-antiforgery="true"
                   method="post" id="loginForm1" autocomplete="off" role="form">
                   <partial name="_LoginFormBody" model="Model" />
             </form>
         </div>
-        <div role="tabpanel" class="tab-pane" id="login2">
+        <div role="tabpanel" class="tab-pane fade" id="login2">
             <form asp-controller="Home" asp-action="Login2" asp-antiforgery="true"
                   method="post" id="loginForm2" autocomplete="off" role="form">
                   <partial name="_LoginFormBody" model="Model" />
             </form>
         </div>
-        <div role="tabpanel" class="tab-pane" id="login3">
+        <div role="tabpanel" class="tab-pane fade" id="login3">
             <form asp-controller="Home" asp-action="Login3" asp-antiforgery="true"
                   method="post" id="loginForm3" autocomplete="off" role="form"
                   data-ajax="true"

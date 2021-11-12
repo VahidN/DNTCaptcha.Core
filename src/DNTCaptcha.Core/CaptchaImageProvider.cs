@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Runtime.Versioning;
 
 namespace DNTCaptcha.Core
 {
@@ -30,6 +31,9 @@ namespace DNTCaptcha.Core
         /// <summary>
         /// Creates the captcha image.
         /// </summary>
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         public byte[] DrawCaptcha(string message, string foreColor, string backColor, float fontSize, string fontName)
         {
             return useFont(fontName, fontSize, captchaFont =>
@@ -67,6 +71,9 @@ namespace DNTCaptcha.Core
             });
         }
 
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         private static Rectangle drawRoundedRectangle(Graphics gfx, Rectangle bounds, int cornerRadius, Pen drawPen, Color fillColor)
         {
             int strokeOffset = Convert.ToInt32(Math.Ceiling(drawPen.Width));
@@ -84,6 +91,9 @@ namespace DNTCaptcha.Core
             return bounds;
         }
 
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         private static SizeF measureString(string text, Font f)
         {
             using var bmp = new Bitmap(1, 1);
@@ -91,12 +101,18 @@ namespace DNTCaptcha.Core
             return g.MeasureString(text, f);
         }
 
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         private void distortImage(string fontName, int height, int width, Bitmap pic)
         {
             addWaves(height, width, pic);
             drawRandomLines(fontName, height, width, pic);
         }
 
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         private void addWaves(int height, int width, Bitmap pic)
         {
             using var copy = new Bitmap(pic);
@@ -115,6 +131,9 @@ namespace DNTCaptcha.Core
             }
         }
 
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         private void drawRandomLines(string fontName, int height, int width, Bitmap pic)
         {
             using var graphics = Graphics.FromImage(pic);
@@ -144,6 +163,9 @@ namespace DNTCaptcha.Core
             });
         }
 
+#if !NETCOREAPP3_0
+        [SupportedOSPlatform("windows")]
+#endif
         private byte[] useFont(string fontName, float fontSize, Func<Font, byte[]> action)
         {
             if (string.IsNullOrWhiteSpace(_options.CustomFontPath))

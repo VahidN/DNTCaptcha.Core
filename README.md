@@ -52,7 +52,7 @@ For bootstrap-3:
              />
 ```
 
-For bootstrap-4 (you will need to `npm install components-font-awesome` for the missing [font-glyphs](https://fontawesome.com/?from=io) too):
+For bootstrap-4 (you will need Bootstrap Icons for the missing [font-glyphs](https://icons.getbootstrap.com/) too):
 
 ```xml
 <dnt-captcha asp-captcha-generator-max="9000"
@@ -73,6 +73,29 @@ For bootstrap-4 (you will need to `npm install components-font-awesome` for the 
              asp-show-refresh-button="true"
              />
 ```
+
+For bootstrap-5 (you will need Bootstrap Icons for the missing [font-glyphs](https://icons.getbootstrap.com/) too):
+```xml
+<dnt-captcha asp-captcha-generator-max="30"
+			 asp-captcha-generator-min="1"
+			 asp-captcha-generator-language="English"
+			 asp-captcha-generator-display-mode="NumberToWord"
+			 asp-use-relative-urls="true"
+			 asp-placeholder="Security code as a number"
+			 asp-validation-error-message="Please enter the security code as a number."
+			 asp-font-name="Tahoma"
+			 asp-font-size="20"
+			 asp-fore-color="#333333"
+			 asp-back-color="#FCF6F5FF"
+			 asp-text-box-class="form-control"
+			 asp-text-box-template="<div class='input-group'><span class='input-group-text'><span class='bi-lock'></span></span>{0}</div>"
+			 asp-validation-message-class="text-danger"
+			 asp-refresh-button-class="bi-arrow-counterclockwise btn-lg"
+			 asp-show-refresh-button="true"
+			 asp-dir="ltr"
+			 />
+```
+
 
 - To register its default providers, call `services.AddDNTCaptcha();` method in your [Startup class](/src/DNTCaptcha.TestWebApp/Startup.cs).
 
@@ -196,8 +219,7 @@ services.Configure<ForwardedHeadersOptions>(options =>
 | SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/Content/mode4.png) |
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
-  - Add required files using the NPM. To do it add [package.json](/src/DNTCaptcha.TestWebApp/package.json#L14-L17) file and then run the `npm install` command
-  - It's better to [bundle](/src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.V3.csproj#L18) the installed dependencies using `dotnet bundle` [bundleconfig.json](/src/DNTCaptcha.TestWebApp/bundleconfig.json#L17)
+  - Add required files using the libman. To do it add [libman.json](/src/DNTCaptcha.TestWebApp/libman.json) file and then run the `libman restore` command.  
   - Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/releases
 
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
