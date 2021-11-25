@@ -75,6 +75,7 @@ For bootstrap-4 (you will need Bootstrap Icons for the missing [font-glyphs](htt
 ```
 
 For bootstrap-5 (you will need Bootstrap Icons for the missing [font-glyphs](https://icons.getbootstrap.com/) too):
+
 ```xml
 <dnt-captcha asp-captcha-generator-max="30"
 			 asp-captcha-generator-min="1"
@@ -96,7 +97,6 @@ For bootstrap-5 (you will need Bootstrap Icons for the missing [font-glyphs](htt
 			 />
 ```
 
-
 - To register its default providers, call `services.AddDNTCaptcha();` method in your [Startup class](/src/DNTCaptcha.TestWebApp/Startup.cs).
 
 ```csharp
@@ -109,7 +109,7 @@ namespace DNTCaptcha.TestWebApp
         public void ConfigureServices(IServiceCollection services)
         {
 	    services.AddDNTCaptcha(options =>
-            {		
+            {
                 // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
                 // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
                 options.UseCookieStorageProvider(SameSiteMode.Strict) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
@@ -196,10 +196,10 @@ If your environment is distributed and you are using a `Session (UseSessionStora
 
 ```C#
 services.Configure<ForwardedHeadersOptions>(options =>
-{ 
-  options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto; 
-  options.KnownProxies.Add(IPAddress.Parse("my load balancer ip 1")); 
-  options.KnownProxies.Add(IPAddress.Parse("my load balancer ip 2")); 
+{
+  options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+  options.KnownProxies.Add(IPAddress.Parse("my load balancer ip 1"));
+  options.KnownProxies.Add(IPAddress.Parse("my load balancer ip 2"));
 });
 ```
 
@@ -211,15 +211,15 @@ services.Configure<ForwardedHeadersOptions>(options =>
 
 **Different supported DisplayModes:**
 
-| DisplayMode            | Output                                                      |
-| ---------------------- | ----------------------------------------------------------- |
+| DisplayMode            | Output                                                              |
+| ---------------------- | ------------------------------------------------------------------- |
 | NumberToWord           | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode1.png) |
 | ShowDigits             | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode2.png) |
 | SumOfTwoNumbers        | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode3.png) |
 | SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode4.png) |
 
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts too:
-  - Add required files using the libman. To do it add [libman.json](/src/DNTCaptcha.TestWebApp/libman.json) file and then run the `libman restore` command.  
+  - Add required files using the libman. To do it add [libman.json](/src/DNTCaptcha.TestWebApp/libman.json) file and then run the `libman restore` command.
   - Or you can download it from: https://github.com/aspnet/jquery-ajax-unobtrusive/releases
 
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
@@ -242,6 +242,7 @@ Find all currently supported languages [here](/src/DNTCaptcha.Core/Language.cs).
 ## How to use/create a different image provider
 
 If you want to use another drawings library, you just need to implement the [ICaptchaImageProvider](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.Core/ICaptchaImageProvider.cs#L6) service and register it as a singleton before adding `services.AddDNTCaptcha`. Your custom implementation will be used instead of the original one.
+
 ```C#
 services.AddSingleton<ICaptchaImageProvider, MyCustomCaptchaImageProvider>();
 services.AddDNTCaptcha();
@@ -249,68 +250,4 @@ services.AddDNTCaptcha();
 
 ## Note:
 
-To run this project on non-Windows-based operating systems, you will need to install `libgdiplus` too:
-
-- Ubuntu 16.04 and above:
-
-```bash
-  apt-get install libgdiplus
-  cd /usr/lib
-  ln -s libgdiplus.so gdiplus.dll
-```
-
-- Fedora 23 and above:
-
-```bash
-  dnf install libgdiplus
-  cd /usr/lib64/
-  ln -s libgdiplus.so.0 gdiplus.dll
-```
-
-- CentOS 7 and above:
-
-```bash
-  yum install autoconf automake libtool
-  yum install freetype-devel fontconfig libXft-devel
-  yum install libjpeg-turbo-devel libpng-devel giflib-devel libtiff-devel libexif-devel
-  yum install glib2-devel cairo-devel
-  git clone https://github.com/mono/libgdiplus
-  cd libgdiplus
-  ./autogen.sh
-  make
-  make install
-  cd /usr/lib64/
-  ln -s /usr/local/lib/libgdiplus.so libgdiplus.so
-```
-
-- Docker
-
-```bash
-  RUN apt-get update \
-         && apt-get install -y --allow-unauthenticated \
-          libgdiplus \
-          libc6-dev \
-         && apt-get clean \
-         && rm -rf /var/lib/apt/lists/\*
-
-  RUN apt-get update && apt-get install  -y --allow-unauthenticated \
-       libgif-dev autoconf libtool automake build-essential gettext libglib2.0-dev libcairo2-dev libtiff-dev libexif-dev
-  RUN apt-get update && apt-get install -y libpango1.0-dev
-
-  RUN apt-get install -y --allow-unauthenticated git
-  RUN git clone https://github.com/mono/libgdiplus.git /libgdiplus
-  WORKDIR /libgdiplus
-  RUN ./autogen.sh --with-pango --prefix=/usr
-  RUN make  
-  RUN make install
-```
-
-- MacOS - brew install mono-libgdiplus
-
-      After installing the [Mono MDK](http://www.mono-project.com/download/#download-mac), Copy Mono MDK Files:
-      	   - /Library/Frameworks/Mono.framework/Versions/4.6.2/lib/libgdiplus.0.dylib
-      	   - /Library/Frameworks/Mono.framework/Versions/4.6.2/lib/libgdiplus.0.dylib.dSYM
-      	   - /Library/Frameworks/Mono.framework/Versions/4.6.2/lib/libgdiplus.dylib
-      	   - /Library/Frameworks/Mono.framework/Versions/4.6.2/lib/libgdiplus.la
-
-      And paste them to: /usr/local/lib
+You will need this [NuGet.config](/src/DNTCaptcha.Core/NuGet.config) file to restore the required dependencies.
