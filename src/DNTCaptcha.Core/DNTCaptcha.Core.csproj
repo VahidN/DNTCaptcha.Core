@@ -23,8 +23,7 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
-      https://www.myget.org/F/sixlabors/api/v3/index.json;
-      $(MSBuildThisFileDirectory)/../References/
+      https://www.myget.org/F/sixlabors/api/v3/index.json;      
     </RestoreAdditionalProjectSources>	
      <RestoreSources>
       $(RestoreSources);
