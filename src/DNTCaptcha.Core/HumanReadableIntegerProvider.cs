@@ -89,7 +89,7 @@ namespace DNTCaptcha.Core
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Arabic, Names=
                 new List<string> { "عشرون", "ثلاثون", "اربعون", "خمسون", "ستون", "سبعون", "ثمانون", "تسعون" }},
            new NumberWord { Group= DigitGroup.Tens, Language= Language.Russian, Names=
-                new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятдесят", "Шестдесят", "Семдесят", "Восемдесят", "Девяносто" }},
+                new List<string> { "Двадцать", "Тридцать", "Сорок", "Пятьдесят", "Шестьдесят", "Семьдесят", "Восемьдесят", "Девяносто" }},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Chinese, Names=
                 new List<string> {"二十","三十","四十","五十","六十","七十","八十","九十"}},
             new NumberWord { Group= DigitGroup.Tens, Language= Language.Spanish, Names=
