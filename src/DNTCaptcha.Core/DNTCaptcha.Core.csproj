@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-    <VersionPrefix>4.3.2</VersionPrefix>
+    <VersionPrefix>4.3.3</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
     <TargetFrameworks>net6.0;net5.0;netcoreapp3.1</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -23,13 +23,13 @@
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
-      https://www.myget.org/F/sixlabors/api/v3/index.json;      
-    </RestoreAdditionalProjectSources>	
+      https://www.myget.org/F/sixlabors/api/v3/index.json;
+    </RestoreAdditionalProjectSources>
      <RestoreSources>
       $(RestoreSources);
       https://api.nuget.org/v3/index.json;
 	  https://www.myget.org/F/sixlabors/api/v3/index.json;
-    </RestoreSources>	
+    </RestoreSources>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>9</LangVersion>
