@@ -1,13 +1,13 @@
 ﻿namespace DNTCaptcha.Core
 {
     /// <summary>
-    /// Captcha Image Provider
+    ///     Captcha Image Provider
     /// </summary>
     public interface ICaptchaImageProvider
     {
         /// <summary>
-        /// Creates the captcha image.
+        ///     Creates the captcha image.
         /// </summary>
-        byte[] DrawCaptcha(string message, string foreColor, string backColor, float fontSize, string fontName);
+        byte[] DrawCaptcha(string text, string foreColor, string backColor, float fontSize, string fontName);
     }
 }

@@ -250,7 +250,6 @@ services.AddDNTCaptcha();
 
 ## Note:
 
-- You will need this [NuGet.config](/src/DNTCaptcha.Core/NuGet.config) file to restore the required dependencies.
 - Don't use this setting, because it will destroy the encrypted part of the captcha's token:
 
 ```C#

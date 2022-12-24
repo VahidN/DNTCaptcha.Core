@@ -7,19 +7,19 @@ using Microsoft.Extensions.Options;
 namespace DNTCaptcha.Core
 {
     /// <summary>
-    /// Validates the input number.
+    ///     Validates the input number.
     /// </summary>
     public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
     {
-        private readonly ILogger<DNTCaptchaValidatorService> _logger;
+        private readonly DNTCaptchaOptions _captchaOptions;
         private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
         private readonly ICaptchaStorageProvider _captchaStorageProvider;
         private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
         private readonly IHttpContextAccessor _contextAccessor;
-        private readonly DNTCaptchaOptions _captchaOptions;
+        private readonly ILogger<DNTCaptchaValidatorService> _logger;
 
         /// <summary>
-        /// Validates the input number.
+        ///     Validates the input number.
         /// </summary>
         public DNTCaptchaValidatorService(
             IHttpContextAccessor contextAccessor,
@@ -31,15 +31,17 @@ namespace DNTCaptcha.Core
         )
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
-            _captchaStorageProvider = captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+            _captchaProtectionProvider = captchaProtectionProvider ??
+                                         throw new ArgumentNullException(nameof(captchaProtectionProvider));
+            _captchaStorageProvider =
+                captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
             _captchaTextProvider = captchaTextProvider ?? throw new ArgumentNullException(nameof(captchaTextProvider));
             _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
             _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         }
 
         /// <summary>
-        /// Validates the input number.
+        ///     Validates the input number.
         /// </summary>
         /// <returns></returns>
         public bool HasRequestValidCaptchaEntry(
@@ -75,10 +77,10 @@ namespace DNTCaptcha.Core
             inputText = inputText.ToEnglishNumbers();
 
             if (!long.TryParse(
-                inputText,
-                NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
-                CultureInfo.InvariantCulture,
-                out long inputNumber))
+                               inputText,
+                               NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
+                               CultureInfo.InvariantCulture,
+                               out var inputNumber))
             {
                 _logger.LogDebug("inputText is not a number.");
                 return false;
@@ -86,7 +88,8 @@ namespace DNTCaptcha.Core
 
             var decryptedText = _captchaProtectionProvider.Decrypt(captchaText);
 
-            var numberToText = _captchaTextProvider(captchaGeneratorDisplayMode).GetText(inputNumber, captchaGeneratorLanguage);
+            var numberToText = _captchaTextProvider(captchaGeneratorDisplayMode)
+                .GetText(inputNumber, captchaGeneratorLanguage);
             if (decryptedText?.Equals(numberToText, StringComparison.Ordinal) != true)
             {
                 _logger.LogDebug($"{decryptedText} != {numberToText}");
@@ -128,7 +131,7 @@ namespace DNTCaptcha.Core
             return areEqual;
         }
 
-        private (string captchaText, string inputText, string cookieToken) getFormValues(HttpContext httpContext)
+        private (string? captchaText, string? inputText, string? cookieToken) getFormValues(HttpContext httpContext)
         {
             var captchaHiddenInputName = _captchaOptions.CaptchaComponent.CaptchaHiddenInputName;
             var captchaInputName = _captchaOptions.CaptchaComponent.CaptchaInputName;
@@ -137,20 +140,19 @@ namespace DNTCaptcha.Core
             if (!httpContext.Request.HasFormContentType)
             {
                 throw new InvalidOperationException(
-                    $"DNTCaptcha expects `{captchaHiddenInputName}`, `{captchaInputName}` & `{captchaHiddenTokenName}` fields to be present in the posted `form` data." +
-                    " Also don't post it as a JSON data. Its `Content-Type` should be `application/x-www-form-urlencoded`.");
+                                                    $"DNTCaptcha expects `{captchaHiddenInputName}`, `{captchaInputName}` & `{captchaHiddenTokenName}` fields to be present in the posted `form` data." +
+                                                    " Also don't post it as a JSON data. Its `Content-Type` should be `application/x-www-form-urlencoded`.");
             }
 
-            var form = httpContext.Request.Form ?? throw new InvalidOperationException("`httpContext.Request.Form` is null.");
-            var captchaTextForm = (string)form[captchaHiddenInputName];
-            var inputTextForm = (string)form[captchaInputName];
-            var cookieTokenForm = (string)form[captchaHiddenTokenName];
+            var form = httpContext.Request.Form ??
+                       throw new InvalidOperationException("`httpContext.Request.Form` is null.");
+            var captchaTextForm = form[captchaHiddenInputName];
+            var inputTextForm = form[captchaInputName];
+            var cookieTokenForm = form[captchaHiddenTokenName];
             return (captchaTextForm, inputTextForm, cookieTokenForm);
         }
 
-        private static bool shouldValidate(HttpContext context)
-        {
-            return string.Equals("POST", context.Request.Method, StringComparison.OrdinalIgnoreCase);
-        }
+        private static bool shouldValidate(HttpContext context) =>
+            string.Equals("POST", context.Request.Method, StringComparison.OrdinalIgnoreCase);
     }
 }

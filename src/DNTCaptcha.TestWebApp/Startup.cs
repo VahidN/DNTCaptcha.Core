@@ -37,7 +37,7 @@ namespace DNTCaptcha.TestWebApp
             });
             services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
-            services.Configure<RouteOptions>(o => o.LowercaseUrls = true);
+            services.Configure<RouteOptions>(o => { o.LowercaseUrls = true; /* o.LowercaseQueryStrings = true; // don't use this! */ });
 
 
             // Added it for AddDNTCaptcha -> options.UseDistributedCacheStorageProvider()
