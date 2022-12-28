@@ -22,14 +22,14 @@ You can also view the [package page](http://www.nuget.org/packages/DNTCaptcha.Co
 
 ## Linux (and containers) support
 
-The SkiaSharp library need extra dependencies to be work on Linux and containers, please install the following NuGet packages:
+The `SkiaSharp` library needs extra dependencies to work on Linux and containers. Please install the following NuGet packages:
 
 ```
 PM> Install-Package SkiaSharp.NativeAssets.Linux.NoDependencies
 PM> Install-Package HarfBuzzSharp.NativeAssets.Linux
 ```
 
-You also need to modify your `.csproj` file to include some MSBuild directives that ensure the required files are in a good place. These extra steps are normally not required but seems to be some issues on how .NET load them.
+You also need to modify your `.csproj` file to include some MSBuild directives that ensure the required files are in a good place. These extra steps are normally not required but seems to be some issues on how .NET loads them.
 
 ```xml
 <Target Name="CopyFilesAfterPublish" AfterTargets="AfterPublish">
