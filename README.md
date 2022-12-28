@@ -20,7 +20,25 @@ PM> Install-Package DNTCaptcha.Core
 
 You can also view the [package page](http://www.nuget.org/packages/DNTCaptcha.Core/) on NuGet.
 
-## Usage:
+## Linux (and containers) support
+
+The SkiaSharp library need extra dependencies to be work on Linux and containers, please install the following NuGet packages:
+
+```
+PM> Install-Package SkiaSharp.NativeAssets.Linux.NoDependencies
+PM> Install-Package HarfBuzzSharp.NativeAssets.Linux
+```
+
+You also need to modify your `.csproj` file to include some MSBuild directives that ensure the required files are in a good place. These extra steps are normally not required but seems to be some issues on how .NET load them.
+
+```xml
+<Target Name="CopyFilesAfterPublish" AfterTargets="AfterPublish">
+    <Copy SourceFiles="$(TargetDir)runtimes/linux-x64/native/libSkiaSharp.so" DestinationFolder="$([System.IO.Path]::GetFullPath('$(PublishDir)'))/bin/" />
+    <Copy SourceFiles="$(TargetDir)runtimes/linux-x64/native/libHarfBuzzSharp.so" DestinationFolder="$([System.IO.Path]::GetFullPath('$(PublishDir)'))/bin/" />
+</Target>
+```
+
+## Usage
 
 - After installing the DNTCaptcha.Core package, add the following definition to the [\_ViewImports.cshtml](/src/DNTCaptcha.TestWebApp/Views/_ViewImports.cshtml) file:
 
@@ -224,7 +242,7 @@ services.Configure<ForwardedHeadersOptions>(options =>
 
 Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for more details.
 
-## SPA Usage:
+## SPA Usage
 
 It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample to demonstrate it:
 
@@ -248,7 +266,7 @@ services.AddSingleton<ICaptchaImageProvider, MyCustomCaptchaImageProvider>();
 services.AddDNTCaptcha();
 ```
 
-## Note:
+## Note
 
 - Don't use this setting, because it will destroy the encrypted part of the captcha's token:
 
