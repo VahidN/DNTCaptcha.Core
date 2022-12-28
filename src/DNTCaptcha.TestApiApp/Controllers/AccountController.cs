@@ -17,8 +17,8 @@ namespace DNTCaptcha.TestApiApp.Controllers
 
         [HttpPost("[action]")]
         [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
-                    CaptchaGeneratorLanguage = Language.English,
-                    CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbers)]
+                    CaptchaGeneratorLanguage = Language.Persian,
+                    CaptchaGeneratorDisplayMode = DisplayMode.ShowDigits)]
         public IActionResult Login([FromForm] AccountViewModel data) //NOTE: It's a [FromForm] data or `application/x-www-form-urlencoded` data.
         {
             if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
@@ -41,8 +41,8 @@ namespace DNTCaptcha.TestApiApp.Controllers
                 FontName = "Tahoma",
                 FontSize = 18,
                 ForeColor = "#111111",
-                Language = Language.English,
-                DisplayMode = DisplayMode.SumOfTwoNumbers,
+                Language = Language.Persian,
+                DisplayMode = DisplayMode.ShowDigits,
                 Max = 90,
                 Min = 1
             });
