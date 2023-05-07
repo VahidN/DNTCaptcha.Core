@@ -255,6 +255,14 @@ namespace DNTCaptcha.Core
         {
             return NumberToText(number, language);
         }
+        
+        /// <summary>
+        /// display a numeric value using the equivalent text
+        /// </summary>
+        /// <param name="number">input number</param>
+        /// <param name="language">local language</param>
+        /// <returns>the equivalent text</returns>
+        public string GetText(int number, Language language) => NumberToText((long)number, language);
 
         /// <summary>
         /// display a numeric value using the equivalent text

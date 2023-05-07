@@ -1,5 +1,3 @@
-using System;
-
 namespace DNTCaptcha.Core;
 
 /// <summary>
@@ -8,7 +6,7 @@ namespace DNTCaptcha.Core;
 public class SumOfTwoNumbersToWordsProvider : ICaptchaTextProvider
 {
     private readonly HumanReadableIntegerProvider _humanReadableIntegerProvider;
-    private readonly int _randomNumber;
+    private readonly IRandomNumberProvider _randomNumberProvider;
 
     /// <summary>
     ///     SumOfTwoNumbersToWords Provider
@@ -17,12 +15,7 @@ public class SumOfTwoNumbersToWordsProvider : ICaptchaTextProvider
         IRandomNumberProvider randomNumberProvider,
         HumanReadableIntegerProvider humanReadableIntegerProvider)
     {
-        if (randomNumberProvider == null)
-        {
-            throw new ArgumentNullException(nameof(randomNumberProvider));
-        }
-
-        _randomNumber = randomNumberProvider.NextNumber(1, 7);
+        _randomNumberProvider = randomNumberProvider;
         _humanReadableIntegerProvider = humanReadableIntegerProvider;
     }
 
@@ -32,8 +25,11 @@ public class SumOfTwoNumbersToWordsProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string GetText(long number, Language language) =>
-        number > _randomNumber
-            ? $"{_humanReadableIntegerProvider.NumberToText(number - _randomNumber, language)} + {_humanReadableIntegerProvider.NumberToText(_randomNumber, language)}"
-            : $"{_humanReadableIntegerProvider.NumberToText(0, language)} + {_humanReadableIntegerProvider.NumberToText(number, language)}";
+    public string GetText(int number, Language language)
+    {
+        var randomNumber = _randomNumberProvider.NextNumber(1, number);
+        return number > randomNumber
+                   ? $"{_humanReadableIntegerProvider.NumberToText(number - randomNumber, language)} + {_humanReadableIntegerProvider.NumberToText(randomNumber, language)}"
+                   : $"{_humanReadableIntegerProvider.NumberToText(0, language)} + {_humanReadableIntegerProvider.NumberToText(number, language)}";
+    }
 }

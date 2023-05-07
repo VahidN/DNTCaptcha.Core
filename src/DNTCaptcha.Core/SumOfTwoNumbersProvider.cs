@@ -1,4 +1,3 @@
-using System;
 using static System.FormattableString;
 
 namespace DNTCaptcha.Core;
@@ -8,20 +7,13 @@ namespace DNTCaptcha.Core;
 /// </summary>
 public class SumOfTwoNumbersProvider : ICaptchaTextProvider
 {
-    private readonly int _randomNumber;
+    private readonly IRandomNumberProvider _randomNumberProvider;
 
     /// <summary>
     ///     SumOfTwoNumbers Provider
     /// </summary>
-    public SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider)
-    {
-        if (randomNumberProvider == null)
-        {
-            throw new ArgumentNullException(nameof(randomNumberProvider));
-        }
-
-        _randomNumber = randomNumberProvider.NextNumber(1, 7);
-    }
+    public SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider) =>
+        _randomNumberProvider = randomNumberProvider;
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -29,6 +21,11 @@ public class SumOfTwoNumbersProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string GetText(long number, Language language) =>
-        number > _randomNumber ? Invariant($"{number - _randomNumber} + {_randomNumber}") : Invariant($"0 + {number}");
+    public string GetText(int number, Language language)
+    {
+        var randomNumber = _randomNumberProvider.NextNumber(1, number);
+        return number > randomNumber
+                   ? Invariant($"{number - randomNumber} + {randomNumber}")
+                   : Invariant($"0 + {number}");
+    }
 }

@@ -1,5 +1,4 @@
-﻿@using DNTCaptcha.TestWebApp.Models
-@model AccountViewModel
+﻿@model DNTCaptcha.TestWebApp.Models.AccountViewModel
 
 <div class="card mt-4">
     <div class="card-header">
@@ -13,7 +12,7 @@
                     <span class="input-group-text">
                         <span class="bi-person"></span>
                     </span>
-                    <input asp-for="Username" class="form-control" dir="ltr" AutoCompleteType="Disabled" />
+                    <input asp-for="Username" class="form-control" dir="ltr" AutoCompleteType="Disabled"/>
                 </div>
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
@@ -25,7 +24,7 @@
                     <span class="input-group-text">
                         <span class="bi-key"></span>
                     </span>
-                    <input asp-for="Password" class="form-control" dir="ltr" />
+                    <input asp-for="Password" class="form-control" dir="ltr"/>
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
@@ -38,7 +37,7 @@
                 <dnt-captcha asp-captcha-generator-max="30"
                              asp-captcha-generator-min="1"
                              asp-captcha-generator-language="English"
-                             asp-captcha-generator-display-mode="NumberToWord"
+                             asp-captcha-generator-display-mode="SumOfTwoNumbersToWords"
                              asp-use-relative-urls="true"
                              asp-placeholder="Security code as a number"
                              asp-validation-error-message="Please enter the security code as a number."
@@ -51,13 +50,12 @@
                              asp-validation-message-class="text-danger"
                              asp-refresh-button-class="bi-arrow-counterclockwise btn-lg"
                              asp-show-refresh-button="true"
-                             asp-dir="ltr"
-                             />
+                             asp-dir="ltr"/>
             </div>
         </div>
     </div>
     <footer class="card-footer">
-        <input type="submit" class="btn btn-secondary" value="Login" />
+        <input type="submit" class="btn btn-secondary" value="Login"/>
     </footer>
 </div>
 <div asp-validation-summary="All" class="text-danger alert alert-block"></div>
