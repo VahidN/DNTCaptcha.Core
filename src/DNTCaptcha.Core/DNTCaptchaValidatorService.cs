@@ -14,7 +14,6 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
     private readonly DNTCaptchaOptions _captchaOptions;
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
     private readonly ICaptchaStorageProvider _captchaStorageProvider;
-    private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
     private readonly IHttpContextAccessor _contextAccessor;
     private readonly ILogger<DNTCaptchaValidatorService> _logger;
 
@@ -26,7 +25,6 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
         ILogger<DNTCaptchaValidatorService> logger,
         ICaptchaCryptoProvider captchaProtectionProvider,
         ICaptchaStorageProvider captchaStorageProvider,
-        Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
         IOptions<DNTCaptchaOptions> options
     )
     {
@@ -35,7 +33,6 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
                                      throw new ArgumentNullException(nameof(captchaProtectionProvider));
         _captchaStorageProvider =
             captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
-        _captchaTextProvider = captchaTextProvider ?? throw new ArgumentNullException(nameof(captchaTextProvider));
         _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
         _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
     }
@@ -44,9 +41,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
     ///     Validates the input number.
     /// </summary>
     /// <returns></returns>
-    public bool HasRequestValidCaptchaEntry(
-        Language captchaGeneratorLanguage,
-        DisplayMode captchaGeneratorDisplayMode)
+    public bool HasRequestValidCaptchaEntry()
     {
         var httpContext = _contextAccessor.HttpContext;
         if (httpContext == null)

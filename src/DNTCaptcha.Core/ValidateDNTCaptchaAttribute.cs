@@ -4,60 +4,49 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     Validate DNTCaptcha Attribute
+/// </summary>
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
 {
     /// <summary>
-    /// Validate DNTCaptcha Attribute
+    ///     Validation error message. It's default value is `لطفا کد امنیتی را به رقم وارد نمائید`.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-    public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
+    public string ErrorMessage { set; get; } = "لطفا کد امنیتی را به رقم وارد نمائید";
+
+    /// <summary>
+    ///     Captcha validator.
+    /// </summary>
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
-        /// <summary>
-        /// The language of captcha generator. It's default value is Persian.
-        /// </summary>
-        public Language CaptchaGeneratorLanguage { set; get; } = Language.Persian;
-
-        /// <summary>
-        /// The display mode of captcha generator. It's default value is NumberToWord.
-        /// </summary>
-        public DisplayMode CaptchaGeneratorDisplayMode { set; get; }
-
-        /// <summary>
-        /// Validation error message. It's default value is `لطفا کد امنیتی را به رقم وارد نمائید`.
-        /// </summary>
-        public string ErrorMessage { set; get; } = "لطفا کد امنیتی را به رقم وارد نمائید";
-
-        /// <summary>
-        /// Captcha validator.
-        /// </summary>
-        public override void OnActionExecuting(ActionExecutingContext context)
+        if (context == null)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            var httpContext = context.HttpContext;
-            if (httpContext == null)
-            {
-                throw new InvalidOperationException("httpContext is null.");
-            }
-
-            var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();
-            if (validatorService.HasRequestValidCaptchaEntry(CaptchaGeneratorLanguage, CaptchaGeneratorDisplayMode))
-            {
-                base.OnActionExecuting(context);
-                return;
-            }
-
-            if (context.Controller is not ControllerBase controllerBase)
-            {
-                throw new InvalidOperationException("controllerBase is null.");
-            }
-
-            var options = httpContext.RequestServices.GetRequiredService<IOptions<DNTCaptchaOptions>>();
-            controllerBase.ModelState.AddModelError(options.Value.CaptchaComponent.CaptchaInputName, ErrorMessage);
-            base.OnActionExecuting(context);
+            throw new ArgumentNullException(nameof(context));
         }
+
+        var httpContext = context.HttpContext;
+        if (httpContext == null)
+        {
+            throw new InvalidOperationException("httpContext is null.");
+        }
+
+        var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();
+        if (validatorService.HasRequestValidCaptchaEntry())
+        {
+            base.OnActionExecuting(context);
+            return;
+        }
+
+        if (context.Controller is not ControllerBase controllerBase)
+        {
+            throw new InvalidOperationException("controllerBase is null.");
+        }
+
+        var options = httpContext.RequestServices.GetRequiredService<IOptions<DNTCaptchaOptions>>();
+        controllerBase.ModelState.AddModelError(options.Value.CaptchaComponent.CaptchaInputName, ErrorMessage);
+        base.OnActionExecuting(context);
     }
 }

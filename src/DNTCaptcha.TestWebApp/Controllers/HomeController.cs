@@ -25,9 +25,7 @@ public class HomeController : Controller
     // You can use it as an ActionFilter.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
-                           CaptchaGeneratorLanguage = Language.English,
-                           CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbersToWords)]
+    [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.")]
     public IActionResult Index([FromForm] AccountViewModel data)
     {
         if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
@@ -44,7 +42,7 @@ public class HomeController : Controller
     [ValidateAntiForgeryToken]
     public IActionResult Login2([FromForm] AccountViewModel data)
     {
-        if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.SumOfTwoNumbersToWords))
+        if (!_validatorService.HasRequestValidCaptchaEntry())
         {
             ModelState.AddModelError(_captchaOptions.CaptchaComponent.CaptchaInputName,
                                      "Please enter the security code as a number.");
@@ -57,9 +55,7 @@ public class HomeController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
-                           CaptchaGeneratorLanguage = Language.English,
-                           CaptchaGeneratorDisplayMode = DisplayMode.SumOfTwoNumbersToWords)]
+    [ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.")]
     public IActionResult Login3([FromForm] AccountViewModel data) // For Ajax Forms
     {
         if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.

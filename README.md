@@ -115,7 +115,7 @@ For bootstrap-5 (you will need Bootstrap Icons for the missing [font-glyphs](htt
 			 />
 ```
 
-- To register its default providers, call `services.AddDNTCaptcha();` method in your [Startup class](/src/DNTCaptcha.TestWebApp/Startup.cs).
+- To register its default providers, call `services.AddDNTCaptcha();` method in your [Program class](/src/DNTCaptcha.TestWebApp/Program.cs).
 
 ```csharp
 using DNTCaptcha.Core;
@@ -158,9 +158,7 @@ namespace DNTCaptcha.TestWebApp
 
 ```csharp
 [HttpPost, ValidateAntiForgeryToken]
-[ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.",
-                    CaptchaGeneratorLanguage = Language.English,
-                    CaptchaGeneratorDisplayMode = DisplayMode.NumberToWord)]
+[ValidateDNTCaptcha(ErrorMessage = "Please enter the security code as a number.")]
 public IActionResult Index([FromForm]AccountViewModel data)
 {
     if (ModelState.IsValid) // If `ValidateDNTCaptcha` fails, it will set a `ModelState.AddModelError`.
@@ -191,7 +189,7 @@ namespace DNTCaptcha.TestWebApp.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public IActionResult Login2([FromForm]AccountViewModel data)
         {
-            if (!_validatorService.HasRequestValidCaptchaEntry(Language.English, DisplayMode.SumOfTwoNumbersToWords))
+            if (!_validatorService.HasRequestValidCaptchaEntry())
             {
                 this.ModelState.AddModelError(_captchaOptions.CaptchaComponent.CaptchaInputName, "Please enter the security code as a number.");
                 return View(nameof(Index));
