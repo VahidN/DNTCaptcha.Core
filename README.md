@@ -38,6 +38,8 @@ You also need to modify your `.csproj` file to include some MSBuild directives t
 </Target>
 ```
 
+Also you should use [a custom font](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/Program.cs#L59) for Linux systems, because they don't have the `Tahoma` font which is defined by `asp-font-name="Tahoma"` by default.
+
 ## Usage
 
 - After installing the DNTCaptcha.Core package, add the following definition to the [\_ViewImports.cshtml](/src/DNTCaptcha.TestWebApp/Views/_ViewImports.cshtml) file:
