@@ -12,6 +12,8 @@
 
 ## Install via NuGet
 
+[![Nuget](https://img.shields.io/nuget/v/DNTCaptcha.Core)](http://www.nuget.org/packages/DNTCaptcha.Core/)
+
 To install DNTCaptcha.Core, run the following command in the Package Manager Console:
 
 ```
