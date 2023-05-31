@@ -208,6 +208,12 @@ namespace DNTCaptcha.TestWebApp.Controllers
 
 If your environment is distributed and you are using a `Session (UseSessionStorageProvider())` or `Memory (UseMemoryCacheStorageProvider())` storage providers to store some temporary values, these values will not be distributed at all. By default, ASP.NET's session is maintained in the RAM of the running web server. However, for instance Windows Azure is a stateless platform, web role instances have no local storage; at any time the web role instance could be moved to a different server in the data center. When the web role instance is moved, the session state **is lost**. To have a perceived sense of state with a stateless protocol on a stateless web server, you need permanent server side storage that persists even if the web role instance is moved. In this case you should `UseDistributedCacheStorageProvider()` or at first try using the `UseCookieStorageProvider()`.
 
+## How to debug it!
+
+If you can't run this library and the captcha image is not being displayed, first you should checkout the server's logs and at least you should see what's the response of the requested image. Open the network's tab of the browser's developer tools and see the responses.
+If you want to see the output of [_logger.LogDebug](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.Core/DNTCaptchaImageController.cs#L188), you should [turn on this level of logging](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/appsettings.json#L3) in the appsettings.json file.
+
+
 **Tips**
 
 - If you are using the `UseCookieStorageProvider()` and also the `CORS` is activated, you should set the `SameSiteMode` to `None`: `options.UseCookieStorageProvider(SameSiteMode.None)` otherwise its default mode effectively disables `CORS`.
