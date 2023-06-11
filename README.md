@@ -258,6 +258,11 @@ It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample t
 - [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
 - [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
 
+## Pure JavaScript Usage
+
+It's possible to use this captcha with a pure JavaScript apps too. [Here is a sample](/src/DNTCaptcha.TestApiApp/wwwroot) to demonstrate it.
+
+
 ## Supported Languages
 
 Find all currently supported languages [here](/src/DNTCaptcha.Core/Language.cs). To add new language, kindly contribute by editing the following files:

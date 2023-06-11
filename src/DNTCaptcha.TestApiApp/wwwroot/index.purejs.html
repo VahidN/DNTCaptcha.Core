@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>DNTCaptcha.Core</title>
+    <meta charset="utf-8"/>
+
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="/content/site.css" rel="stylesheet"/>
+</head>
+
+<body>
+<div class="container">
+    <h3>Login Form</h3>
+    <form action="" id="loginForm" method="post" novalidate>
+        <div class="mb-3">
+            <label class="form-label">User Name</label>
+            <input class="form-control" name="username" type="text"/>
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input class="form-control" name="password" type="password"/>
+        </div>
+
+        <div class="dntCaptcha mb-3">
+            <img
+                    alt="captcha"
+                    id="dntCaptchaImg"
+                    name="dntCaptchaImg"
+                    style="margin-bottom: 4px"
+            />
+            <a
+                    class="bi-arrow-counterclockwise btn-lg"
+                    id="dntCaptchaRefreshButton"
+                    name="dntCaptchaRefreshButton"
+                    onclick="doRefreshCaptcha()"
+                    style="cursor: pointer"
+            ></a>
+            <input id="DNTCaptchaText" name="DNTCaptchaText" type="hidden"/>
+            <div class="input-group">
+            <span class="input-group-text">
+              <span class="bi-lock"></span>
+            </span>
+                <input
+                        autocomplete="off"
+                        class="form-control"
+                        dir="ltr"
+                        id="DNTCaptchaInputText"
+                        name="DNTCaptchaInputText"
+                        placeholder="Security code as a number"
+                        type="text"
+                />
+            </div>
+            <input id="DNTCaptchaToken" name="DNTCaptchaToken" type="hidden"/>
+        </div>
+
+        <button class="btn btn-secondary" id="submitLogin" type="submit">
+            Submit
+        </button>
+
+        <div
+                class="alert alert-warning"
+                id="validationErrorMessage"
+                style="display: none"
+        ></div>
+    </form>
+</div>
+<script type="text/javascript">
+    const captchaApiUrl =
+        "https://localhost:5001/api/account/CreateDNTCaptchaParams";
+    const loginUrl = "https://localhost:5001/api/account/login";
+
+    const loginFormId = "loginForm";
+    const submitButtonId = "submitLogin";
+    const validationErrorMessageId = "validationErrorMessage";
+    const validationErrorMessageElement = document.getElementById(validationErrorMessageId);
+
+    function handleErrors(response) {
+        if (response.ok) {
+            return response;
+        }
+        return Promise.reject(response);
+    }
+
+    function getCaptchaInfo() {
+
+        fetch(captchaApiUrl, {
+            method: 'GET',
+            headers: {}
+        })
+            .then(handleErrors)
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                const {
+                    dntCaptchaImgUrl,
+                    dntCaptchaId,
+                    dntCaptchaTextValue,
+                    dntCaptchaTokenValue,
+                } = data;
+                document.getElementById("dntCaptchaImg").setAttribute("src", dntCaptchaImgUrl);
+                document.getElementById("DNTCaptchaText").setAttribute("value", dntCaptchaTextValue);
+                document.getElementById("DNTCaptchaToken").setAttribute("value", dntCaptchaTokenValue);
+                document.querySelector("div.dntCaptcha").setAttribute("id", dntCaptchaId);
+            })
+            .catch(error => console.log("error", error));
+    }
+
+    function doRefreshCaptcha() {
+        document.getElementById("DNTCaptchaInputText").value = "";
+        getCaptchaInfo();
+    }
+
+    function errorToString(obj) {
+        const parts = [];
+        parts.push("<ul>");
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                const value = obj[key];
+                if (typeof value === "object") {
+                    return errorToString(value);
+                }
+
+                if (value !== null && value !== undefined) {
+                    parts.push(`<li>${value}</li>`);
+                }
+            }
+        }
+        parts.push("</ul>");
+        return parts.join("");
+    }
+
+    window.onload = function () {
+
+        getCaptchaInfo();
+
+        // Post login form to the server
+        document.getElementById(submitButtonId).addEventListener('click', function (event) {
+            event.preventDefault();
+            validationErrorMessageElement.innerHTML = "";
+            validationErrorMessageElement.style.display = 'none';
+            const formData = new URLSearchParams(new FormData(document.getElementById(loginFormId))).toString();
+            console.log("formData", formData);
+
+            fetch(loginUrl, {
+                method: 'POST',
+                // NOTE: Don't post it as a JSON data. Its `Content-Type` should be `application/x-www-form-urlencoded`.
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: formData
+            })
+                .then(handleErrors)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert("Succeed!");
+                    doRefreshCaptcha();
+                })
+                .catch(error => {
+                    alert("Failed! Try again!");
+                    error.json().then((json) => {
+                        console.log(json);
+                        validationErrorMessageElement.innerHTML = errorToString(json);
+                        validationErrorMessageElement.style.display = 'block';
+                    });
+                    doRefreshCaptcha();
+                });
+        });
+    }
+</script>
+</body>
+</html>
