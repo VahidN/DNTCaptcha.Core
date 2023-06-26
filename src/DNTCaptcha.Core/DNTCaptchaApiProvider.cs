@@ -73,16 +73,17 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         var cookieToken = $".{captchaDivId}";
         var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
 
-        _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken,
-                                    number.ToString(CultureInfo.InvariantCulture));
+        string numberStr = number.ToString(CultureInfo.InvariantCulture);
+        string encryptedNumber = _captchaProtectionProvider.Encrypt(numberStr);
+        _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken, numberStr);
 
         return new DNTCaptchaApiResponse
-               {
-                   DntCaptchaImgUrl = captchaImageUrl,
-                   DntCaptchaId = captchaDivId,
-                   DntCaptchaTextValue = encryptedText,
-                   DntCaptchaTokenValue = hiddenInputToken,
-               };
+        {
+            DntCaptchaImgUrl = captchaImageUrl,
+            DntCaptchaId = captchaDivId,
+            DntCaptchaTextValue = encryptedNumber,
+            DntCaptchaTokenValue = hiddenInputToken,
+        };
     }
 
     private string getCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
@@ -93,14 +94,14 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         }
 
         var values = new CaptchaImageParams
-                     {
-                         Text = encryptedText,
-                         RndDate = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture),
-                         ForeColor = captchaAttributes.ForeColor,
-                         BackColor = captchaAttributes.BackColor,
-                         FontSize = captchaAttributes.FontSize,
-                         FontName = captchaAttributes.FontName,
-                     };
+        {
+            Text = encryptedText,
+            RndDate = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture),
+            ForeColor = captchaAttributes.ForeColor,
+            BackColor = captchaAttributes.BackColor,
+            FontSize = captchaAttributes.FontSize,
+            FontName = captchaAttributes.FontName,
+        };
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
         var actionUrl = captchaAttributes.UseRelativeUrls
                             ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
