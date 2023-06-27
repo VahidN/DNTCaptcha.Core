@@ -1,20 +1,31 @@
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     Defines options of the captcha's noise
+/// </summary>
+public class DNTCaptchaNoise
 {
     /// <summary>
-    /// Defines options of the captcha's noise
+    ///     The frequency in the x-direction in the range of 0..1.
+    ///     Its default value is 0.015f
     /// </summary>
-    public class DNTCaptchaNoise
-    {
-        /// <summary>
-        /// Defines density of the noise's pixels.
-        /// Its default value is 25.
-        /// </summary>
-        public float NoisePixelsDensity { set; get; } = 25;
+    public float BaseFrequencyX { set; get; } = 0.015f;
 
-        /// <summary>
-        /// Defines the number of random noise's lines.
-        /// Its default value is 3.
-        /// </summary>
-        public int NoiseLinesCount { set; get; } = 3;
-    }
+    /// <summary>
+    ///     The frequency in the y-direction in the range of 0..1.
+    ///     Its default value is 0.015f
+    /// </summary>
+    public float BaseFrequencyY { set; get; } = 0.015f;
+
+    /// <summary>
+    ///     The number of octaves, usually fairly small.
+    ///     Its default value is 1
+    /// </summary>
+    public int NumOctaves { set; get; } = 1;
+
+    /// <summary>
+    ///     The randomization seed.
+    ///     Its default value is 0
+    /// </summary>
+    public float Seed { set; get; }
 }

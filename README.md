@@ -143,7 +143,7 @@ namespace DNTCaptcha.TestWebApp
                 .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf")) // This is optional.
                 .AbsoluteExpiration(minutes: 7)
                 .ShowThousandsSeparators(false)
-                .WithNoise(pixelsDensity: 25, linesCount: 3)
+                .WithNoise(0.015f, 0.015f, 1, 0.0f)
                 .WithEncryptionKey("This is my secure key!")
                 .InputNames(// This is optional. Change it if you don't like the default names.
                     new DNTCaptchaComponent

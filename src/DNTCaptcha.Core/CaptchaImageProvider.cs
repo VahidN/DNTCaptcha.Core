@@ -109,9 +109,12 @@ public class CaptchaImageProvider : ICaptchaImageProvider
         }
     }
 
-    private static void CreateNoises(SKCanvas canvas)
+    private void CreateNoises(SKCanvas canvas)
     {
-        using var shader = SKShader.CreatePerlinNoiseTurbulence(0.015f, 0.015f, 1, 0.0f);
+        using var shader = SKShader.CreatePerlinNoiseTurbulence(_options.CaptchaNoise.BaseFrequencyX,
+                                                                _options.CaptchaNoise.BaseFrequencyY,
+                                                                _options.CaptchaNoise.NumOctaves,
+                                                                _options.CaptchaNoise.Seed);
         using var paint = new SKPaint();
         paint.Shader = shader;
         canvas.DrawPaint(paint);
