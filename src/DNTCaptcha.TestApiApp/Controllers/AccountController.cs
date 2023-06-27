@@ -38,7 +38,7 @@ public class AccountController : ControllerBase
                                           FontSize = 18,
                                           ForeColor = "#111111",
                                           Language = Language.Persian,
-                                          DisplayMode = DisplayMode.ShowDigits,
+                                          DisplayMode = DisplayMode.SumOfTwoNumbers,
                                           Max = 90,
                                           Min = 1,
                                       });

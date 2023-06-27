@@ -73,14 +73,15 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         var cookieToken = $".{captchaDivId}";
         var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
 
-        _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken,
-                                    number.ToString(CultureInfo.InvariantCulture));
+        var value = number.ToString(CultureInfo.InvariantCulture);
+        var encryptedValue = _captchaProtectionProvider.Encrypt(value);
+        _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken, value);
 
         return new DNTCaptchaApiResponse
                {
                    DntCaptchaImgUrl = captchaImageUrl,
                    DntCaptchaId = captchaDivId,
-                   DntCaptchaTextValue = encryptedText,
+                   DntCaptchaTextValue = encryptedValue,
                    DntCaptchaTokenValue = hiddenInputToken,
                };
     }
