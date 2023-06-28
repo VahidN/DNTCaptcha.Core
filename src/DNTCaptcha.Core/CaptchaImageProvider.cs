@@ -41,6 +41,12 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     public byte[] DrawCaptcha(string text, string foreColor, string backColor, float fontSize, string fontName)
     {
         var fontType = GetFont(fontName, _options.CustomFontPath);
+        if (fontType is null)
+        {
+            throw new
+                InvalidOperationException("`fontType` is null. It's better to set this option first: .UseCustomFont(Path.Combine(env.WebRootPath, \"fonts\", \"my-font.ttf\")); ");
+        }
+
         using var shaper = new SKShaper(fontType);
         if (!SKColor.TryParse(foreColor, out var skColor))
         {
