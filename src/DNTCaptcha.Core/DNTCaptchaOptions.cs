@@ -64,6 +64,11 @@ public class DNTCaptchaOptions
     public string CaptchaClass { get; set; } = "dntCaptcha";
 
     /// <summary>
+    ///     Display exceptions in the response
+    /// </summary>
+    public bool ShowExceptions { set; get; }
+
+    /// <summary>
     ///     The CSS class name of the captcha's DIV.
     ///     Its default value is `dntCaptcha`.
     /// </summary>
@@ -226,6 +231,15 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions UseMemoryCacheStorageProvider()
     {
         CaptchaStorageProvider = typeof(MemoryCacheCaptchaStorageProvider);
+        return this;
+    }
+
+    /// <summary>
+    ///     It will simplify the debugging by showing the exceptions in the response body.
+    /// </summary>
+    public DNTCaptchaOptions ShowExceptionsInResponse(bool enable)
+    {
+        ShowExceptions = enable;
         return this;
     }
 

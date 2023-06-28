@@ -57,6 +57,7 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
                                    // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
                                    // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
                                    .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
+                                   .ShowExceptionsInResponse(env.IsDevelopment())
                                    .AbsoluteExpiration(7)
                                    .ShowThousandsSeparators(false)
                                    .WithNoise(0.015f, 0.015f, 1, 0.0f)

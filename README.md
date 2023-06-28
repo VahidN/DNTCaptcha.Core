@@ -212,6 +212,11 @@ If your environment is distributed and you are using a `Session (UseSessionStora
 
 If you can't run this library and the captcha image is not being displayed, first you should checkout the server's logs and at least you should see what's the response of the requested image. Open the network's tab of the browser's developer tools and see the responses.
 If you want to see the output of [_logger.LogDebug](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.Core/DNTCaptchaImageController.cs#L188), you should [turn on this level of logging](https://github.com/VahidN/DNTCaptcha.Core/blob/master/src/DNTCaptcha.TestWebApp/appsettings.json#L3) in the appsettings.json file.
+Also you can set the `.ShowExceptionsInResponse(env.IsDevelopment())` option to simplify the debugging by showing the exceptions in the response body.
+
+## The Blazor based version!
+
+If you have a Blazor based app, it's better to try [DNTCaptcha.Blazor](https://github.com/VahidN/DNTCaptcha.Blazor).
 
 
 **Tips**
