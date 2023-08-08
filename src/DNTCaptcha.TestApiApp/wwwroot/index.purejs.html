@@ -103,7 +103,12 @@
                 document.getElementById("DNTCaptchaToken").setAttribute("value", dntCaptchaTokenValue);
                 document.querySelector("div.dntCaptcha").setAttribute("id", dntCaptchaId);
             })
-            .catch(error => console.log("error", error));
+            .catch(error => {
+                if (error.status === 429) {
+                    alert('Too many requests! Please wait a minute!');
+                }
+                console.log("error", error);
+            });
     }
 
     function doRefreshCaptcha() {

@@ -10,6 +10,12 @@ namespace DNTCaptcha.Core;
 public class DNTCaptchaOptions
 {
     /// <summary>
+    ///     Maximum number of permit counters that can be allowed in a minute. Must be set to a value > 0
+    ///     Its default value is 10.
+    /// </summary>
+    public int PermitLimit { set; get; } = 10;
+
+    /// <summary>
     ///     Defines options of the captcha's noise
     /// </summary>
     public DNTCaptchaNoise CaptchaNoise { get; set; } = new();
@@ -67,6 +73,18 @@ public class DNTCaptchaOptions
     ///     Display exceptions in the response
     /// </summary>
     public bool ShowExceptions { set; get; }
+
+    /// <summary>
+    ///     Maximum number of permit counters that can be allowed in a minute for a given IP.
+    ///     Must be set to a value > 0.
+    ///     Its default value is 10.
+    ///     Also you need to call app.UseRateLimiter() after calling app.UseRouting().
+    /// </summary>
+    public DNTCaptchaOptions RateLimiterPermitLimit(int permitLimit)
+    {
+        PermitLimit = permitLimit;
+        return this;
+    }
 
     /// <summary>
     ///     The CSS class name of the captcha's DIV.

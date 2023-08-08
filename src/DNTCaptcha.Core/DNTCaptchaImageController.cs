@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+#if NET7_0
+using Microsoft.AspNetCore.RateLimiting;
+#endif
 
 namespace DNTCaptcha.Core;
 
@@ -21,6 +24,9 @@ namespace DNTCaptcha.Core;
 /// </summary>
 [Route("[controller]")]
 [AllowAnonymous]
+#if NET7_0
+[EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
+#endif
 public class DNTCaptchaImageController : Controller
 {
     private const string TheReceivedDataIsNullOrEmpty = "The received data is null or empty.";

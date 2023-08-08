@@ -1,6 +1,7 @@
 using DNTCaptcha.Core;
 using DNTCaptcha.TestApiApp.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace DNTCaptcha.TestApiApp.Controllers;
 
@@ -28,6 +29,7 @@ public class AccountController : ControllerBase
 
     [HttpGet("[action]")]
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+    [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)] // don't forget this one!
     public ActionResult<DNTCaptchaApiResponse> CreateDNTCaptchaParams() =>
         // Note: For security reasons, a JavaScript client shouldn't be able to provide these attributes directly.
         // Otherwise an attacker will be able to change them and make them easier!

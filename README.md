@@ -142,6 +142,7 @@ namespace DNTCaptcha.TestWebApp
                 // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
                 .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf")) // This is optional.
                 .AbsoluteExpiration(minutes: 7)
+                .RateLimiterPermitLimit(10) // for .NET 7x+, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
                 .ShowThousandsSeparators(false)
                 .WithNoise(0.015f, 0.015f, 1, 0.0f)
                 .WithEncryptionKey("This is my secure key!")

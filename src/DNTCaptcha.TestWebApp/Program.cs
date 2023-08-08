@@ -59,6 +59,7 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
                                    .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
                                    .ShowExceptionsInResponse(env.IsDevelopment())
                                    .AbsoluteExpiration(7)
+                                   .RateLimiterPermitLimit(10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
                                    .ShowThousandsSeparators(false)
                                    .WithNoise(0.015f, 0.015f, 1, 0.0f)
                                    .WithEncryptionKey("This is my secure key!")
@@ -112,6 +113,7 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
     app.UseStaticFiles();
 
     app.UseRouting();
+    app.UseRateLimiter();
 
     app.UseSession();
 }

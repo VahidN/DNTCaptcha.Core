@@ -1,187 +1,195 @@
 ﻿<!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>DNTCaptcha.Core</title>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
 
-    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
-	<link href="/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
-	<link href="/content/site.css" rel="stylesheet" />
-	
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="/lib/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link href="/content/site.css" rel="stylesheet"/>
+
     <script src="/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
     <script src="/lib/jquery-validation/dist/jquery.validate.min.js" type="text/javascript"></script>
-    <script src="/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js" type="text/javascript"></script>
+    <script src="/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"
+            type="text/javascript"></script>
     <script src="/lib/jquery-ajax-unobtrusive/dist/jquery.unobtrusive-ajax.min.js" type="text/javascript"></script>
-    <script src="/lib/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>	
-  </head>
+    <script src="/lib/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
+</head>
 
-  <body>
-    <div class="container">
-      <h3>Login Form</h3>
-      <form id="loginForm" action="" method="post" novalidate>
+<body>
+<div class="container">
+    <h3>Login Form</h3>
+    <form action="" id="loginForm" method="post" novalidate>
         <div class="mb-3">
-          <label class="form-label">User Name</label>
-          <input type="text" class="form-control" name="username" />
+            <label class="form-label">User Name</label>
+            <input class="form-control" name="username" type="text"/>
         </div>
         <div class="mb-3">
-          <label>Password</label>
-          <input type="password" class="form-control" name="password" />
+            <label>Password</label>
+            <input class="form-control" name="password" type="password"/>
         </div>
 
         <div class="dntCaptcha mb-3">
-          <img
-            alt="captcha"
-            id="dntCaptchaImg"
-            name="dntCaptchaImg"
-            style="margin-bottom: 4px"
-          />
-          <a
-            class="bi-arrow-counterclockwise btn-lg"
-            style="cursor: pointer"
-            id="dntCaptchaRefreshButton"
-            name="dntCaptchaRefreshButton"
-            onclick="doRefreshCaptcha()"
-          ></a>
-          <input id="DNTCaptchaText" name="DNTCaptchaText" type="hidden" />
-          <div class="input-group">
+            <img
+                    alt="captcha"
+                    id="dntCaptchaImg"
+                    name="dntCaptchaImg"
+                    style="margin-bottom: 4px"
+            />
+            <a
+                    class="bi-arrow-counterclockwise btn-lg"
+                    id="dntCaptchaRefreshButton"
+                    name="dntCaptchaRefreshButton"
+                    onclick="doRefreshCaptcha()"
+                    style="cursor: pointer"
+            ></a>
+            <input id="DNTCaptchaText" name="DNTCaptchaText" type="hidden"/>
+            <div class="input-group">
             <span class="input-group-text">
               <span class="bi-lock"></span>
             </span>
-            <input
-              autocomplete="off"
-              class="form-control"
-              dir="ltr"
-              id="DNTCaptchaInputText"
-              name="DNTCaptchaInputText"
-              placeholder="Security code as a number"
-              type="text"
-            />
-          </div>
-          <input id="DNTCaptchaToken" name="DNTCaptchaToken" type="hidden" />
+                <input
+                        autocomplete="off"
+                        class="form-control"
+                        dir="ltr"
+                        id="DNTCaptchaInputText"
+                        name="DNTCaptchaInputText"
+                        placeholder="Security code as a number"
+                        type="text"
+                />
+            </div>
+            <input id="DNTCaptchaToken" name="DNTCaptchaToken" type="hidden"/>
         </div>
 
-        <button id="submitLogin" class="btn btn-secondary" type="submit">
-          Submit
+        <button class="btn btn-secondary" id="submitLogin" type="submit">
+            Submit
         </button>
 
         <div
-          class="alert alert-warning"
-          style="display: none"
-          id="validationErrorMessage"
+                class="alert alert-warning"
+                id="validationErrorMessage"
+                style="display: none"
         ></div>
-      </form>
-    </div>
-    <script type="text/javascript">
-      const captchaApiUrl =
+    </form>
+</div>
+<script type="text/javascript">
+    const captchaApiUrl =
         "https://localhost:5001/api/account/CreateDNTCaptchaParams";
-      const loginUrl = "https://localhost:5001/api/account/login";
+    const loginUrl = "https://localhost:5001/api/account/login";
 
-      const loginFormId = "#loginForm";
-      const submitButtonId = "#submitLogin";
-      const validationErrorMessageId = "#validationErrorMessage";
+    const loginFormId = "#loginForm";
+    const submitButtonId = "#submitLogin";
+    const validationErrorMessageId = "#validationErrorMessage";
 
-      function getCaptchaInfo() {
+    function getCaptchaInfo() {
         $.ajax({
-          url: captchaApiUrl,
-          type: "GET",
+            url: captchaApiUrl,
+            type: "GET",
         }).then(
-          function (response) {
-            console.log(response);
-            const {
-              dntCaptchaImgUrl,
-              dntCaptchaId,
-              dntCaptchaTextValue,
-              dntCaptchaTokenValue,
-            } = response;
-            $("#dntCaptchaImg").attr("src", dntCaptchaImgUrl);
-            $("#DNTCaptchaText").attr("value", dntCaptchaTextValue);
-            $("#DNTCaptchaToken").attr("value", dntCaptchaTokenValue);
-            $("div.dntCaptcha").attr("id", dntCaptchaId);
-          },
-          function (xhr, status, error) {
-            console.log({ xhr: xhr, status: status, error: error });
-          }
+            function (response) {
+                console.log(response);
+                const {
+                    dntCaptchaImgUrl,
+                    dntCaptchaId,
+                    dntCaptchaTextValue,
+                    dntCaptchaTokenValue,
+                } = response;
+                $("#dntCaptchaImg").attr("src", dntCaptchaImgUrl);
+                $("#DNTCaptchaText").attr("value", dntCaptchaTextValue);
+                $("#DNTCaptchaToken").attr("value", dntCaptchaTokenValue);
+                $("div.dntCaptcha").attr("id", dntCaptchaId);
+            },
+            function (xhr, status, error) {
+                console.log({xhr: xhr, status: status, error: error});
+                if (xhr.status === 429) {
+                    alert('Too many requests! Please wait a minute!');
+                }
+            }
         );
-      }
+    }
 
-      function doRefreshCaptcha() {
+    function doRefreshCaptcha() {
         $("#DNTCaptchaInputText").val("");
         getCaptchaInfo();
-      }
+    }
 
-      function getFormDataAsJsonObject($form) {
+    function getFormDataAsJsonObject($form) {
         var unIndexedArray = $form.serializeArray();
         var indexedArray = {};
 
         $.map(unIndexedArray, function (n, i) {
-          indexedArray[n["name"]] = n["value"];
+            indexedArray[n["name"]] = n["value"];
         });
 
         return indexedArray;
-      }
+    }
 
-      function errorToString(obj) {
+    function errorToString(obj) {
         const parts = [];
         parts.push("<ul>");
         for (const key in obj) {
-          if (obj.hasOwnProperty(key)) {
-            const value = obj[key];
-            if (typeof value === "object") {
-              return errorToString(value);
-            }
+            if (obj.hasOwnProperty(key)) {
+                const value = obj[key];
+                if (typeof value === "object") {
+                    return errorToString(value);
+                }
 
-            if (value !== null && value !== undefined) {
-              parts.push(`<li>${value}</li>`);
+                if (value !== null && value !== undefined) {
+                    parts.push(`<li>${value}</li>`);
+                }
             }
-          }
         }
         parts.push("</ul>");
         return parts.join("");
-      }
+    }
 
-      $(function () {
-        $.ajaxSetup({ xhrFields: { withCredentials: true } }); // Set this if you are using `CORS`.
+    $(function () {
+        $.ajaxSetup({xhrFields: {withCredentials: true}}); // Set this if you are using `CORS`.
 
         getCaptchaInfo();
 
         // Post login form to the server
         $(submitButtonId).on("click", function (event) {
-          event.preventDefault();
-          $(validationErrorMessageId).html("");
-          $(validationErrorMessageId).hide();
+            event.preventDefault();
+            $(validationErrorMessageId).html("");
+            $(validationErrorMessageId).hide();
 
-          $.ajax({
-            url: loginUrl,
-            type: "POST",
-            data: $(loginFormId).serialize(), // serializes the form's elements as a form-urlencoded data.
-            /*
-            NOTE: Don't post it as a JSON data. Its `Content-Type` should be `application/x-www-form-urlencoded`.
-
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(getFormDataAsJsonObject($(loginFormId))),
-            */
-            success: function (result) {
-              console.log(result);
-              alert("Succeed!");
-              doRefreshCaptcha();
-            },
-            error: function (xhr, status, error) {
-              console.log({ xhr: xhr, status: status, error: error });
-              if (xhr.status === 400) {
-                alert("Failed! Try again!");
-                $(validationErrorMessageId).html(
-                  errorToString(xhr.responseJSON)
-                );
-                $(validationErrorMessageId).show();
-              } else {
-                alert(xhr.responseText);
-              }
-              doRefreshCaptcha();
-            },
-          });
+            $.ajax({
+                url: loginUrl,
+                type: "POST",
+                data: $(loginFormId).serialize(), // serializes the form's elements as a form-urlencoded data.
+                /*
+                NOTE: Don't post it as a JSON data. Its `Content-Type` should be `application/x-www-form-urlencoded`.
+    
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(getFormDataAsJsonObject($(loginFormId))),
+                */
+                success: function (result) {
+                    console.log(result);
+                    alert("Succeed!");
+                    doRefreshCaptcha();
+                },
+                error: function (xhr, status, error) {
+                    console.log({xhr: xhr, status: status, error: error});
+                    if (xhr.status === 429) {
+                        alert('Too many requests! Please wait a minute!');
+                        return;
+                    }
+                    if (xhr.status === 400) {
+                        alert("Failed! Try again!");
+                        $(validationErrorMessageId).html(
+                            errorToString(xhr.responseJSON)
+                        );
+                        $(validationErrorMessageId).show();
+                    } else {
+                        alert(xhr.responseText);
+                    }
+                    doRefreshCaptcha();
+                },
+            });
         });
-      });
-    </script>
-  </body>
+    });
+</script>
+</body>
 </html>

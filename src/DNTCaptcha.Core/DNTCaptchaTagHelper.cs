@@ -20,6 +20,7 @@ namespace DNTCaptcha.Core;
 public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
 {
     private const string DataAjaxBeginFunctionName = "onRefreshButtonDataAjaxBegin";
+    private const string DataAjaxFailureFunctionName = "onRefreshButtonDataAjaxFailure";
     private readonly IAntiforgery _antiforgery;
     private readonly DNTCaptchaOptions _captchaOptions;
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
@@ -147,10 +148,11 @@ public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
         var hiddenInputToken = getHiddenInputTokenTagBuilder(_captchaProtectionProvider.Encrypt(cookieToken));
         output.Content.AppendHtml(hiddenInputToken);
 
-        var dataAjaxBeginScript = getOnRefreshButtonDataAjaxBegin(ViewContext);
-        output.Content.AppendHtml(dataAjaxBeginScript);
+        var dataAjaxScripts = getOnRefreshButtonDataAjaxScripts(ViewContext);
+        output.Content.AppendHtml(dataAjaxScripts);
 
-        _captchaStorageProvider.Add(ViewContext.HttpContext, cookieToken,
+        _captchaStorageProvider.Add(ViewContext.HttpContext,
+                                    cookieToken,
                                     number.ToString(CultureInfo.InvariantCulture));
     }
 
@@ -291,17 +293,20 @@ public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
         refreshButton.Attributes.Add("data-ajax-mode", "replace-with");
         refreshButton.Attributes.Add("data-ajax-update", $"#{captchaDivId}");
         refreshButton.Attributes.Add("data-ajax-begin", DataAjaxBeginFunctionName);
+        refreshButton.Attributes.Add("data-ajax-failure", DataAjaxFailureFunctionName);
         refreshButton.Attributes.Add("class", RefreshButtonClass);
         return refreshButton;
     }
 
-    private TagBuilder getOnRefreshButtonDataAjaxBegin(ViewContext viewContext)
+    private TagBuilder getOnRefreshButtonDataAjaxScripts(ViewContext viewContext)
     {
         var requestVerificationToken = _antiforgery.GetAndStoreTokens(viewContext.HttpContext).RequestToken;
         var script = new TagBuilder("script");
         script.Attributes.Add("type", "text/javascript");
-        script.InnerHtml.AppendHtml(
-                                    $"function {DataAjaxBeginFunctionName}(xhr, settings) {{ settings.data = settings.data + '&__RequestVerificationToken={requestVerificationToken}';  }}");
+        script.InnerHtml
+              .AppendHtml($" function {DataAjaxBeginFunctionName}(xhr, settings) {{ settings.data = settings.data + '&__RequestVerificationToken={requestVerificationToken}';  }}");
+        script.InnerHtml
+              .AppendHtml($" function {DataAjaxFailureFunctionName}(xhr, status, error) {{ if(xhr.status === 429) alert('Too many requests! Please wait a minute!'); }}");
         return script;
     }
 
