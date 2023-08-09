@@ -260,6 +260,7 @@ public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
                          TextBoxClass = TextBoxClass,
                          TextBoxTemplate = TextBoxTemplate,
                          ValidationErrorMessage = ValidationErrorMessage,
+                         TooManyRequestsErrorMessage = TooManyRequestsErrorMessage,
                          ValidationMessageClass = ValidationMessageClass,
                          CaptchaToken = captchaToken,
                          RefreshButtonClass = RefreshButtonClass,
@@ -306,7 +307,7 @@ public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
         script.InnerHtml
               .AppendHtml($" function {DataAjaxBeginFunctionName}(xhr, settings) {{ settings.data = settings.data + '&__RequestVerificationToken={requestVerificationToken}';  }}");
         script.InnerHtml
-              .AppendHtml($" function {DataAjaxFailureFunctionName}(xhr, status, error) {{ if(xhr.status === 429) alert('Too many requests! Please wait a minute!'); }}");
+              .AppendHtml($" function {DataAjaxFailureFunctionName}(xhr, status, error) {{ if(xhr.status === 429) alert('{TooManyRequestsErrorMessage}'); }}");
         return script;
     }
 
