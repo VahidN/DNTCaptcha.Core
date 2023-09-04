@@ -75,6 +75,25 @@ public class DNTCaptchaOptions
     public bool ShowExceptions { set; get; }
 
     /// <summary>
+    ///     Its default value is `NETESCAPADES_NONCE`
+    ///     It's coming from https://github.com/andrewlock/NetEscapades.AspNetCore.SecurityHeaders
+    ///     builder.AddScriptSrc().Self().WithNonce()
+    /// </summary>
+    public string NonceKey { set; get; } = "NETESCAPADES_NONCE";
+
+    /// <summary>
+    ///     Its default value is `NETESCAPADES_NONCE`.
+    ///     It's coming from https://github.com/andrewlock/NetEscapades.AspNetCore.SecurityHeaders
+    ///     builder.AddScriptSrc().Self().`WithNonce()` settings.
+    ///     `WithNonce()` will generate the HttpContext.Items["NETESCAPADES_NONCE"] automatically.
+    /// </summary>
+    public DNTCaptchaOptions WithNonceKey(string key)
+    {
+        NonceKey = key;
+        return this;
+    }
+
+    /// <summary>
     ///     Maximum number of permit counters that can be allowed in a minute for a given IP.
     ///     Must be set to a value > 0.
     ///     Its default value is 10.
@@ -93,7 +112,6 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions Identifier(string className)
     {
         CaptchaClass = className;
-
         return this;
     }
 
@@ -103,7 +121,6 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions InputNames(DNTCaptchaComponent component)
     {
         CaptchaComponent = component;
-
         return this;
     }
 
@@ -114,7 +131,6 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions ShowThousandsSeparators(bool show)
     {
         AllowThousandsSeparators = show;
-
         return this;
     }
 
@@ -125,7 +141,6 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions AbsoluteExpiration(int minutes)
     {
         AbsoluteExpirationMinutes = minutes;
-
         return this;
     }
 
@@ -136,7 +151,6 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions WithEncryptionKey(string key)
     {
         EncryptionKey = key;
-
         return this;
     }
 

@@ -149,6 +149,7 @@ namespace DNTCaptcha.TestWebApp
                 .ShowThousandsSeparators(false)
                 .WithNoise(0.015f, 0.015f, 1, 0.0f)
                 .WithEncryptionKey("This is my secure key!")
+                .WithNonceKey("NETESCAPADES_NONCE")
                 .InputNames(// This is optional. Change it if you don't like the default names.
                     new DNTCaptchaComponent
                     {

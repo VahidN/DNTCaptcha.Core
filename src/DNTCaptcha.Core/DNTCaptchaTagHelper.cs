@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -299,17 +300,19 @@ public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
         return refreshButton;
     }
 
-    private TagBuilder getOnRefreshButtonDataAjaxScripts(ViewContext viewContext)
+    private IHtmlContent getOnRefreshButtonDataAjaxScripts(ViewContext viewContext)
     {
         var requestVerificationToken = _antiforgery.GetAndStoreTokens(viewContext.HttpContext).RequestToken;
-        var script = new TagBuilder("script");
-        script.Attributes.Add("type", "text/javascript");
-        script.InnerHtml
-              .AppendHtml($" function {DataAjaxBeginFunctionName}(xhr, settings) {{ settings.data = settings.data + '&__RequestVerificationToken={requestVerificationToken}';  }}");
-        script.InnerHtml
-              .AppendHtml($" function {DataAjaxFailureFunctionName}(xhr, status, error) {{ if(xhr.status === 429) alert('{TooManyRequestsErrorMessage}'); }}");
-        return script;
+        return new
+            DNTScriptTag($" function {DataAjaxBeginFunctionName}(xhr, settings) {{ settings.data = settings.data + '&__RequestVerificationToken={requestVerificationToken}';  }}" +
+                         $" function {DataAjaxFailureFunctionName}(xhr, status, error) {{ if(xhr.status === 429) alert('{TooManyRequestsErrorMessage}'); }}",
+                         getNonceValue(viewContext));
     }
+
+    private string getNonceValue(ViewContext viewContext) =>
+        viewContext.HttpContext.Items.TryGetValue(_captchaOptions.NonceKey, out var value)
+            ? value as string ?? string.Empty
+            : string.Empty;
 
     private TagBuilder getTextInputTagBuilder()
     {
