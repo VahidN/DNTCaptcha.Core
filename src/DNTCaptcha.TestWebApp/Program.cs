@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using DNTCaptcha.Core;
+using DNTCaptcha.TestWebApp.Common;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +64,7 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
                                    .ShowThousandsSeparators(false)
                                    .WithNoise(0.015f, 0.015f, 1, 0.0f)
                                    .WithEncryptionKey("This is my secure key!")
+                                   .WithNonceKey("NETESCAPADES_NONCE")
                                    .InputNames( // This is optional. Change it if you don't like the default names.
                                                new DNTCaptchaComponent
                                                {
@@ -105,6 +107,8 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
         app.UseExceptionHandler("/Home/Error");
         app.UseHsts();
     }
+
+    app.UseSecurityHeaders(policies => policies.AddMyCustomCsp(env.IsDevelopment()));
 
     app.UseHttpsRedirection();
 
