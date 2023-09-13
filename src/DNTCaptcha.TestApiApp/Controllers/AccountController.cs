@@ -37,9 +37,9 @@ public class AccountController : ControllerBase
                                       {
                                           BackColor = "#f7f3f3",
                                           FontName = "Tahoma",
-                                          FontSize = 18,
+                                          FontSize = 33,
                                           ForeColor = "#111111",
-                                          Language = Language.Persian,
+                                          Language = Language.English,
                                           DisplayMode = DisplayMode.SumOfTwoNumbers,
                                           Max = 90,
                                           Min = 1,
