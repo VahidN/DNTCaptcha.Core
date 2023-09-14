@@ -9,8 +9,13 @@ import { DNTCaptcha } from '../interfaces/dnt-captcha.interface';
 export class DNTCaptchaService {
   // default endpoint from DNTCaptcha.TestApiApp
   captchaApiUrl = 'https://localhost:5001/api/account/CreateDNTCaptchaParams';
+  loginUrl = 'https://localhost:5001/api/account/login';
   http = inject(HttpClient);
   getDntCaptcha(): Observable<DNTCaptcha> {
     return this.http.get<DNTCaptcha>(this.captchaApiUrl);
+  }
+
+  validateDntCaptcha(): Observable<boolean> {
+    return this.http.post<boolean>(this.loginUrl, {});
   }
 }

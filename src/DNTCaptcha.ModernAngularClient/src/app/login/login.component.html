@@ -1,0 +1,26 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+      <div class="card m-4">
+        <div class="card-header">Example login form</div>
+        <div class="card-body">
+          <div class="mb-3">
+            <label for="username" class="form-label">Username:</label>
+            <input class="form-control" id="username" placeholder="username" />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" class="form-control" id="password" placeholder="password" />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Captcha:</label>
+            <app-dnt-captcha [captchaForm]="captchaForm" />
+          </div>
+          <div class="mt-3 w-100 text-end">
+            <div class="btn btn-primary">Send form</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
