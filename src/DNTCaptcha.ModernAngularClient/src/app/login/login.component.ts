@@ -1,25 +1,39 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DntCaptchaForm } from '../dnt-captcha/interfaces/dnt-captcha.form';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DntCaptchaComponent } from '../dnt-captcha/component/dnt-captcha.component';
+import { DntCaptchaService } from '../dnt-captcha/service/dnt-captcha.service';
+import { DntCaptchaForm } from '../dnt-captcha/interfaces/dnt-captcha-form.interface';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, DntCaptchaComponent],
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  imports: [CommonModule, DntCaptchaComponent, ReactiveFormsModule],
+  templateUrl: './login.component.html'
 })
 export class LoginComponent {
-  loginForm: FormGroup = new FormGroup({
-    username: new FormControl('', Validators.required),
-    password: new FormControl('', Validators.required)
+  captchaService = inject(DntCaptchaService);
+
+  form: FormGroup = new FormGroup({
+    username: new FormControl<string>('', { nonNullable: true, validators: Validators.required }),
+    password: new FormControl<string>('', { nonNullable: true, validators: Validators.required })
   });
 
   captchaForm: FormGroup<DntCaptchaForm> = new FormGroup<DntCaptchaForm>({
-    captchaInputText: new FormControl('', Validators.required),
-    captchaText: new FormControl('', Validators.required),
-    captchaToken: new FormControl('', Validators.required)
+    dntCaptchaInputText: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    dntCaptchaText: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    dntCaptchaToken: new FormControl('', { nonNullable: true, validators: Validators.required })
   });
+
+  login(): void {
+    if (!this.form.valid || !this.captchaForm.valid) {
+      return;
+    }
+
+    this.captchaService
+      .validateDntCaptchaAndLogin({ ...this.form.getRawValue(), ...this.captchaForm.getRawValue() })
+      .subscribe((response: boolean): void => {
+        console.log(response);
+      });
+  }
 }

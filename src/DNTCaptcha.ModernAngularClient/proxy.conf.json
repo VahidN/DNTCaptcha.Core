@@ -1,0 +1,14 @@
+{
+  "/api": {
+    "target": "https://localhost:5001/api/",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    },
+    "headers": {
+      "Connection": "keep-alive"
+    },
+    "logLevel": "debug"
+  }
+}

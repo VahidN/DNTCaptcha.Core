@@ -1,21 +1,23 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DNTCaptcha } from '../interfaces/dnt-captcha.interface';
+import { DntCaptchaParams } from '../interfaces/dnt-captcha-params.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class DNTCaptchaService {
-  // default endpoint from DNTCaptcha.TestApiApp
-  captchaApiUrl = 'https://localhost:5001/api/account/CreateDNTCaptchaParams';
-  loginUrl = 'https://localhost:5001/api/account/login';
-  http = inject(HttpClient);
-  getDntCaptcha(): Observable<DNTCaptcha> {
-    return this.http.get<DNTCaptcha>(this.captchaApiUrl);
+export class DntCaptchaService {
+  http: HttpClient = inject(HttpClient);
+  getDntCaptchaParams(): Observable<DntCaptchaParams> {
+    return this.http.get<DntCaptchaParams>('api/account/CreateDNTCaptchaParams');
   }
 
-  validateDntCaptcha(): Observable<boolean> {
-    return this.http.post<boolean>(this.loginUrl, {});
+  // body should contain dntCaptchaText, dntCaptchaToken, dntCaptchaInputText and actual form fields
+  validateDntCaptchaAndLogin(body: { [key: string]: string }): Observable<boolean> {
+    const data: string = new HttpParams({ fromObject: body }).toString();
+
+    return this.http.post<boolean>('api/account/login', data, {
+      headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
+    });
   }
 }

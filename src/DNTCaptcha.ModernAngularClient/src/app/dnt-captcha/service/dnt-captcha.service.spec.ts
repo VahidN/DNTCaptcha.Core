@@ -1,13 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-
-import { DNTCaptchaService } from './dnt-captcha.service';
+import { DntCaptchaService } from './dnt-captcha.service';
 
 describe('DntCaptchaService', () => {
-  let service: DNTCaptchaService;
+  let service: DntCaptchaService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DNTCaptchaService);
+    service = TestBed.inject(DntCaptchaService);
   });
 
   it('should be created', () => {

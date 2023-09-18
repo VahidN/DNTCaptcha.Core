@@ -1,9 +1,12 @@
-<div class="d-flex align-items-center mb-3">
+<div class="d-flex align-items-center justify-content-between mb-3">
   <ng-container *ngIf="captchaImageUrl">
     <div style="height: 38px" class="w-25 position-relative">
-      <img [ngSrc]="captchaImageUrl" fill="true" alt="DNTCaptcha image" />
+      <img [ngSrc]="captchaImageUrl" fill="true" alt="DNTCaptcha image" priority="true" />
     </div>
   </ng-container>
-  <span class="mx-1">=</span>
-  <input type="password" class="w-75 form-control" id="captcha" />
+  <button class="btn btn-link" (click)="loadCaptcha()"><i class="bi bi-arrow-clockwise"></i></button>
+
+  <form [formGroup]="captchaForm">
+    <input formControlName="dntCaptchaInputText" type="text" class="form-control" id="captcha" />
+  </form>
 </div>

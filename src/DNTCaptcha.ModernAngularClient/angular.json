@@ -76,7 +76,8 @@
               "browserTarget": "dntcaptcha-modern-angular-client:build:production"
             },
             "development": {
-              "browserTarget": "dntcaptcha-modern-angular-client:build:development"
+              "browserTarget": "dntcaptcha-modern-angular-client:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"
