@@ -1,8 +1,8 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { DntCaptchaService } from '../service/dnt-captcha.service';
 import { DntCaptchaParams } from '../interfaces/dnt-captcha-params.interface';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DntCaptchaForm } from '../interfaces/dnt-captcha-form.interface';
 
 @Component({
@@ -13,16 +13,20 @@ import { DntCaptchaForm } from '../interfaces/dnt-captcha-form.interface';
   styles: ['i { font-size: 1.125rem } form { width: 65%;} button { height: 38px; width: 38px;}']
 })
 export class DntCaptchaComponent implements OnInit {
-  @Input({ required: true }) captchaForm!: FormGroup<DntCaptchaForm>;
+  dntCaptchaService = inject(DntCaptchaService);
 
   captchaImageUrl = '';
 
-  dntCaptchaService = inject(DntCaptchaService);
+  captchaForm: FormGroup<DntCaptchaForm> = new FormGroup<DntCaptchaForm>({
+    dntCaptchaInputText: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    dntCaptchaText: new FormControl('', { nonNullable: true, validators: Validators.required }),
+    dntCaptchaToken: new FormControl('', { nonNullable: true, validators: Validators.required })
+  });
   ngOnInit(): void {
-    this.loadCaptcha();
+    this.loadNewCaptcha();
   }
 
-  loadCaptcha(): void {
+  loadNewCaptcha(): void {
     this.dntCaptchaService.getDntCaptchaParams().subscribe((data: DntCaptchaParams) => {
       this.captchaImageUrl = data.dntCaptchaImgUrl;
       this.captchaForm.reset({

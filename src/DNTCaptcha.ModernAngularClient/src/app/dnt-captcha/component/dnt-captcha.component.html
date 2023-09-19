@@ -4,7 +4,9 @@
       <img [ngSrc]="captchaImageUrl" fill="true" alt="DNTCaptcha image" priority="true" />
     </div>
   </ng-container>
-  <button class="btn btn-link" (click)="loadCaptcha()"><i class="bi bi-arrow-clockwise"></i></button>
+  <button title="Refresh captcha" class="btn btn-link" (click)="loadNewCaptcha()">
+    <i class="bi bi-arrow-clockwise"></i>
+  </button>
 
   <form [formGroup]="captchaForm">
     <input formControlName="dntCaptchaInputText" type="text" class="form-control" id="captcha" />
