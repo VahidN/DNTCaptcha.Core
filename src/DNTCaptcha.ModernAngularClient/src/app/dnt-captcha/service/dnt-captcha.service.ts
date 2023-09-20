@@ -4,7 +4,9 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { DntCaptchaParams } from '../interfaces/dnt-captcha-params.interface';
 import { ToastrService } from 'ngx-toastr';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class DntCaptchaService {
   http: HttpClient = inject(HttpClient);
   toastr: ToastrService = inject(ToastrService);
