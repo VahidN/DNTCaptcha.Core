@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
         <VersionPrefix>4.9.0</VersionPrefix>
@@ -71,7 +71,7 @@
     </ItemGroup>
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.3"/>
+        <PackageReference Include="SkiaSharp" Version="2.88.6"/>
         <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.3"/>
     </ItemGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
