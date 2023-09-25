@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "dntcaptcha-modern-angular-client": {
+    "dntcaptcha-angular-client": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -24,7 +24,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser-esbuild",
           "options": {
-            "outputPath": "dist/dntcaptcha-modern-angular-client",
+            "outputPath": "dist/dntcaptcha-angular-client",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -73,10 +73,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "dntcaptcha-modern-angular-client:build:production"
+              "browserTarget": "dntcaptcha-angular-client:build:production"
             },
             "development": {
-              "browserTarget": "dntcaptcha-modern-angular-client:build:development",
+              "browserTarget": "dntcaptcha-angular-client:build:development",
               "proxyConfig": "proxy.conf.json"
             }
           },
@@ -85,7 +85,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "dntcaptcha-modern-angular-client:build"
+            "browserTarget": "dntcaptcha-angular-client:build"
           }
         },
         "test": {

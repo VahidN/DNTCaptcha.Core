@@ -16,6 +16,7 @@ import { DntCaptchaForm } from '../interfaces/dnt-captcha-form.interface';
 export class DntCaptchaComponent implements OnInit {
   dntCaptchaService: DntCaptchaService = inject(DntCaptchaService);
 
+  // if you are working with angular<16, remove the required property
   @Input({ required: true }) captchaForm!: FormGroup<DntCaptchaForm>;
 
   captchaImageUrl = '';

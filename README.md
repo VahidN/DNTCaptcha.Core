@@ -262,22 +262,13 @@ Please follow the [DNTCaptcha.TestWebApp](/src/DNTCaptcha.TestWebApp) sample for
 
 ## SPA Usage
 
-### Angular 4.3+
+### Angular
 
-It's possible to use this captcha with Angular 4.3+ apps too. Here is a sample to demonstrate it:
-
-- [The server side controller](/src/DNTCaptcha.TestWebApp/Controllers/NgxController.cs)
-- [The Angular 4.3+ component](/src/DNTCaptcha.AngularClient/src/app/dnt-captcha)
-- [A sample Angular 4.3+ login page](/src/DNTCaptcha.AngularClient/src/app/users-login)
-
-
-### Angular 16+
-
-It's possible to use this captcha with modern Angular 16+ apps too. Here is a sample to demonstrate it:
+It's possible to use this captcha with modern Angular apps too. Here is a sample to demonstrate it:
 
 - [The server side controller](/src/DNTCaptcha.TestApiApp/Controllers/AccountController.cs)
-- [The Angular 16+ DNTCaptcha component](/src/DNTCaptcha.ModernAngularClient/src/app/dnt-captcha)
-- [A sample Angular 16+ login component](/src/DNTCaptcha.ModernAngularClient/src/app/login)
+- [The Angular DNTCaptcha component](/src/DNTCaptcha.ModernAngularClient/src/app/dnt-captcha)
+- [A sample Angular login component](/src/DNTCaptcha.ModernAngularClient/src/app/login)
 - [How to run it locally](/src/DNTCaptcha.ModernAngularClient/README.md)
 
 ## Pure JavaScript Usage
