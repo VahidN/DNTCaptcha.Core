@@ -1,4 +1,4 @@
-using DNTCaptcha.Core;
+﻿using DNTCaptcha.Core;
 using DNTCaptcha.TestApiApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -37,9 +37,9 @@ public class AccountController : ControllerBase
                                       {
                                           BackColor = "#f7f3f3",
                                           FontName = "Tahoma",
-                                          FontSize = 33,
+                                          FontSize = 18,
                                           ForeColor = "#111111",
-                                          Language = Language.English,
+                                          Language = Language.Persian,
                                           DisplayMode = DisplayMode.SumOfTwoNumbers,
                                           Max = 90,
                                           Min = 1,
