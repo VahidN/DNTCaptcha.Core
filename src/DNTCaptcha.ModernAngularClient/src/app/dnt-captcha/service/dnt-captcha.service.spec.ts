@@ -42,15 +42,17 @@ describe('DntCaptchaService', () => {
   });
 
   it('should perform GET operation and return captchaData', () => {
-    let captchaData;
+    let captchaData: DntCaptchaParams | null = null;
 
     service
       .getDntCaptchaParams()
       .pipe(first())
-      .subscribe((data) => {
+      .subscribe((data: DntCaptchaParams) => {
         captchaData = data;
       });
+
     const req = httpMock.expectOne('api/account/CreateDNTCaptchaParams');
+
     req.flush(captchaDataMock);
 
     expect(req.request.method).toEqual('GET');
