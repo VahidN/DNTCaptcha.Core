@@ -1,4 +1,4 @@
-using DNTCaptcha.Core;
+﻿using DNTCaptcha.Core;
 using DNTCaptcha.TestApiApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;

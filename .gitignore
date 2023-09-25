@@ -245,3 +245,50 @@ ModelManifest.xml
 .fake/
 /.idea
 package-lock.json
+/src/DNTCaptcha.ModernAngularClient/.editorconfig
+
+
+# Compiled output
+/dist/
+/tmp/
+/out-tsc/
+/bazel-out/
+
+# Node
+npm-debug.log
+yarn-error.log
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+.angular/
+*dist/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# Miscellaneous
+/.angular/cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+
+# System files
+.DS_Store
+Thumbs.db
+
+# TODO: remove in PR:
+/src/DNTCaptcha.ModernAngularClient/src/assets/.gitkeep
+

@@ -1,0 +1,14 @@
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <ng-container *ngIf="captchaImageUrl">
+    <div style="height: 38px" class="w-25 position-relative">
+      <img [ngSrc]="captchaImageUrl" fill="true" alt="DNTCaptcha image" priority="true" />
+    </div>
+  </ng-container>
+  <button title="Refresh captcha" class="btn btn-link" (click)="loadNewCaptcha()">
+    <i class="bi bi-arrow-clockwise"></i>
+  </button>
+
+  <form [formGroup]="captchaForm">
+    <input formControlName="dntCaptchaInputText" type="text" class="form-control" id="captcha" />
+  </form>
+</div>

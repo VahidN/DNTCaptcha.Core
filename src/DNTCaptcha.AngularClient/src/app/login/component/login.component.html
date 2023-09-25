@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-6">
+      <div class="card m-4">
+        <div class="card-header">Example login form</div>
+        <div class="card-body">
+          <form [formGroup]="form">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username:</label>
+              <input formControlName="username" class="form-control" id="username" />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Password:</label>
+              <input formControlName="password" type="password" class="form-control" id="password" />
+            </div>
+          </form>
+          <div class="mb-3">
+            <label for="password" class="form-label">Captcha:</label>
+            <app-dnt-captcha [captchaForm]="captchaForm" />
+          </div>
+          <div class="mt-3 w-100 text-end">
+            <button class="btn btn-primary" [disabled]="!form.valid" (click)="submitForm()">Send form</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
