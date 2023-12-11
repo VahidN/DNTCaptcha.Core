@@ -300,7 +300,7 @@ public class DNTCaptchaTagHelper : DNTCaptchaTagHelperHtmlAttributes, ITagHelper
         return refreshButton;
     }
 
-    private IHtmlContent getOnRefreshButtonDataAjaxScripts(ViewContext viewContext)
+    private DNTScriptTag getOnRefreshButtonDataAjaxScripts(ViewContext viewContext)
     {
         var requestVerificationToken = _antiforgery.GetAndStoreTokens(viewContext.HttpContext).RequestToken;
         return new

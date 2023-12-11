@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-        <VersionPrefix>4.9.1</VersionPrefix>
+        <VersionPrefix>4.9.2</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
-        <TargetFrameworks>net7.0;net6.0;</TargetFrameworks>
+        <TargetFrameworks>net8.0;net7.0;net6.0;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <AssemblyName>DNTCaptcha.Core</AssemblyName>
         <PackageId>DNTCaptcha.Core</PackageId>
@@ -42,11 +42,11 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.62">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.120">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.6.40">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.8.14">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -58,7 +58,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.4.0.72892">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.15.0.81779">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -67,17 +67,20 @@
         <PlatformTarget>anycpu</PlatformTarget>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
     </ItemGroup>
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
         <PackageReference Include="SkiaSharp" Version="2.88.6"/>
-        <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.3"/>
+        <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.6"/>
     </ItemGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <DefineConstants>NET6_0</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
         <DefineConstants>NET7_0</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+        <DefineConstants>NET8_0</DefineConstants>
     </PropertyGroup>
 </Project>

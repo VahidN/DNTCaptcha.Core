@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-#if NET7_0
+#if NET7_0 || NET8_0
 using Microsoft.AspNetCore.RateLimiting;
 #endif
 
@@ -24,7 +24,7 @@ namespace DNTCaptcha.Core;
 /// </summary>
 [Route("[controller]")]
 [AllowAnonymous]
-#if NET7_0
+#if NET7_0 || NET8_0
 [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
 #endif
 public class DNTCaptchaImageController : Controller
@@ -88,22 +88,13 @@ public class DNTCaptchaImageController : Controller
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(data))
-            {
-                return BadRequest(TheReceivedDataIsNullOrEmpty);
-            }
+            if (string.IsNullOrWhiteSpace(data)) return BadRequest(TheReceivedDataIsNullOrEmpty);
 
             var decryptedModel = _captchaProtectionProvider.Decrypt(data);
-            if (decryptedModel == null)
-            {
-                return BadRequest(CouldntDecryptTheReceivedData);
-            }
+            if (decryptedModel == null) return BadRequest(CouldntDecryptTheReceivedData);
 
             var model = _serializationProvider.Deserialize<DNTCaptchaTagHelperHtmlAttributes>(decryptedModel);
-            if (model == null)
-            {
-                return BadRequest(IsYourNetworkDistributed);
-            }
+            if (model == null) return BadRequest(IsYourNetworkDistributed);
 
             invalidateToken(model);
 
@@ -127,42 +118,40 @@ public class DNTCaptchaImageController : Controller
             tagHelper.ShowRefreshButton = model.ShowRefreshButton;
 
             var tagHelperContext = new TagHelperContext(
-                                                        new TagHelperAttributeList(),
-                                                        new Dictionary<object, object> { { typeof(IUrlHelper), Url } },
-                                                        Guid.NewGuid().ToString("N"));
+                new TagHelperAttributeList(),
+                new Dictionary<object, object> { { typeof(IUrlHelper), Url } },
+                Guid.NewGuid().ToString("N"));
 
             var tagHelperOutput = new TagHelperOutput(
-                                                      "div",
-                                                      new TagHelperAttributeList(),
-                                                      (useCachedResult, encoder) =>
-                                                      {
-                                                          var tagHelperContent = new DefaultTagHelperContent();
-                                                          tagHelperContent.SetContent(string.Empty);
-                                                          return Task.FromResult<TagHelperContent>(tagHelperContent);
-                                                      });
+                "div",
+                new TagHelperAttributeList(),
+                (useCachedResult, encoder) =>
+                {
+                    var tagHelperContent = new DefaultTagHelperContent();
+                    tagHelperContent.SetContent(string.Empty);
+                    return Task.FromResult<TagHelperContent>(tagHelperContent);
+                });
             tagHelper.ViewContext = ViewContext ?? new ViewContext(
-                                                                   new ActionContext(HttpContext,
-                                                                    HttpContext.GetRouteData(),
-                                                                    ControllerContext.ActionDescriptor),
-                                                                   new FakeView(),
-                                                                   new
-                                                                   ViewDataDictionary(new EmptyModelMetadataProvider(),
-                                                                    new ModelStateDictionary())
-                                                                   {
-                                                                       Model = null,
-                                                                   },
-                                                                   new TempDataDictionary(HttpContext,
-                                                                    _tempDataProvider),
-                                                                   TextWriter.Null,
-                                                                   new HtmlHelperOptions());
+                new ActionContext(HttpContext,
+                    HttpContext.GetRouteData(),
+                    ControllerContext.ActionDescriptor),
+                new FakeView(),
+                new
+                    ViewDataDictionary(new EmptyModelMetadataProvider(),
+                        new ModelStateDictionary())
+                    {
+                        Model = null
+                    },
+                new TempDataDictionary(HttpContext,
+                    _tempDataProvider),
+                TextWriter.Null,
+                new HtmlHelperOptions());
 
             tagHelper.Process(tagHelperContext, tagHelperOutput);
 
             var attrs = new StringBuilder();
             foreach (var attr in tagHelperOutput.Attributes)
-            {
                 attrs.Append(' ').Append(attr.Name).Append("='").Append(attr.Value).Append('\'');
-            }
 
             var content = $"<div {attrs}>{tagHelperOutput.Content.GetContent()}</div>";
             return Content(content);
@@ -189,34 +178,22 @@ public class DNTCaptchaImageController : Controller
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(data))
-            {
-                return BadRequest(TheReceivedDataIsNullOrEmpty);
-            }
+            if (string.IsNullOrWhiteSpace(data)) return BadRequest(TheReceivedDataIsNullOrEmpty);
 
             var decryptedModel = _captchaProtectionProvider.Decrypt(data);
-            if (decryptedModel == null)
-            {
-                return BadRequest(CouldntDecryptTheReceivedData);
-            }
+            if (decryptedModel == null) return BadRequest(CouldntDecryptTheReceivedData);
 
             var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
-            if (model == null)
-            {
-                return BadRequest(IsYourNetworkDistributed);
-            }
+            if (model == null) return BadRequest(IsYourNetworkDistributed);
 
             var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
-            if (decryptedText == null)
-            {
-                return BadRequest("Couldn't decrypt the text.");
-            }
+            if (decryptedText == null) return BadRequest("Couldn't decrypt the text.");
 
             var image = _captchaImageProvider.DrawCaptcha(decryptedText,
-                                                          model.ForeColor,
-                                                          model.BackColor,
-                                                          model.FontSize,
-                                                          model.FontName);
+                model.ForeColor,
+                model.BackColor,
+                model.FontSize,
+                model.FontName);
             return new FileContentResult(image, "image/png");
         }
         catch (Exception ex)

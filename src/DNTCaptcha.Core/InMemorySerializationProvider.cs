@@ -12,6 +12,10 @@ namespace DNTCaptcha.Core;
 public class InMemorySerializationProvider : ISerializationProvider
 {
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
+
+    private readonly JsonSerializerOptions _jsonSerializerOptions =
+        new() { WriteIndented = false, IgnoreNullValues = true };
+
     private readonly ILogger<InMemorySerializationProvider> _logger;
     private readonly IMemoryCache _memoryCache;
     private readonly DNTCaptchaOptions _options;
@@ -38,19 +42,17 @@ public class InMemorySerializationProvider : ISerializationProvider
     /// </summary>
     public string Serialize(object data)
     {
-        var result = JsonSerializer.Serialize(data,
-                                              new JsonSerializerOptions
-                                              { WriteIndented = false, IgnoreNullValues = true });
+        var result = JsonSerializer.Serialize(data, _jsonSerializerOptions);
         var token = _captchaProtectionProvider.Hash(result).HashString;
         _memoryCache.Set(token,
-                         result,
-                         new MemoryCacheEntryOptions
-                         {
-                             AbsoluteExpiration =
-                                 DateTimeOffset.UtcNow
-                                               .AddMinutes(_options.AbsoluteExpirationMinutes),
-                             Size = 1, // the size limit is the count of entries
-                         });
+            result,
+            new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration =
+                    DateTimeOffset.UtcNow
+                        .AddMinutes(_options.AbsoluteExpirationMinutes),
+                Size = 1 // the size limit is the count of entries
+            });
         return token;
     }
 
@@ -61,7 +63,8 @@ public class InMemorySerializationProvider : ISerializationProvider
     {
         if (!_memoryCache.TryGetValue(data, out string? result) || result is null)
         {
-            _logger.LogDebug("The registered memory cache provider returned null. Which means your data is expired. Please read the `How to choose a correct storage mode` in the readme file. Probably a local `memory cache` shouldn't be used with your distributed servers.");
+            _logger.LogDebug(
+                "The registered memory cache provider returned null. Which means your data is expired. Please read the `How to choose a correct storage mode` in the readme file. Probably a local `memory cache` shouldn't be used with your distributed servers.");
             return default;
         }
 

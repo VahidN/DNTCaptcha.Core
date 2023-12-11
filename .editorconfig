@@ -4,6 +4,9 @@ charset = utf-8-bom
 
 [*.cs]
 
+dotnet_diagnostic.ASP0023.severity = suggestion
+dotnet_diagnostic.CA1510.severity = suggestion
+
 dotnet_diagnostic.SYSLIB0021.severity = suggestion
 
 dotnet_diagnostic.SYSLIB0020.severity = suggestion

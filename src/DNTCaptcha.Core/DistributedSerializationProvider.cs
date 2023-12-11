@@ -14,6 +14,10 @@ public class DistributedSerializationProvider : ISerializationProvider
 {
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
     private readonly IDistributedCache _distributedCache;
+
+    private readonly JsonSerializerOptions _jsonSerializerOptions =
+        new() { WriteIndented = false, IgnoreNullValues = true };
+
     private readonly ILogger<DistributedSerializationProvider> _logger;
     private readonly DNTCaptchaOptions _options;
 
@@ -39,17 +43,15 @@ public class DistributedSerializationProvider : ISerializationProvider
     /// </summary>
     public string Serialize(object data)
     {
-        var resultBytes = JsonSerializer.SerializeToUtf8Bytes(data,
-                                                              new JsonSerializerOptions
-                                                              { WriteIndented = false, IgnoreNullValues = true });
+        var resultBytes = JsonSerializer.SerializeToUtf8Bytes(data, _jsonSerializerOptions);
         var token = _captchaProtectionProvider.Hash(Encoding.UTF8.GetString(resultBytes)).HashString;
         _distributedCache.Set(token,
-                              resultBytes,
-                              new DistributedCacheEntryOptions
-                              {
-                                  AbsoluteExpiration =
-                                      DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes),
-                              });
+            resultBytes,
+            new DistributedCacheEntryOptions
+            {
+                AbsoluteExpiration =
+                    DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes)
+            });
         return token;
     }
 
@@ -61,7 +63,8 @@ public class DistributedSerializationProvider : ISerializationProvider
         var resultBytes = _distributedCache.Get(data);
         if (resultBytes == null)
         {
-            _logger.LogDebug("The registered distributed cache provider returned null. Which means your data is expired.");
+            _logger.LogDebug(
+                "The registered distributed cache provider returned null. Which means your data is expired.");
             return default;
         }
 
