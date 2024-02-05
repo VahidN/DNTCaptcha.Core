@@ -22,11 +22,11 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser-esbuild",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist/dntcaptcha-angular-client",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "polyfills": [
               "zone.js"
             ],
@@ -61,7 +61,6 @@
               "outputHashing": "all"
             },
             "development": {
-              "buildOptimizer": false,
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
@@ -73,11 +72,11 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "dntcaptcha-angular-client:build:production"
+              "buildTarget": "dntcaptcha-angular-client:build:production"
             },
             "development": {
-              "browserTarget": "dntcaptcha-angular-client:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.conf.json",
+              "buildTarget": "dntcaptcha-angular-client:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -85,7 +84,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "dntcaptcha-angular-client:build"
+            "buildTarget": "dntcaptcha-angular-client:build"
           }
         },
         "test": {
@@ -113,6 +112,7 @@
   "cli": {
     "schematicCollections": [
       "@angular-eslint/schematics"
-    ]
+    ],
+    "analytics": false
   }
 }

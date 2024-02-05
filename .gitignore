@@ -245,7 +245,6 @@ ModelManifest.xml
 .fake/
 /.idea
 package-lock.json
-/src/DNTCaptcha.ModernAngularClient/.editorconfig
 
 
 # Compiled output
@@ -288,7 +287,4 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
-
-# TODO: remove in PR:
-/src/DNTCaptcha.ModernAngularClient/src/assets/.gitkeep
 
