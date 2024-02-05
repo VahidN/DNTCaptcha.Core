@@ -29,11 +29,6 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.1.5",
-    "@angular-eslint/builder": "16.1.2",
-    "@angular-eslint/eslint-plugin": "16.1.2",
-    "@angular-eslint/eslint-plugin-template": "16.1.2",
-    "@angular-eslint/schematics": "16.1.2",
-    "@angular-eslint/template-parser": "16.1.2",
     "@angular/cli": "~16.1.5",
     "@angular/compiler-cli": "^16.1.0",
     "@types/jest": "^29.5.5",
