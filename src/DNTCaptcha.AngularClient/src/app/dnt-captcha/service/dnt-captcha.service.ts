@@ -9,13 +9,14 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class DntCaptchaService {
   http: HttpClient = inject(HttpClient);
-  toastr: ToastrService = inject(ToastrService);
+
+  notificationService: ToastrService = inject(ToastrService);
 
   getDntCaptchaParams(): Observable<DntCaptchaParams> {
     return this.http.get<DntCaptchaParams>('api/account/CreateDNTCaptchaParams').pipe(
       catchError((err) => {
         if (err.status === 429) {
-          this.toastr.error('Too many requests for captcha generation.', 'Error');
+          this.notificationService.error('Too many requests for captcha generation.', 'Error');
         }
 
         return throwError(err);
