@@ -26,12 +26,9 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     /// <summary>
     ///     The default captcha image provider
     /// </summary>
-    public CaptchaImageProvider(
-        IRandomNumberProvider randomNumberProvider,
-        IOptions<DNTCaptchaOptions> options)
+    public CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IOptions<DNTCaptchaOptions> options)
     {
-        _randomNumberProvider =
-            randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
+        _randomNumberProvider = randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
         _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
     }
 
@@ -41,28 +38,30 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     public byte[] DrawCaptcha(string text, string foreColor, string backColor, float fontSize, string fontName)
     {
         var fontType = GetFont(fontName, _options.CustomFontPath);
+
         if (fontType is null)
         {
-            throw new
-                InvalidOperationException("`fontType` is null. It's better to set this option first: .UseCustomFont(Path.Combine(env.WebRootPath, \"fonts\", \"my-font.ttf\")); ");
+            throw new InvalidOperationException(
+                "`fontType` is null. It's better to set this option first: .UseCustomFont(Path.Combine(env.WebRootPath, \"fonts\", \"my-font.ttf\")); ");
         }
 
         using var shaper = new SKShaper(fontType);
+
         if (!SKColor.TryParse(foreColor, out var skColor))
         {
             skColor = SKColors.Black;
         }
 
         using var textPaint = new SKPaint
-                              {
-                                  IsAntialias = true,
-                                  FilterQuality = SKFilterQuality.High,
-                                  TextSize = fontSize,
-                                  Color = skColor,
-                                  TextAlign = SKTextAlign.Left,
-                                  Typeface = fontType,
-                                  SubpixelText = true,
-                              };
+        {
+            IsAntialias = true,
+            FilterQuality = SKFilterQuality.High,
+            TextSize = fontSize,
+            Color = skColor,
+            TextAlign = SKTextAlign.Left,
+            Typeface = fontType,
+            SubpixelText = true
+        };
 
         var textBounds = GetTextBounds(text, textPaint);
         var width = GetTextWidth(text, fontSize, textPaint);
@@ -84,6 +83,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
         AddWaves(imageWidth, imageHeight, sKBitmap);
         CreateNoises(canvas);
         DrawRectangle(canvas, width, textBounds.Height);
+
         return ToPng(sKBitmap);
     }
 
@@ -91,8 +91,8 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     {
         using var copy = new SKBitmap();
         pic.CopyTo(copy);
-        double distort = _randomNumberProvider.NextNumber(1, 6) *
-                         (_randomNumberProvider.NextNumber(2) == 1 ? 1 : -1);
+        double distort = _randomNumberProvider.NextNumber(1, 6) * (_randomNumberProvider.NextNumber(2) == 1 ? 1 : -1);
+
         for (var y = 0; y < height; y++)
         {
             for (var x = 0; x < width; x++)
@@ -100,6 +100,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
                 // Adds a simple wave
                 var newX = (int)(x + distort * Math.Sin(Math.PI * y / 84.0));
                 var newY = (int)(y + distort * Math.Cos(Math.PI * x / 44.0));
+
                 if (newX < 0 || newX >= width)
                 {
                     newX = 0;
@@ -118,9 +119,8 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     private void CreateNoises(SKCanvas canvas)
     {
         using var shader = SKShader.CreatePerlinNoiseTurbulence(_options.CaptchaNoise.BaseFrequencyX,
-                                                                _options.CaptchaNoise.BaseFrequencyY,
-                                                                _options.CaptchaNoise.NumOctaves,
-                                                                _options.CaptchaNoise.Seed);
+            _options.CaptchaNoise.BaseFrequencyY, _options.CaptchaNoise.NumOctaves, _options.CaptchaNoise.Seed);
+
         using var paint = new SKPaint();
         paint.Shader = shader;
         canvas.DrawPaint(paint);
@@ -139,6 +139,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
         hbFont.GetScale(out var xScale, out _);
         var scale = fontSize / xScale;
         var width = buffer.GlyphPositions.Sum(position => position.XAdvance) * scale;
+
         return width;
     }
 
@@ -146,14 +147,11 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     {
         var textBounds = new SKRect();
         textPaint.MeasureText(text, ref textBounds);
+
         return textBounds;
     }
 
-    private void DrawText(string text,
-                          SKCanvas canvas,
-                          SKShaper shaper,
-                          SKPaint textPaint,
-                          SKRect textBounds)
+    private void DrawText(string text, SKCanvas canvas, SKShaper shaper, SKPaint textPaint, SKRect textBounds)
     {
         var x = TextMargin + textBounds.Left;
         var y = Math.Abs(textBounds.Top) + TextMargin;
@@ -166,18 +164,22 @@ public class CaptchaImageProvider : ICaptchaImageProvider
         {
             case 1:
                 canvas.DrawShapedText(shaper, text, x - 1, y - 1, textPaint);
+
                 break;
 
             case 2:
                 canvas.DrawShapedText(shaper, text, x + 1, y - 1, textPaint);
+
                 break;
 
             case 3:
                 canvas.DrawShapedText(shaper, text, x - 1, y + 1, textPaint);
+
                 break;
 
             case 4:
                 canvas.DrawShapedText(shaper, text, x + 1, y + 1, textPaint);
+
                 break;
         }
     }
@@ -185,16 +187,13 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     private static void DrawRectangle(SKCanvas canvas, float width, float height)
     {
         using var skPaint = new SKPaint
-                            {
-                                Color = SKColors.LightGray,
-                                IsStroke = true,
-                                StrokeWidth = 1f,
-                            };
-        canvas.DrawRect(new SKRect(0,
-                                   0,
-                                   width + 2 * TextMargin - 1,
-                                   height + 2 * TextMargin - 1),
-                        skPaint);
+        {
+            Color = SKColors.LightGray,
+            IsStroke = true,
+            StrokeWidth = 1f
+        };
+
+        canvas.DrawRect(new SKRect(0, 0, width + 2 * TextMargin - 1, height + 2 * TextMargin - 1), skPaint);
     }
 
     private static SKTypeface GetFont(string fontName, string? customFontPath)
@@ -204,12 +203,12 @@ public class CaptchaImageProvider : ICaptchaImageProvider
             return FontsTypeface.GetOrAdd(fontName, SKTypeface.FromFamilyName);
         }
 
-        return FontsTypeface.GetOrAdd(customFontPath,
-                                      key =>
-                                      {
-                                          using var embeddedFont = File.OpenRead(key);
-                                          return SKTypeface.FromStream(File.OpenRead(key));
-                                      });
+        return FontsTypeface.GetOrAdd(customFontPath, key =>
+        {
+            using var embeddedFont = File.OpenRead(key);
+
+            return SKTypeface.FromStream(File.OpenRead(key));
+        });
     }
 
     private static byte[] ToPng(SKBitmap bitmap)
@@ -217,6 +216,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
         using var data = bitmap.Encode(SKEncodedImageFormat.Png, 100);
         using var memory = new MemoryStream();
         data.SaveTo(memory);
+
         return memory.ToArray();
     }
 }

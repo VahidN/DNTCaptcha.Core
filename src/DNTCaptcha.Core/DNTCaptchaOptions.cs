@@ -90,6 +90,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions WithNonceKey(string key)
     {
         NonceKey = key;
+
         return this;
     }
 
@@ -102,6 +103,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions RateLimiterPermitLimit(int permitLimit)
     {
         PermitLimit = permitLimit;
+
         return this;
     }
 
@@ -112,6 +114,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions Identifier(string className)
     {
         CaptchaClass = className;
+
         return this;
     }
 
@@ -121,6 +124,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions InputNames(DNTCaptchaComponent component)
     {
         CaptchaComponent = component;
+
         return this;
     }
 
@@ -131,6 +135,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions ShowThousandsSeparators(bool show)
     {
         AllowThousandsSeparators = show;
+
         return this;
     }
 
@@ -141,6 +146,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions AbsoluteExpiration(int minutes)
     {
         AbsoluteExpirationMinutes = minutes;
+
         return this;
     }
 
@@ -151,6 +157,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions WithEncryptionKey(string key)
     {
         EncryptionKey = key;
+
         return this;
     }
 
@@ -174,18 +181,16 @@ public class DNTCaptchaOptions
     ///     Its default value is 0
     /// </param>
     /// <returns></returns>
-    public DNTCaptchaOptions WithNoise(float baseFrequencyX,
-                                       float baseFrequencyY,
-                                       int numOctaves,
-                                       float seed)
+    public DNTCaptchaOptions WithNoise(float baseFrequencyX, float baseFrequencyY, int numOctaves, float seed)
     {
         CaptchaNoise = new DNTCaptchaNoise
-                       {
-                           BaseFrequencyX = baseFrequencyX,
-                           BaseFrequencyY = baseFrequencyY,
-                           NumOctaves = numOctaves,
-                           Seed = seed,
-                       };
+        {
+            BaseFrequencyX = baseFrequencyX,
+            BaseFrequencyY = baseFrequencyY,
+            NumOctaves = numOctaves,
+            Seed = seed
+        };
+
         return this;
     }
 
@@ -200,6 +205,7 @@ public class DNTCaptchaOptions
         }
 
         CustomFontPath = fullPath;
+
         return this;
     }
 
@@ -207,9 +213,11 @@ public class DNTCaptchaOptions
     ///     You can introduce a custom ICaptchaStorageProvider to be used as an StorageProvider.
     /// </summary>
     /// <typeparam name="T">Implements ICaptchaStorageProvider</typeparam>
-    public DNTCaptchaOptions UseCustomStorageProvider<T>() where T : ICaptchaStorageProvider
+    public DNTCaptchaOptions UseCustomStorageProvider<T>()
+        where T : ICaptchaStorageProvider
     {
         CaptchaStorageProvider = typeof(T);
+
         return this;
     }
 
@@ -220,6 +228,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions UseDistributedSerializationProvider()
     {
         CaptchaSerializationProvider = typeof(DistributedSerializationProvider);
+
         return this;
     }
 
@@ -229,6 +238,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions UseInMemorySerializationProvider()
     {
         CaptchaSerializationProvider = typeof(InMemorySerializationProvider);
+
         return this;
     }
 
@@ -240,6 +250,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions UseSessionStorageProvider()
     {
         CaptchaStorageProvider = typeof(SessionCaptchaStorageProvider);
+
         return this;
     }
 
@@ -254,6 +265,7 @@ public class DNTCaptchaOptions
     {
         SameSiteMode = sameSite;
         CaptchaStorageProvider = typeof(CookieCaptchaStorageProvider);
+
         return this;
     }
 
@@ -263,6 +275,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions UseMemoryCacheStorageProvider()
     {
         CaptchaStorageProvider = typeof(MemoryCacheCaptchaStorageProvider);
+
         return this;
     }
 
@@ -272,6 +285,7 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions ShowExceptionsInResponse(bool enable)
     {
         ShowExceptions = enable;
+
         return this;
     }
 
@@ -283,6 +297,7 @@ public class DNTCaptchaOptions
     {
         CaptchaStorageProvider = typeof(DistributedCacheCaptchaStorageProvider);
         CaptchaSerializationProvider = typeof(DistributedSerializationProvider);
+
         return this;
     }
 }

@@ -1,16 +1,15 @@
 using System;
 
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     Refresh Data
+/// </summary>
+[Serializable]
+public class RefreshData : DNTCaptchaTagHelperHtmlAttributes
 {
     /// <summary>
-    /// Refresh Data
+    ///     Current Date
     /// </summary>
-    [Serializable]
-    public class RefreshData : DNTCaptchaTagHelperHtmlAttributes
-    {
-        /// <summary>
-        /// Current Date
-        /// </summary>
-        public long RndDate { get; set; }
-    }
+    public long RndDate { get; set; }
 }

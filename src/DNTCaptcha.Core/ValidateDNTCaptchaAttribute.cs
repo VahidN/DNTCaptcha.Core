@@ -28,15 +28,18 @@ public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
         }
 
         var httpContext = context.HttpContext;
+
         if (httpContext == null)
         {
             throw new InvalidOperationException("httpContext is null.");
         }
 
         var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();
+
         if (validatorService.HasRequestValidCaptchaEntry())
         {
             base.OnActionExecuting(context);
+
             return;
         }
 

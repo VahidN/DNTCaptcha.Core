@@ -12,8 +12,8 @@ public class SumOfTwoNumbersProvider : ICaptchaTextProvider
     /// <summary>
     ///     SumOfTwoNumbers Provider
     /// </summary>
-    public SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider) =>
-        _randomNumberProvider = randomNumberProvider;
+    public SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider)
+        => _randomNumberProvider = randomNumberProvider;
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -24,8 +24,9 @@ public class SumOfTwoNumbersProvider : ICaptchaTextProvider
     public string GetText(int number, Language language)
     {
         var randomNumber = _randomNumberProvider.NextNumber(1, number);
+
         return number > randomNumber
-                   ? Invariant($"{number - randomNumber} + {randomNumber}")
-                   : Invariant($"0 + {number}");
+            ? Invariant($"{number - randomNumber} + {randomNumber}")
+            : Invariant($"0 + {number}");
     }
 }

@@ -1,18 +1,17 @@
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     Serialization Provider
+/// </summary>
+public interface ISerializationProvider
 {
     /// <summary>
-    /// Serialization Provider
+    ///     Serialize the given data to an string.
     /// </summary>
-    public interface ISerializationProvider
-    {
-        /// <summary>
-        /// Serialize the given data to an string.
-        /// </summary>
-        string Serialize(object data);
+    string Serialize(object data);
 
-        /// <summary>
-        /// Deserialize the given string to an object.
-        /// </summary>
-        T? Deserialize<T>(string data);
-    }
+    /// <summary>
+    ///     Deserialize the given string to an object.
+    /// </summary>
+    T? Deserialize<T>(string data);
 }

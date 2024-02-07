@@ -11,8 +11,7 @@ public class SumOfTwoNumbersToWordsProvider : ICaptchaTextProvider
     /// <summary>
     ///     SumOfTwoNumbersToWords Provider
     /// </summary>
-    public SumOfTwoNumbersToWordsProvider(
-        IRandomNumberProvider randomNumberProvider,
+    public SumOfTwoNumbersToWordsProvider(IRandomNumberProvider randomNumberProvider,
         HumanReadableIntegerProvider humanReadableIntegerProvider)
     {
         _randomNumberProvider = randomNumberProvider;
@@ -28,8 +27,9 @@ public class SumOfTwoNumbersToWordsProvider : ICaptchaTextProvider
     public string GetText(int number, Language language)
     {
         var randomNumber = _randomNumberProvider.NextNumber(1, number);
+
         return number > randomNumber
-                   ? $"{_humanReadableIntegerProvider.NumberToText(number - randomNumber, language)} + {_humanReadableIntegerProvider.NumberToText(randomNumber, language)}"
-                   : $"{_humanReadableIntegerProvider.NumberToText(0, language)} + {_humanReadableIntegerProvider.NumberToText(number, language)}";
+            ? $"{_humanReadableIntegerProvider.NumberToText(number - randomNumber, language)} + {_humanReadableIntegerProvider.NumberToText(randomNumber, language)}"
+            : $"{_humanReadableIntegerProvider.NumberToText(0, language)} + {_humanReadableIntegerProvider.NumberToText(number, language)}";
     }
 }

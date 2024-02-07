@@ -15,9 +15,7 @@ public class RandomNumberProvider : IRandomNumberProvider
     /// </summary>
     /// <param name="randomBytes"></param>
     public void NextBytes(byte[] randomBytes)
-    {
-        _rand.GetBytes(randomBytes);
-    }
+        => _rand.GetBytes(randomBytes);
 
     /// <summary>
     ///     Generates a random non-negative number.
@@ -26,9 +24,9 @@ public class RandomNumberProvider : IRandomNumberProvider
     {
         var randb = new byte[4];
         _rand.GetBytes(randb);
+
         return randb;
     }
-
 
     /// <summary>
     ///     Generates a random non-negative number.
@@ -37,6 +35,7 @@ public class RandomNumberProvider : IRandomNumberProvider
     {
         var randb = NextBytes();
         var value = BitConverter.ToInt32(randb, 0);
+
         if (value < 0)
         {
             value = -value;
@@ -55,6 +54,7 @@ public class RandomNumberProvider : IRandomNumberProvider
         _rand.GetBytes(randb);
         var value = BitConverter.ToInt32(randb, 0);
         value = value % (max + 1); // % calculates remainder
+
         if (value < 0)
         {
             value = -value;
@@ -72,6 +72,7 @@ public class RandomNumberProvider : IRandomNumberProvider
     public int NextNumber(int min, int max)
     {
         var value = NextNumber(max - min) + min;
+
         return value;
     }
 }

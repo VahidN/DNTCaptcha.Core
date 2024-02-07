@@ -30,8 +30,7 @@ public static class HttpContextExtensions
         }
 
         // RemoteIpAddress is always null in DNX RC1 Update1 (bug).
-        if (string.IsNullOrWhiteSpace(ip) &&
-            httpContext.Connection?.RemoteIpAddress != null)
+        if (string.IsNullOrWhiteSpace(ip) && httpContext.Connection?.RemoteIpAddress != null)
         {
             ip = httpContext.Connection.RemoteIpAddress.ToString();
         }
@@ -51,12 +50,7 @@ public static class HttpContextExtensions
             return new List<string>();
         }
 
-        return csvList
-               .TrimEnd(',')
-               .Split(',')
-               .AsEnumerable()
-               .Select(s => s.Trim())
-               .ToList();
+        return csvList.TrimEnd(',').Split(',').AsEnumerable().Select(s => s.Trim()).ToList();
     }
 
     private static string? GetHeaderValue(HttpContext httpContext, string headerName)
@@ -64,7 +58,7 @@ public static class HttpContextExtensions
         ArgumentNullException.ThrowIfNull(httpContext);
 
         return httpContext.Request?.Headers?.TryGetValue(headerName, out var values) ?? false
-                   ? values.ToString()
-                   : string.Empty;
+            ? values.ToString()
+            : string.Empty;
     }
 }

@@ -1,94 +1,106 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     Represents a session storage to save the captcha tokens.
+/// </summary>
+public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
 {
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
+    private readonly ILogger<SessionCaptchaStorageProvider> _logger;
+
     /// <summary>
-    /// Represents a session storage to save the captcha tokens.
+    ///     Represents the storage to save the captcha tokens.
     /// </summary>
-    public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
+    public SessionCaptchaStorageProvider(ICaptchaCryptoProvider captchaProtectionProvider,
+        ILogger<SessionCaptchaStorageProvider> logger)
     {
-        private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-        private readonly ILogger<SessionCaptchaStorageProvider> _logger;
+        _captchaProtectionProvider = captchaProtectionProvider ??
+                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
 
-        /// <summary>
-        /// Represents the storage to save the captcha tokens.
-        /// </summary>
-        public SessionCaptchaStorageProvider(
-            ICaptchaCryptoProvider captchaProtectionProvider,
-            ILogger<SessionCaptchaStorageProvider> logger)
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        _logger.LogDebug("Using the SessionCaptchaStorageProvider.");
+    }
+
+    /// <summary>
+    ///     Adds the specified token and its value to the storage.
+    /// </summary>
+    public void Add(HttpContext context, string? token, string value)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+
+        value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
+        context.Session.SetString(token, value);
+    }
+
+    /// <summary>
+    ///     Determines whether the <see cref="ICaptchaStorageProvider" /> contains a specific token.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="token">The specified token.</param>
+    /// <returns>
+    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
+    /// </returns>
+    public bool Contains(HttpContext context, [NotNullWhen(true)] string? token)
+    {
+        if (context == null)
         {
-            _captchaProtectionProvider = captchaProtectionProvider ?? throw new ArgumentNullException(nameof(captchaProtectionProvider));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-            _logger.LogDebug("Using the SessionCaptchaStorageProvider.");
+            throw new ArgumentNullException(nameof(context));
         }
 
-        /// <summary>
-        /// Adds the specified token and its value to the storage.
-        /// </summary>
-        public void Add(HttpContext context, string token, string value)
+        return context.Session.Keys.Any(key => string.Equals(key, token, StringComparison.Ordinal));
+    }
+
+    /// <summary>
+    ///     Gets the value associated with the specified token.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="token">The specified token.</param>
+    public string? GetValue(HttpContext context, string? token)
+    {
+        if (context == null)
         {
-            value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
-            context.Session.SetString(token, value);
+            throw new ArgumentNullException(nameof(context));
         }
 
-        /// <summary>
-        /// Determines whether the <see cref="ICaptchaStorageProvider" /> contains a specific token.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="token">The specified token.</param>
-        /// <returns>
-        /// <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
-        /// </returns>
-        public bool Contains(HttpContext context, string token)
+        if (string.IsNullOrWhiteSpace(token))
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            return context.Session.Keys.Any(key => string.Equals(key, token, StringComparison.Ordinal));
+            return null;
         }
 
-        /// <summary>
-        /// Gets the value associated with the specified token.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="token">The specified token.</param>
-        public string? GetValue(HttpContext context, string token)
+        var value = context.Session.GetString(token);
+
+        if (string.IsNullOrWhiteSpace(value))
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
+            _logger.LogDebug("Couldn't find the captcha's session value in the request.");
 
-            var value = context.Session.GetString(token);
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                _logger.LogDebug("Couldn't find the captcha's session value in the request.");
-                return null;
-            }
-
-            Remove(context, token);
-
-            var decryptedValue = _captchaProtectionProvider.Decrypt(value);
-            return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty, StringComparison.Ordinal);
+            return null;
         }
 
-        /// <summary>
-        /// Removes the specified token from the storage.
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="token">The specified token.</param>
-        public void Remove(HttpContext context, string token)
+        Remove(context, token);
+
+        var decryptedValue = _captchaProtectionProvider.Decrypt(value);
+
+        return decryptedValue?.Replace(context.GetSalt(_captchaProtectionProvider), string.Empty,
+            StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    ///     Removes the specified token from the storage.
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="token">The specified token.</param>
+    public void Remove(HttpContext context, string? token)
+    {
+        if (Contains(context, token))
         {
-            if (Contains(context, token))
-            {
-                context.Session.Remove(token);
-            }
+            context.Session.Remove(token);
         }
     }
 }

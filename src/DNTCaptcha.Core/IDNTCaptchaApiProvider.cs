@@ -1,14 +1,13 @@
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     DNTCaptcha Api
+/// </summary>
+public interface IDNTCaptchaApiProvider
 {
     /// <summary>
-    /// DNTCaptcha Api
+    ///     Creates DNTCaptcha
     /// </summary>
-    public interface IDNTCaptchaApiProvider
-    {
-        /// <summary>
-        /// Creates DNTCaptcha
-        /// </summary>
-        /// <param name="captchaAttributes">captcha attributes</param>
-        DNTCaptchaApiResponse CreateDNTCaptcha(DNTCaptchaTagHelperHtmlAttributes captchaAttributes);
-    }
+    /// <param name="captchaAttributes">captcha attributes</param>
+    DNTCaptchaApiResponse CreateDNTCaptcha(DNTCaptchaTagHelperHtmlAttributes captchaAttributes);
 }

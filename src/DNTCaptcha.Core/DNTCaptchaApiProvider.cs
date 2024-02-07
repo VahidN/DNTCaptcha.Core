@@ -24,8 +24,7 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
     /// <summary>
     ///     DNTCaptcha Api
     /// </summary>
-    public DNTCaptchaApiProvider(
-        ICaptchaCryptoProvider captchaProtectionProvider,
+    public DNTCaptchaApiProvider(ICaptchaCryptoProvider captchaProtectionProvider,
         IRandomNumberProvider randomNumberProvider,
         Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
         ICaptchaStorageProvider captchaStorageProvider,
@@ -36,12 +35,16 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
     {
         _captchaProtectionProvider = captchaProtectionProvider ??
                                      throw new ArgumentNullException(nameof(captchaProtectionProvider));
+
         _randomNumberProvider = randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
         _captchaTextProvider = captchaTextProvider ?? throw new ArgumentNullException(nameof(captchaTextProvider));
+
         _captchaStorageProvider =
             captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+
         _serializationProvider =
             serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
+
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         _urlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
         _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
@@ -64,12 +67,17 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         }
 
         var number = _randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max);
+
         var randomText = _captchaTextProvider(captchaAttributes.DisplayMode)
             .GetText(number, captchaAttributes.Language);
+
         var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
         var captchaImageUrl = getCaptchaImageUrl(captchaAttributes, encryptedText);
+
         var captchaDivId =
-            Invariant($"{_captchaOptions.CaptchaClass}{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}");
+            Invariant(
+                $"{_captchaOptions.CaptchaClass}{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}");
+
         var cookieToken = $".{captchaDivId}";
         var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
 
@@ -78,12 +86,12 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken, value);
 
         return new DNTCaptchaApiResponse
-               {
-                   DntCaptchaImgUrl = captchaImageUrl,
-                   DntCaptchaId = captchaDivId,
-                   DntCaptchaTextValue = encryptedValue,
-                   DntCaptchaTokenValue = hiddenInputToken,
-               };
+        {
+            DntCaptchaImgUrl = captchaImageUrl,
+            DntCaptchaId = captchaDivId,
+            DntCaptchaTextValue = encryptedValue,
+            DntCaptchaTokenValue = hiddenInputToken
+        };
     }
 
     private string getCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
@@ -94,30 +102,35 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         }
 
         var values = new CaptchaImageParams
-                     {
-                         Text = encryptedText,
-                         RndDate = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture),
-                         ForeColor = captchaAttributes.ForeColor,
-                         BackColor = captchaAttributes.BackColor,
-                         FontSize = captchaAttributes.FontSize,
-                         FontName = captchaAttributes.FontName,
-                     };
+        {
+            Text = encryptedText,
+            RndDate = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture),
+            ForeColor = captchaAttributes.ForeColor,
+            BackColor = captchaAttributes.BackColor,
+            FontSize = captchaAttributes.FontSize,
+            FontName = captchaAttributes.FontName
+        };
+
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
+
         var actionUrl = captchaAttributes.UseRelativeUrls
-                            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                                                nameof(DNTCaptchaImageController)
-                                                    .Replace("Controller", string.Empty, StringComparison.Ordinal),
-                                                new { data = encryptSerializedValues, area = "" })
-                            : _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                                                nameof(DNTCaptchaImageController)
-                                                    .Replace("Controller", string.Empty, StringComparison.Ordinal),
-                                                new { data = encryptSerializedValues, area = "" },
-                                                _httpContextAccessor.HttpContext.Request.Scheme);
+            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
+                nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal), new
+                {
+                    data = encryptSerializedValues,
+                    area = ""
+                })
+            : _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
+                nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal), new
+                {
+                    data = encryptSerializedValues,
+                    area = ""
+                }, _httpContextAccessor.HttpContext.Request.Scheme);
 
         if (string.IsNullOrWhiteSpace(actionUrl))
         {
-            throw new
-                InvalidOperationException("It's not possible to determine the URL of the `DNTCaptchaImageController.Show` method. Please register the `services.AddControllers()` and `endpoints.MapControllerRoute(...)`.");
+            throw new InvalidOperationException(
+                "It's not possible to determine the URL of the `DNTCaptchaImageController.Show` method. Please register the `services.AddControllers()` and `endpoints.MapControllerRoute(...)`.");
         }
 
         return actionUrl;

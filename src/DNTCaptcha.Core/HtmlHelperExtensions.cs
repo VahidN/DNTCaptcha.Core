@@ -3,26 +3,26 @@ using System.IO;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Html;
 
-namespace DNTCaptcha.Core
+namespace DNTCaptcha.Core;
+
+/// <summary>
+///     Html Helper Extensions
+/// </summary>
+public static class HtmlHelperExtensions
 {
     /// <summary>
-    /// Html Helper Extensions
+    ///     Convert IHtmlContent/TagBuilder to string
     /// </summary>
-    public static class HtmlHelperExtensions
+    public static string GetString(this IHtmlContent content)
     {
-        /// <summary>
-        /// Convert IHtmlContent/TagBuilder to string
-        /// </summary>
-        public static string GetString(this IHtmlContent content)
+        if (content == null)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException(nameof(content));
-            }
-
-            using var writer = new StringWriter();
-            content.WriteTo(writer, HtmlEncoder.Default);
-            return writer.ToString();
+            throw new ArgumentNullException(nameof(content));
         }
+
+        using var writer = new StringWriter();
+        content.WriteTo(writer, HtmlEncoder.Default);
+
+        return writer.ToString();
     }
 }

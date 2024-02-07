@@ -15,8 +15,11 @@ public class DistributedSerializationProvider : ISerializationProvider
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
     private readonly IDistributedCache _distributedCache;
 
-    private readonly JsonSerializerOptions _jsonSerializerOptions =
-        new() { WriteIndented = false, IgnoreNullValues = true };
+    private readonly JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        WriteIndented = false,
+        IgnoreNullValues = true
+    };
 
     private readonly ILogger<DistributedSerializationProvider> _logger;
     private readonly DNTCaptchaOptions _options;
@@ -24,15 +27,16 @@ public class DistributedSerializationProvider : ISerializationProvider
     /// <summary>
     ///     Serialization Provider
     /// </summary>
-    public DistributedSerializationProvider(
-        IDistributedCache distributedCache,
+    public DistributedSerializationProvider(IDistributedCache distributedCache,
         ICaptchaCryptoProvider captchaProtectionProvider,
         ILogger<DistributedSerializationProvider> logger,
         IOptions<DNTCaptchaOptions> options)
     {
         _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
+
         _captchaProtectionProvider = captchaProtectionProvider ??
                                      throw new ArgumentNullException(nameof(captchaProtectionProvider));
+
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         logger.LogDebug("Using the DistributedSerializationProvider.");
@@ -45,13 +49,12 @@ public class DistributedSerializationProvider : ISerializationProvider
     {
         var resultBytes = JsonSerializer.SerializeToUtf8Bytes(data, _jsonSerializerOptions);
         var token = _captchaProtectionProvider.Hash(Encoding.UTF8.GetString(resultBytes)).HashString;
-        _distributedCache.Set(token,
-            resultBytes,
-            new DistributedCacheEntryOptions
-            {
-                AbsoluteExpiration =
-                    DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes)
-            });
+
+        _distributedCache.Set(token, resultBytes, new DistributedCacheEntryOptions
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow.AddMinutes(_options.AbsoluteExpirationMinutes)
+        });
+
         return token;
     }
 
@@ -61,14 +64,17 @@ public class DistributedSerializationProvider : ISerializationProvider
     public T? Deserialize<T>(string data)
     {
         var resultBytes = _distributedCache.Get(data);
+
         if (resultBytes == null)
         {
             _logger.LogDebug(
                 "The registered distributed cache provider returned null. Which means your data is expired.");
+
             return default;
         }
 
         _distributedCache.Remove(data);
+
         return JsonSerializer.Deserialize<T>(new ReadOnlySpan<byte>(resultBytes));
     }
 }

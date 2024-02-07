@@ -30,8 +30,8 @@ public class ShowDigitsProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string GetText(int number, Language language) =>
-        _captchaOptions.AllowThousandsSeparators
+    public string GetText(int number, Language language)
+        => _captchaOptions.AllowThousandsSeparators
             ? string.Format(CultureInfo.InvariantCulture, "{0:N0}", number)
             : number.ToString(CultureInfo.InvariantCulture);
 }
