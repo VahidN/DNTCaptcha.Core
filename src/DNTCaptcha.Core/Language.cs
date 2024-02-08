@@ -64,5 +64,10 @@ public enum Language
     /// <summary>
     ///     German Language
     /// </summary>
-    German
+    German,
+
+    /// <summary>
+    ///     Azerbaijan Language
+    /// </summary>
+    Azerbaijani
 }
