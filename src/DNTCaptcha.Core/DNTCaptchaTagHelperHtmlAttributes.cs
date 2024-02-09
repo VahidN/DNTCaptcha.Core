@@ -81,20 +81,43 @@ public class DNTCaptchaTagHelperHtmlAttributes
     [HtmlAttributeName("asp-text-box-class")]
     public string TextBoxClass { set; get; } = "text-box single-line form-control col-md-4";
 
+    
     /// <summary>
-    ///     The text-box-template of the captcha. It's default value is `
+    /// HTML template for the captcha control.
+    /// Use {0} for captchaImage, {1} for refreshButton, and {2} for inputText.
+    /// default value is : <br/> <![CDATA[
+    /// <div class='col-md-12'>
+    ///     {0}
+    ///     {1}
     ///     <div class='input-group col-md-4'>
-    ///         <span class='input-group-addon'>
-    ///             <span class='glyphicon glyphicon-lock'></span>
-    ///         </span>
-    ///         {0}
-    ///     </div>
-    ///     `.
+    ///        <span class='input-group-addon'>
+    ///            <span class='glyphicon glyphicon-lock'></span>
+    ///        </span>
+    ///        {2}
+    ///    </div>
+    /// </div>
+    /// ]]>
     /// </summary>
-    [HtmlAttributeName("asp-text-box-template")]
-    public string TextBoxTemplate { set; get; } =
-        "<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{0}</div>";
+    /// /// <exception cref="ArgumentException">CaptchaTemplate must include placeholders for {0}, {1}, and {2}</exception>
+    [HtmlAttributeName("asp-captcha-template")]
+    public string CaptchaTemplate
+    {
+        set
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            
+            if (!value.Contains("{0}", StringComparison.OrdinalIgnoreCase) || !value.Contains("{1}", StringComparison.OrdinalIgnoreCase) || !value.Contains("{2}", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ArgumentException("CaptchaTemplate must include placeholders for {0}, {1}, and {2}", value);
+            }
 
+            _captchaTemplate = value;
+        }
+        get => _captchaTemplate;
+    }
+    private string _captchaTemplate =
+        "<div class='col-md-12'>{0}{1}<div class='input-group col-md-4'><span class='input-group-addon'><span class='glyphicon glyphicon-lock'></span></span>{2}</div></div>";
+    
     /// <summary>
     ///     The validation-error-message of the captcha. It's default value is `لطفا کد امنیتی را به رقم وارد نمائید`.
     /// </summary>

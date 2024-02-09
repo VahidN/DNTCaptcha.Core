@@ -122,7 +122,7 @@ public class DNTCaptchaImageController : Controller
             tagHelper.Min = model.Min;
             tagHelper.Placeholder = model.Placeholder;
             tagHelper.TextBoxClass = model.TextBoxClass;
-            tagHelper.TextBoxTemplate = model.TextBoxTemplate;
+            tagHelper.CaptchaTemplate = model.CaptchaTemplate;
             tagHelper.ValidationErrorMessage = model.ValidationErrorMessage;
             tagHelper.TooManyRequestsErrorMessage = model.TooManyRequestsErrorMessage;
             tagHelper.ValidationMessageClass = model.ValidationMessageClass;
