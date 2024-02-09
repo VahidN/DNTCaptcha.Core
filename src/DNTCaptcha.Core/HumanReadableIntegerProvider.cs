@@ -45,6 +45,9 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
         },
         {
             Language.German, " und "
+        },
+        {
+            Language.Azerbaijani, " "
         }
     };
 
@@ -85,6 +88,9 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
         },
         {
             Language.German, "Negativ"
+        },
+        {
+            Language.Azerbaijani, "Neqativ"
         }
     };
 
@@ -304,6 +310,24 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 "Sieben",
                 "Acht",
                 "Neun"
+            }
+        },
+        new()
+        {
+            Group = DigitGroup.Ones,
+            Language = Language.Azerbaijani,
+            Names = new List<string>
+            {
+                string.Empty,
+                "Bir",
+                "İki",
+                "Üç",
+                "Dörd",
+                "Beş",
+                "Altı",
+                "Yeddi",
+                "Səkkiz",
+                "Doqquz"
             }
         },
 
@@ -527,6 +551,25 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
 
         new()
         {
+            Group = DigitGroup.Teens,
+            Language = Language.Azerbaijani,
+            Names = new List<string>
+            {
+                "On",
+                "Onbir",
+                "Oniki",
+                "Onüç",
+                "Ondörd",
+                "Onbeş",
+                "Onaltı",
+                "Onyeddi",
+                "Onsəkkiz",
+                "Ondoqquz"
+            }
+        },
+
+        new()
+        {
             Group = DigitGroup.Tens,
             Language = Language.English,
             Names = new List<string>
@@ -715,6 +758,23 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 "Siebzig",
                 "Achtzig",
                 "Neunzig"
+            }
+        },
+
+        new()
+        {
+            Group = DigitGroup.Tens,
+            Language = Language.Azerbaijani,
+            Names = new List<string>
+            {
+                "İyirmi",
+                "Otuz",
+                "Qırx",
+                "Əlli",
+                "Altmış",
+                "Yetmiş",
+                "Səksən",
+                "Doxsan"
             }
         },
 
@@ -932,6 +992,25 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 "Siebenhundert",
                 "Achthundert",
                 "Neunhundert"
+            }
+        },
+
+        new()
+        {
+            Group = DigitGroup.Hundreds,
+            Language = Language.Azerbaijani,
+            Names = new List<string>
+            {
+                string.Empty,
+                "Yüz",
+                "İki yüz",
+                "Üç yüz",
+                "Dörd yüz",
+                "Beş yüz",
+                "Altı yüz",
+                "Yeddi yüz",
+                "Səkkiz yüz",
+                "Doqquz yüz"
             }
         },
 
@@ -1446,6 +1525,50 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 " Sexdecilliarde",
                 " Septendecillion"
             }
+        },
+
+        new()
+        {
+            Group = DigitGroup.Thousands,
+            Language = Language.Azerbaijani,
+            Names = new List<string>
+            {
+                string.Empty,
+                " Min",
+                " milyon",
+                " Milyard",
+                " Trilyon",
+                " Kvadrilyon",
+                " Kvintilyon",
+                " Sekstillian",
+                " Septilyon",
+                " Oktilyon",
+                " Nonillion",
+                " Decillion",
+                " Undecillion",
+                " Duodecillion",
+                " Tredecillion",
+                " Quattuordecillion",
+                " Quindecillion",
+                " Sexdecillion",
+                " Septendecillion",
+                " Octodecillion",
+                " Novemdecillion",
+                " Vigintillion",
+                " Unvigintillion",
+                " Duovigintillion",
+                " 10^72",
+                " 10^75",
+                " 10^78",
+                " 10^81",
+                " 10^84",
+                " 10^87",
+                " Vigintinonillion",
+                " 10^93",
+                " 10^96",
+                " Duotrigintillion",
+                " Trestrigintillion"
+            }
         }
     };
 
@@ -1486,6 +1609,9 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
         },
         {
             Language.German, "Null"
+        },
+        {
+            Language.Azerbaijani, "Sıfır"
         }
     };
 
