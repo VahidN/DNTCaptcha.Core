@@ -19,40 +19,38 @@ webApp.Run();
 void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
 {
     services.AddDNTCaptcha(options =>
-                           {
-                               // options.UseSessionStorageProvider(); // -> It doesn't rely on the server or client's times. Also it's the safest one.
-                               // options.UseMemoryCacheStorageProvider(); // -> It relies on the server's times. It's safer than the CookieStorageProvider.
-                               options
-                                   .UseCookieStorageProvider( /* If you are using CORS, set it to `None` */) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
-                                   // .UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
-                                   // .UseDistributedSerializationProvider();
+    {
+        // options.UseSessionStorageProvider(); // -> It doesn't rely on the server or client's times. Also it's the safest one.
+        // options.UseMemoryCacheStorageProvider(); // -> It relies on the server's times. It's safer than the CookieStorageProvider.
+        options
+            .UseCookieStorageProvider(
+ /* If you are using CORS, set it to `None` */) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+            // .UseDistributedCacheStorageProvider(); // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+            // .UseDistributedSerializationProvider();
 
-                                   // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
-                                   // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
-                                   .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
-                                   .AbsoluteExpiration(7)
-                                   .RateLimiterPermitLimit(10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
-                                   .ShowExceptionsInResponse(env.IsDevelopment())
-                                   .ShowThousandsSeparators(false)
-                                   .WithNoise(0.015f, 0.015f, 1, 0.0f)
-                                   .WithEncryptionKey("This is my secure key!")
-                                   .WithNonceKey("NETESCAPADES_NONCE")
-                                   .InputNames(
-                                               new DNTCaptchaComponent
-                                               {
-                                                   CaptchaHiddenInputName = "DNTCaptchaText",
-                                                   CaptchaHiddenTokenName = "DNTCaptchaToken",
-                                                   CaptchaInputName = "DNTCaptchaInputText",
-                                               })
-                                   .Identifier("dntCaptcha");
-                           });
+            // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
+            // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
+            .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf")).AbsoluteExpiration(7)
+            .RateLimiterPermitLimit(
+                10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
+            .ShowExceptionsInResponse(env.IsDevelopment()).ShowThousandsSeparators(false)
+            .WithNoise(0.015f, 0.015f, 1, 0.0f).WithEncryptionKey("This is my secure key!")
+            .WithNonceKey("NETESCAPADES_NONCE")
+
+            //.WithCaptchaImageControllerRouteTemplate("my-custom-captcha/[action]")
+            .InputNames(new DNTCaptchaComponent
+            {
+                CaptchaHiddenInputName = "DNTCaptchaText",
+                CaptchaHiddenTokenName = "DNTCaptchaToken",
+                CaptchaInputName = "DNTCaptchaInputText"
+            }).Identifier("dntCaptcha");
+    });
 
     services.AddControllers().AddJsonOptions(opt =>
-                                             {
-                                                 // This is necessary for the languages enum.
-                                                 opt.JsonSerializerOptions.Converters
-                                                    .Add(new JsonStringEnumConverter());
-                                             });
+    {
+        // This is necessary for the languages enum.
+        opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 }
 
 void ConfigureLogging(ILoggingBuilder logging, IHostEnvironment env, IConfiguration configuration)
@@ -80,7 +78,6 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
     app.UseDefaultFiles();
     app.UseStaticFiles();
 
-
     app.UseRouting();
     app.UseRateLimiter();
 
@@ -88,6 +85,4 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
 }
 
 void ConfigureEndpoints(IApplicationBuilder app)
-{
-    app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-}
+    => app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

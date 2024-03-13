@@ -21,23 +21,18 @@ webApp.Run();
 void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
 {
     services.AddCors(options =>
-                     {
-                         options.AddPolicy("CorsPolicy",
-                                           cp => cp
-                                                 .WithOrigins("http://localhost:4200") //Note:  The URL must be specified without a trailing slash (/).
-                                                 .AllowAnyMethod()
-                                                 .AllowAnyHeader()
-                                                 .SetIsOriginAllowed(_ => true)
-                                                 .AllowCredentials());
-                     });
+    {
+        options.AddPolicy("CorsPolicy", cp => cp
+            .WithOrigins("http://localhost:4200") //Note:  The URL must be specified without a trailing slash (/).
+            .AllowAnyMethod().AllowAnyHeader().SetIsOriginAllowed(_ => true).AllowCredentials());
+    });
+
     services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 
     services.Configure<RouteOptions>(o =>
-                                     {
-                                         o.LowercaseUrls =
-                                             true; /* o.LowercaseQueryStrings = true; // don't use this! */
-                                     });
-
+    {
+        o.LowercaseUrls = true; /* o.LowercaseQueryStrings = true; // don't use this! */
+    });
 
     // Added it for AddDNTCaptcha -> options.UseDistributedCacheStorageProvider()
     /*services.AddStackExchangeRedisCache(options =>
@@ -47,34 +42,33 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
     });*/
 
     services.AddDNTCaptcha(options =>
-                           {
-                               // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
-                               // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
-                               options
-                                   .UseCookieStorageProvider( /* If you are using CORS, set it to `None` */) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
-                                   // .UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
-                                   // .UseDistributedSerializationProvider()
+    {
+        // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
+        // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
+        options
+            .UseCookieStorageProvider(
+ /* If you are using CORS, set it to `None` */) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+            // .UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
+            // .UseDistributedSerializationProvider()
 
-                                   // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
-                                   // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
-                                   .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
-                                   .ShowExceptionsInResponse(env.IsDevelopment())
-                                   .AbsoluteExpiration(1)
-                                   .RateLimiterPermitLimit(10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
-                                   .ShowThousandsSeparators(false)
-                                   .WithNoise(0.015f, 0.015f, 1, 0.0f)
-                                   .WithEncryptionKey("This is my secure key!")
-                                   .WithNonceKey("NETESCAPADES_NONCE")
-                                   .InputNames( // This is optional. Change it if you don't like the default names.
-                                               new DNTCaptchaComponent
-                                               {
-                                                   CaptchaHiddenInputName = "DNT_CaptchaText",
-                                                   CaptchaHiddenTokenName = "DNT_CaptchaToken",
-                                                   CaptchaInputName = "DNT_CaptchaInputText",
-                                               })
-                                   .Identifier("dnt_Captcha") // This is optional. Change it if you don't like its default name.
-                                   ;
-                           });
+            // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
+            // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
+            .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf"))
+            .ShowExceptionsInResponse(env.IsDevelopment()).AbsoluteExpiration(1)
+            .RateLimiterPermitLimit(
+                10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
+            .ShowThousandsSeparators(false).WithNoise(0.015f, 0.015f, 1, 0.0f)
+            .WithEncryptionKey("This is my secure key!").WithNonceKey("NETESCAPADES_NONCE")
+            .WithCaptchaImageControllerRouteTemplate("my-custom-captcha/[action]")
+            .InputNames( // This is optional. Change it if you don't like the default names.
+                new DNTCaptchaComponent
+                {
+                    CaptchaHiddenInputName = "DNT_CaptchaText",
+                    CaptchaHiddenTokenName = "DNT_CaptchaToken",
+                    CaptchaInputName = "DNT_CaptchaInputText"
+                }).Identifier("dnt_Captcha") // This is optional. Change it if you don't like its default name.
+            ;
+    });
 
     services.AddSession();
 
@@ -123,11 +117,8 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
 }
 
 void ConfigureEndpoints(IApplicationBuilder app)
-{
-    app.UseEndpoints(endpoints =>
-                     {
-                         endpoints.MapControllerRoute("default",
-                                                      "{controller=Home}/{action=Index}/{id?}");
-                         endpoints.MapRazorPages();
-                     });
-}
+    => app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+        endpoints.MapRazorPages();
+    });

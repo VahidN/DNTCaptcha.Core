@@ -10,6 +10,11 @@ namespace DNTCaptcha.Core;
 public class DNTCaptchaOptions
 {
     /// <summary>
+    ///     Its default value is `DNTCaptchaImage/[action]`
+    /// </summary>
+    public string? CaptchaImageControllerRouteTemplate { set; get; } = "DNTCaptchaImage/[action]";
+
+    /// <summary>
     ///     Maximum number of permit counters that can be allowed in a minute. Must be set to a value > 0
     ///     Its default value is 10.
     /// </summary>
@@ -297,6 +302,19 @@ public class DNTCaptchaOptions
     {
         CaptchaStorageProvider = typeof(DistributedCacheCaptchaStorageProvider);
         CaptchaSerializationProvider = typeof(DistributedSerializationProvider);
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Allow changing the route's template dynamically at run-time.
+    ///     Its default value is `DNTCaptchaImage/[action]`
+    /// </summary>
+    /// <param name="template"></param>
+    /// <returns></returns>
+    public DNTCaptchaOptions WithCaptchaImageControllerRouteTemplate(string template)
+    {
+        CaptchaImageControllerRouteTemplate = template;
 
         return this;
     }

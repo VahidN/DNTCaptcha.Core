@@ -53,7 +53,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (!shouldValidate(httpContext))
         {
-            _logger.LogDebug($"Ignoring ValidateDNTCaptcha during `{httpContext.Request.Method}`.");
+            _logger.LogDebug("Ignoring ValidateDNTCaptcha during `{Method}`.", httpContext.Request.Method);
 
             return true;
         }
@@ -89,7 +89,8 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (decryptedText?.Equals(numberToText, StringComparison.Ordinal) != true)
         {
-            _logger.LogDebug($"decryptedText:{decryptedText} != numberToText:{numberToText}");
+            _logger.LogDebug("decryptedText:{DecryptedText} != numberToText:{NumberToText}", decryptedText,
+                numberToText);
 
             return false;
         }
@@ -128,7 +129,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (!areEqual)
         {
-            _logger.LogDebug($"isValidCookie:: {cookieValue} != {decryptedText}");
+            _logger.LogDebug("isValidCookie:: {CookieValue} != {DecryptedText}", cookieValue, decryptedText);
         }
 
         _captchaStorageProvider.Remove(httpContext, cookieToken);

@@ -24,7 +24,13 @@ public static class CaptchaServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
-        configOptions(services, options);
+        var configuredOptions = configOptions(services, options);
+
+        services.AddControllers(opts =>
+        {
+            opts.Conventions.Add(
+                new DynamicRoutingControllerModelConvention(configuredOptions.CaptchaImageControllerRouteTemplate));
+        });
 
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
@@ -79,13 +85,15 @@ public static class CaptchaServiceCollectionExtensions
             _ => throw new InvalidOperationException($"Service of type {key} is not implemented.")
         };
 
-    private static void configOptions(IServiceCollection services, Action<DNTCaptchaOptions>? options)
+    private static DNTCaptchaOptions configOptions(IServiceCollection services, Action<DNTCaptchaOptions>? options)
     {
         var captchaOptions = new DNTCaptchaOptions();
         options?.Invoke(captchaOptions);
         setCaptchaStorageProvider(services, captchaOptions);
         setSerializationProvider(services, captchaOptions);
         services.TryAddSingleton(Options.Create(captchaOptions));
+
+        return captchaOptions;
     }
 
     private static void setSerializationProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
