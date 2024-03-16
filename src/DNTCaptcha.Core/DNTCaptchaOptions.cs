@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 
@@ -13,6 +13,11 @@ public class DNTCaptchaOptions
     ///     Its default value is `DNTCaptchaImage/[action]`
     /// </summary>
     public string? CaptchaImageControllerRouteTemplate { set; get; } = "DNTCaptchaImage/[action]";
+
+    /// <summary>
+    ///     Its default value is `DNTCaptchaImage`
+    /// </summary>
+    public string? CaptchaImageControllerNameTemplate { set; get; } = "DNTCaptchaImage";
 
     /// <summary>
     ///     Maximum number of permit counters that can be allowed in a minute. Must be set to a value > 0
@@ -315,6 +320,19 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions WithCaptchaImageControllerRouteTemplate(string template)
     {
         CaptchaImageControllerRouteTemplate = template;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Allow changing the image controller's name template dynamically at run-time.
+    ///     Its default value is `DNTCaptchaImage`
+    /// </summary>
+    /// <param name="template"></param>
+    /// <returns></returns>
+    public DNTCaptchaOptions WithCaptchaImageControllerNameTemplate(string template)
+    {
+        CaptchaImageControllerNameTemplate = template;
 
         return this;
     }
