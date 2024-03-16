@@ -157,6 +157,7 @@ namespace DNTCaptcha.TestWebApp
                 .WithEncryptionKey("This is my secure key!")
                 .WithNonceKey("NETESCAPADES_NONCE")
                 .WithCaptchaImageControllerRouteTemplate("my-custom-captcha/[action]")
+                .WithCaptchaImageControllerNameTemplate("my-custom-captcha")
                 .InputNames(// This is optional. Change it if you don't like the default names.
                     new DNTCaptchaComponent
                     {

@@ -29,7 +29,7 @@ public static class CaptchaServiceCollectionExtensions
         services.AddControllers(opts =>
         {
             opts.Conventions.Add(
-                new DynamicRoutingControllerModelConvention(configuredOptions.CaptchaImageControllerRouteTemplate));
+                new ControllerRoutingConvention( typeof(DNTCaptchaImageController), configuredOptions.CaptchaImageControllerRouteTemplate, configuredOptions.CaptchaImageControllerNameTemplate));
         });
 
         services.AddMemoryCache();
