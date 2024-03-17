@@ -113,15 +113,19 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
 
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
 
+        string controllerName = nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal);
+        if (!String.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate))
+            controllerName = _captchaOptions.CaptchaImageControllerNameTemplate;
+
         var actionUrl = captchaAttributes.UseRelativeUrls
             ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal), new
+                controllerName, new
                 {
                     data = encryptSerializedValues,
                     area = ""
                 })
             : _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal), new
+                controllerName, new
                 {
                     data = encryptSerializedValues,
                     area = ""
