@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
 namespace DNTCaptcha.Core;
@@ -9,6 +10,19 @@ namespace DNTCaptcha.Core;
 /// </summary>
 public class DNTCaptchaOptions
 {
+    /// <summary>
+    ///     Its default value is `TooManyRequests.`
+    ///     '/TimeoutWindow/' will be replaced by the window time.
+    ///     '/PermitLimit/' will be replaced by the RateLimiterPermitLimit.
+    /// </summary>
+    public string? RateLimiterRejectedResponse { set; get; } = "TooManyRequests.";
+
+    /// <summary>
+    ///     Its default value is false.
+    ///     set to true for Json response.
+    /// </summary>
+    public bool RateLimiterRejectedResponseType { set; get; }
+
     /// <summary>
     ///     Its default value is `DNTCaptchaImage/[action]`
     /// </summary>
@@ -113,6 +127,34 @@ public class DNTCaptchaOptions
     public DNTCaptchaOptions RateLimiterPermitLimit(int permitLimit)
     {
         PermitLimit = permitLimit;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     The response that is sent to user when the captcha rate limit has exceeded.
+    ///     The default response is : `TooManyRequests.`
+    ///     '/TimeoutWindow/' will be replaced by the window time.
+    ///     '/PermitLimit/' will be replaced by the RateLimiterPermitLimit.
+    /// </summary>
+    public DNTCaptchaOptions WithRateLimiterRejectResponse(string rejectResponse)
+    {
+        RateLimiterRejectedResponse = rejectResponse;
+        RateLimiterRejectedResponseType = false;
+
+        return this;
+    }
+
+    /// <summary>
+    ///     The response that is sent to user when the captcha rate limit has exceeded.
+    ///     The default response is : `TooManyRequests.`
+    ///     '/TimeoutWindow/' will be replaced by the window time.
+    ///     '/PermitLimit/' will be replaced by the RateLimiterPermitLimit.
+    /// </summary>
+    public DNTCaptchaOptions WithRateLimiterRejectResponse(object rejectResponse)
+    {
+        RateLimiterRejectedResponse = JsonSerializer.Serialize(rejectResponse);
+        RateLimiterRejectedResponseType = true;
 
         return this;
     }
