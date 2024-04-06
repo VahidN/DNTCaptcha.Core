@@ -21,7 +21,7 @@ public class DNTCaptchaOptions
     ///     Its default value is false.
     ///     set to true for Json response.
     /// </summary>
-    public bool RateLimiterRejectedResponseType { set; get; }
+    public bool? RateLimiterRejectedResponseType { set; get; } = false;
 
     /// <summary>
     ///     Its default value is `DNTCaptchaImage/[action]`
