@@ -152,6 +152,7 @@ namespace DNTCaptcha.TestWebApp
                 .UseCustomFont(Path.Combine(_env.WebRootPath, "fonts", "IRANSans(FaNum)_Bold.ttf")) // This is optional.
                 .AbsoluteExpiration(minutes: 7)
                 .RateLimiterPermitLimit(10) // for .NET 7x+, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
+                .WithRateLimiterRejectResponse("RateLimit Exceeded.") //you can instead provide an object, it will automatically converted to json result.
                 .ShowThousandsSeparators(false)
                 .WithNoise(0.015f, 0.015f, 1, 0.0f)
                 .WithEncryptionKey("This is my secure key!")
