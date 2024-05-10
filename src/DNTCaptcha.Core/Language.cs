@@ -69,5 +69,10 @@ public enum Language
     /// <summary>
     ///     Azerbaijan Language
     /// </summary>
-    Azerbaijani
+    Azerbaijani,
+
+    /// <summary>
+    ///     Dutch Language
+    /// </summary>
+    Dutch
 }

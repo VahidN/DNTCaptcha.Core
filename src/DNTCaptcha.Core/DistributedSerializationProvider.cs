@@ -17,8 +17,7 @@ public class DistributedSerializationProvider : ISerializationProvider
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
-        WriteIndented = false,
-        IgnoreNullValues = true
+        WriteIndented = false
     };
 
     private readonly ILogger<DistributedSerializationProvider> _logger;

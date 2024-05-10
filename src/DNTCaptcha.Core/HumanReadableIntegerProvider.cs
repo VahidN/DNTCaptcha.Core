@@ -47,6 +47,9 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
             Language.German, " und "
         },
         {
+            Language.Dutch, " en "
+        },
+        {
             Language.Azerbaijani, " "
         }
     };
@@ -88,6 +91,9 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
         },
         {
             Language.German, "Negativ"
+        },
+        {
+            Language.Dutch, "Negatief"
         },
         {
             Language.Azerbaijani, "Neqativ"
@@ -312,6 +318,25 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 "Neun"
             }
         },
+        new()
+        {
+            Group = DigitGroup.Ones,
+            Language = Language.Dutch,
+            Names = new List<string>
+            {
+                string.Empty,
+                "Een",
+                "Twee",
+                "Drie",
+                "Vier",
+                "Vijf",
+                "Zes",
+                "Zeven",
+                "Acht",
+                "Negen"
+            }
+        },
+
         new()
         {
             Group = DigitGroup.Ones,
@@ -552,6 +577,25 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
         new()
         {
             Group = DigitGroup.Teens,
+            Language = Language.Dutch,
+            Names = new List<string>
+            {
+                "Tien",
+                "Elf",
+                "Twaalf",
+                "Dertien",
+                "Veertien",
+                "Vijftien",
+                "Zestien",
+                "Zeventien",
+                "Achttien",
+                "Negentien"
+            }
+        },
+
+        new()
+        {
+            Group = DigitGroup.Teens,
             Language = Language.Azerbaijani,
             Names = new List<string>
             {
@@ -758,6 +802,22 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 "Siebzig",
                 "Achtzig",
                 "Neunzig"
+            }
+        },
+        new()
+        {
+            Group = DigitGroup.Tens,
+            Language = Language.Dutch,
+            Names = new List<string>
+            {
+                "Twintig",
+                "Dertig",
+                "Veertig",
+                "Vijftig",
+                "Zestig",
+                "Zeventig",
+                "Tachtig",
+                "Negentig"
             }
         },
 
@@ -992,6 +1052,25 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
                 "Siebenhundert",
                 "Achthundert",
                 "Neunhundert"
+            }
+        },
+
+        new()
+        {
+            Group = DigitGroup.Hundreds,
+            Language = Language.Dutch,
+            Names = new List<string>
+            {
+                string.Empty,
+                "Honderd",
+                "Tweehonderd",
+                "Driehonderd",
+                "Vierhonderd",
+                "Vijfhonderd",
+                "Zeshonderd",
+                "Zevenhonderd",
+                "Achthonderd",
+                "Negenhonderd"
             }
         },
 
@@ -1530,6 +1609,50 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
         new()
         {
             Group = DigitGroup.Thousands,
+            Language = Language.Dutch,
+            Names = new List<string>
+            {
+                string.Empty,
+                "Duizend",
+                "Miljoen",
+                "Miljard",
+                "Biljoen",
+                "Biljard",
+                "Triljoen",
+                "Triljard",
+                "Quadriljoen",
+                "Quadriljard",
+                "Quintiljoen",
+                "Quintiljard",
+                "Sextiljoen",
+                "Sextiljard",
+                "Septiljoen",
+                "Septiljard",
+                "Octiljoen",
+                "Octiljard",
+                "Noniljoen",
+                "Noniljard",
+                "Deciljoen",
+                "Deciljard",
+                "Undeciljoen",
+                "Undeciljard",
+                "Duodeciljoen",
+                "Duodeciljard",
+                "Tredeciljoen",
+                "Tredeciljard",
+                "Quattuordeciljoen",
+                "Quattuordeciljard",
+                "Quindeciljoen",
+                "Quindeciljard",
+                "Sexdeciljoen",
+                "Sexdeciljard",
+                "Septendeciljoen"
+            }
+        },
+
+        new()
+        {
+            Group = DigitGroup.Thousands,
             Language = Language.Azerbaijani,
             Names = new List<string>
             {
@@ -1611,6 +1734,9 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
             Language.German, "Null"
         },
         {
+            Language.Dutch, "Nul"
+        },
+        {
             Language.Azerbaijani, "Sıfır"
         }
     };
@@ -1621,8 +1747,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string GetText(int number, Language language)
-        => NumberToText((long)number, language);
+    public string GetText(int number, Language language) => NumberToText((long)number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -1630,8 +1755,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string GetText(long number, Language language)
-        => NumberToText(number, language);
+    public string GetText(long number, Language language) => NumberToText(number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -1639,8 +1763,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string NumberToText(int number, Language language)
-        => NumberToText((long)number, language);
+    public string NumberToText(int number, Language language) => NumberToText((long)number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -1648,8 +1771,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string NumberToText(uint number, Language language)
-        => NumberToText((long)number, language);
+    public string NumberToText(uint number, Language language) => NumberToText((long)number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -1657,8 +1779,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string NumberToText(byte number, Language language)
-        => NumberToText((long)number, language);
+    public string NumberToText(byte number, Language language) => NumberToText((long)number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -1666,8 +1787,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string NumberToText(decimal number, Language language)
-        => NumberToText((long)number, language);
+    public string NumberToText(decimal number, Language language) => NumberToText((long)number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text
@@ -1675,8 +1795,7 @@ public class HumanReadableIntegerProvider : ICaptchaTextProvider
     /// <param name="number">input number</param>
     /// <param name="language">local language</param>
     /// <returns>the equivalent text</returns>
-    public string NumberToText(double number, Language language)
-        => NumberToText((long)number, language);
+    public string NumberToText(double number, Language language) => NumberToText((long)number, language);
 
     /// <summary>
     ///     display a numeric value using the equivalent text

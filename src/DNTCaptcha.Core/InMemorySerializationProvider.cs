@@ -15,8 +15,7 @@ public class InMemorySerializationProvider : ISerializationProvider
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
-        WriteIndented = false,
-        IgnoreNullValues = true
+        WriteIndented = false
     };
 
     private readonly ILogger<InMemorySerializationProvider> _logger;
