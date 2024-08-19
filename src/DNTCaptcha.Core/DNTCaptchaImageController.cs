@@ -23,6 +23,7 @@ namespace DNTCaptcha.Core;
 ///     DNTCaptcha Image Controller
 /// </summary>
 [AllowAnonymous]
+[Route("[controller]")]
 #if NET7_0 || NET8_0
 [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
 #endif
@@ -86,6 +87,7 @@ public class DNTCaptchaImageController : Controller
     ///     Refresh the captcha
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+    [Route("[action]"), HttpGet("[action]"), HttpPost("[action]")] 
     public IActionResult Refresh(string data)
     {
         try
@@ -180,6 +182,7 @@ public class DNTCaptchaImageController : Controller
     ///     Creates the captcha image.
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+    [Route("[action]"), HttpGet("[action]"), HttpPost("[action]")] 
     public IActionResult Show(string data)
     {
         try

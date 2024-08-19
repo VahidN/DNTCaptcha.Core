@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-        <VersionPrefix>5.2.4</VersionPrefix>
+        <VersionPrefix>5.2.5</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net8.0;net7.0;net6.0;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -42,11 +42,11 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Meziantou.Analyzer" Version="2.0.150">
+        <PackageReference Include="Meziantou.Analyzer" Version="2.0.163">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.10.48">
+        <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -58,7 +58,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.25.0.90414">
+        <PackageReference Include="SonarAnalyzer.CSharp" Version="9.32.0.97167">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
