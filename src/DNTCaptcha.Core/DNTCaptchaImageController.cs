@@ -23,7 +23,6 @@ namespace DNTCaptcha.Core;
 ///     DNTCaptcha Image Controller
 /// </summary>
 [AllowAnonymous]
-[Route("[controller]")]
 #if NET7_0 || NET8_0
 [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
 #endif
