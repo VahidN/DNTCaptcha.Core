@@ -10,36 +10,32 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Distributed serialization provider
 /// </summary>
-public class DistributedSerializationProvider : ISerializationProvider
+/// <remarks>
+///     Serialization Provider
+/// </remarks>
+public class DistributedSerializationProvider(
+    IDistributedCache distributedCache,
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    ILogger<DistributedSerializationProvider> logger,
+    IOptions<DNTCaptchaOptions> options) : ISerializationProvider
 {
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly IDistributedCache _distributedCache;
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
+
+    private readonly IDistributedCache _distributedCache =
+        distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
 
     private readonly JsonSerializerOptions _jsonSerializerOptions = new()
     {
         WriteIndented = false
     };
 
-    private readonly ILogger<DistributedSerializationProvider> _logger;
-    private readonly DNTCaptchaOptions _options;
+    private readonly ILogger<DistributedSerializationProvider> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
-    /// <summary>
-    ///     Serialization Provider
-    /// </summary>
-    public DistributedSerializationProvider(IDistributedCache distributedCache,
-        ICaptchaCryptoProvider captchaProtectionProvider,
-        ILogger<DistributedSerializationProvider> logger,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
-
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
-
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-        logger.LogDebug("Using the DistributedSerializationProvider.");
-    }
+    private readonly DNTCaptchaOptions _options =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Serialize the given data to an string.
@@ -67,7 +63,7 @@ public class DistributedSerializationProvider : ISerializationProvider
         if (resultBytes == null)
         {
             _logger.LogDebug(
-                "The registered distributed cache provider returned null. Which means your data is expired.");
+                message: "The registered distributed cache provider returned null. Which means your data is expired.");
 
             return default;
         }

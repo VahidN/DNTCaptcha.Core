@@ -27,13 +27,7 @@ public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
             throw new ArgumentNullException(nameof(context));
         }
 
-        var httpContext = context.HttpContext;
-
-        if (httpContext == null)
-        {
-            throw new InvalidOperationException("httpContext is null.");
-        }
-
+        var httpContext = context.HttpContext ?? throw new InvalidOperationException(message: "httpContext is null.");
         var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();
 
         if (validatorService.HasRequestValidCaptchaEntry())
@@ -45,7 +39,7 @@ public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
 
         if (context.Controller is not ControllerBase controllerBase)
         {
-            throw new InvalidOperationException("controllerBase is null.");
+            throw new InvalidOperationException(message: "controllerBase is null.");
         }
 
         var options = httpContext.RequestServices.GetRequiredService<IOptions<DNTCaptchaOptions>>();

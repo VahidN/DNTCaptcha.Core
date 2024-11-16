@@ -10,45 +10,42 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     DNTCaptcha Api
 /// </summary>
-public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
+/// <remarks>
+///     DNTCaptcha Api
+/// </remarks>
+public class DNTCaptchaApiProvider(
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    IRandomNumberProvider randomNumberProvider,
+    Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
+    ICaptchaStorageProvider captchaStorageProvider,
+    ISerializationProvider serializationProvider,
+    IHttpContextAccessor httpContextAccessor,
+    IUrlHelper urlHelper,
+    IOptions<DNTCaptchaOptions> options) : IDNTCaptchaApiProvider
 {
-    private readonly DNTCaptchaOptions _captchaOptions;
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly ICaptchaStorageProvider _captchaStorageProvider;
-    private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IRandomNumberProvider _randomNumberProvider;
-    private readonly ISerializationProvider _serializationProvider;
-    private readonly IUrlHelper _urlHelper;
+    private readonly DNTCaptchaOptions _captchaOptions =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
-    /// <summary>
-    ///     DNTCaptcha Api
-    /// </summary>
-    public DNTCaptchaApiProvider(ICaptchaCryptoProvider captchaProtectionProvider,
-        IRandomNumberProvider randomNumberProvider,
-        Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
-        ICaptchaStorageProvider captchaStorageProvider,
-        ISerializationProvider serializationProvider,
-        IHttpContextAccessor httpContextAccessor,
-        IUrlHelper urlHelper,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-        _randomNumberProvider = randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
-        _captchaTextProvider = captchaTextProvider ?? throw new ArgumentNullException(nameof(captchaTextProvider));
+    private readonly ICaptchaStorageProvider _captchaStorageProvider =
+        captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
 
-        _captchaStorageProvider =
-            captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+    private readonly Func<DisplayMode, ICaptchaTextProvider> _captchaTextProvider =
+        captchaTextProvider ?? throw new ArgumentNullException(nameof(captchaTextProvider));
 
-        _serializationProvider =
-            serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
+    private readonly IHttpContextAccessor _httpContextAccessor =
+        httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
 
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        _urlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
-        _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-    }
+    private readonly IRandomNumberProvider _randomNumberProvider =
+        randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
+
+    private readonly ISerializationProvider _serializationProvider =
+        serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
+
+    private readonly IUrlHelper _urlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
 
     /// <summary>
     ///     Creates DNTCaptcha
@@ -63,7 +60,7 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
 
         if (_httpContextAccessor.HttpContext == null)
         {
-            throw new InvalidOperationException("`_httpContextAccessor.HttpContext` is null.");
+            throw new InvalidOperationException(message: "`_httpContextAccessor.HttpContext` is null.");
         }
 
         var number = _randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max);
@@ -72,7 +69,7 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
             .GetText(number, captchaAttributes.Language);
 
         var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
-        var captchaImageUrl = getCaptchaImageUrl(captchaAttributes, encryptedText);
+        var captchaImageUrl = GetCaptchaImageUrl(captchaAttributes, encryptedText);
 
         var captchaDivId =
             Invariant(
@@ -94,11 +91,11 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
         };
     }
 
-    private string getCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
+    private string GetCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
     {
         if (_httpContextAccessor.HttpContext == null)
         {
-            throw new InvalidOperationException("`_httpContextAccessor.HttpContext` is null.");
+            throw new InvalidOperationException(message: "`_httpContextAccessor.HttpContext` is null.");
         }
 
         var values = new CaptchaImageParams
@@ -113,27 +110,30 @@ public class DNTCaptchaApiProvider : IDNTCaptchaApiProvider
 
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(_serializationProvider.Serialize(values));
 
-        string controllerName = nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal);
-        if (!String.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate))
+        var controllerName = nameof(DNTCaptchaImageController)
+            .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal);
+
+        if (!string.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate))
+        {
             controllerName = _captchaOptions.CaptchaImageControllerNameTemplate;
+        }
 
         var actionUrl = captchaAttributes.UseRelativeUrls
-            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                controllerName, new
-                {
-                    data = encryptSerializedValues,
-                    area = ""
-                })
-            : _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                controllerName, new
-                {
-                    data = encryptSerializedValues,
-                    area = ""
-                }, _httpContextAccessor.HttpContext.Request.Scheme);
+            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show), controllerName, new
+            {
+                data = encryptSerializedValues,
+                area = ""
+            })
+            : _urlHelper.Action(nameof(DNTCaptchaImageController.Show), controllerName, new
+            {
+                data = encryptSerializedValues,
+                area = ""
+            }, _httpContextAccessor.HttpContext.Request.Scheme);
 
         if (string.IsNullOrWhiteSpace(actionUrl))
         {
             throw new InvalidOperationException(
+                message:
                 "It's not possible to determine the URL of the `DNTCaptchaImageController.Show` method. Please register the `services.AddControllers()` and `endpoints.MapControllerRoute(...)`.");
         }
 

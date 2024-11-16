@@ -26,7 +26,7 @@ public class CaptchaCryptoProvider : ICaptchaCryptoProvider
             throw new ArgumentNullException(nameof(options));
         }
 
-        _keyBytes = getDesKey(options.Value.EncryptionKey);
+        _keyBytes = GetDesKey(options.Value.EncryptionKey);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class CaptchaCryptoProvider : ICaptchaCryptoProvider
         }
 
         var inputBytes = WebEncoders.Base64UrlDecode(inputText);
-        var bytes = decrypt(inputBytes);
+        var bytes = DecryptIt(inputBytes);
 
         return Encoding.UTF8.GetString(bytes);
     }
@@ -66,87 +66,89 @@ public class CaptchaCryptoProvider : ICaptchaCryptoProvider
         }
 
         var inputBytes = Encoding.UTF8.GetBytes(inputText);
-        var bytes = encrypt(inputBytes);
+        var bytes = EncryptIt(inputBytes);
 
         return WebEncoders.Base64UrlEncode(bytes);
     }
 
-    [SuppressMessage("Microsoft.Usage", "S5547:encrypt uses a weak cryptographic algorithm TripleDES",
-         Justification = "That's enough for our usecase!"),
-     SuppressMessage("Microsoft.Usage", "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
-         Justification = "That's enough for our usecase!"),
-     SuppressMessage("Microsoft.Usage", "SCS0011:encrypt uses a weak cryptographic algorithm TripleDES",
-         Justification = "That's enough for our usecase!")]
-    private byte[] encrypt(byte[] data)
+    [SuppressMessage(category: "Microsoft.Usage",
+        checkId: "S5547:encrypt uses a weak cryptographic algorithm TripleDES",
+        Justification = "That's enough for our usecase!")]
+    [SuppressMessage(category: "Microsoft.Usage",
+        checkId: "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
+        Justification = "That's enough for our usecase!")]
+    [SuppressMessage(category: "Microsoft.Usage",
+        checkId: "SCS0011:encrypt uses a weak cryptographic algorithm TripleDES",
+        Justification = "That's enough for our usecase!")]
+    private byte[] EncryptIt(byte[] data)
     {
-        using (var des = new TripleDESCryptoServiceProvider
-               {
-                   Key = _keyBytes,
-                   Mode = CipherMode.CBC,
-                   Padding = PaddingMode.PKCS7
-               })
+        using var des = new TripleDESCryptoServiceProvider
         {
-            using var encryptor = des.CreateEncryptor();
-            using var cipherStream = new MemoryStream();
+            Key = _keyBytes,
+            Mode = CipherMode.CBC,
+            Padding = PaddingMode.PKCS7
+        };
 
-            using (var cryptoStream = new CryptoStream(cipherStream, encryptor, CryptoStreamMode.Write))
-            {
-                using (var binaryWriter = new BinaryWriter(cryptoStream))
-                {
-                    // prepend IV to data
-                    cipherStream.Write(des.IV); // This is an auto-generated random key
-                    binaryWriter.Write(data);
-                    cryptoStream.FlushFinalBlock();
-                }
-            }
+        using var encryptor = des.CreateEncryptor();
+        using var cipherStream = new MemoryStream();
 
-            return cipherStream.ToArray();
+        using (var cryptoStream = new CryptoStream(cipherStream, encryptor, CryptoStreamMode.Write))
+        {
+            using var binaryWriter = new BinaryWriter(cryptoStream);
+
+            // prepend IV to data
+            cipherStream.Write(des.IV); // This is an auto-generated random key
+            binaryWriter.Write(data);
+            cryptoStream.FlushFinalBlock();
         }
+
+        return cipherStream.ToArray();
     }
 
-    [SuppressMessage("Microsoft.Usage", "S5547:encrypt uses a weak cryptographic algorithm TripleDES",
-         Justification = "That's enough for our usecase!"),
-     SuppressMessage("Microsoft.Usage", "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
-         Justification = "That's enough for our usecase!"),
-     SuppressMessage("Microsoft.Usage", "SCS0011:encrypt uses a weak cryptographic algorithm TripleDES",
-         Justification = "That's enough for our usecase!")]
-    private byte[] decrypt(byte[] data)
+    [SuppressMessage(category: "Microsoft.Usage",
+        checkId: "S5547:encrypt uses a weak cryptographic algorithm TripleDES",
+        Justification = "That's enough for our usecase!")]
+    [SuppressMessage(category: "Microsoft.Usage",
+        checkId: "CA5350:encrypt uses a weak cryptographic algorithm TripleDES",
+        Justification = "That's enough for our usecase!")]
+    [SuppressMessage(category: "Microsoft.Usage",
+        checkId: "SCS0011:encrypt uses a weak cryptographic algorithm TripleDES",
+        Justification = "That's enough for our usecase!")]
+    private byte[] DecryptIt(byte[] data)
     {
-        using (var des = new TripleDESCryptoServiceProvider
-               {
-                   Key = _keyBytes,
-                   Mode = CipherMode.CBC,
-                   Padding = PaddingMode.PKCS7
-               })
+        using var des = new TripleDESCryptoServiceProvider
         {
-            var iv = new byte[8]; // 3DES-IV is always 8 bytes/64 bits because block size is always 64 bits
-            Array.Copy(data, 0, iv, 0, iv.Length);
+            Key = _keyBytes,
+            Mode = CipherMode.CBC,
+            Padding = PaddingMode.PKCS7
+        };
 
-            using var ms = new MemoryStream();
+        var iv = new byte[8]; // 3DES-IV is always 8 bytes/64 bits because block size is always 64 bits
+        Array.Copy(data, sourceIndex: 0, iv, destinationIndex: 0, iv.Length);
 
-            using (var decryptor = new CryptoStream(ms, des.CreateDecryptor(_keyBytes, iv), CryptoStreamMode.Write))
-            {
-                using (var binaryWriter = new BinaryWriter(decryptor))
-                {
-                    // decrypt cipher text from data, starting just past the IV
-                    binaryWriter.Write(data, iv.Length, data.Length - iv.Length);
-                }
-            }
+        using var ms = new MemoryStream();
 
-            return ms.ToArray();
+        using (var decryptor = new CryptoStream(ms, des.CreateDecryptor(_keyBytes, iv), CryptoStreamMode.Write))
+        {
+            using var binaryWriter = new BinaryWriter(decryptor);
+
+            // decrypt cipher text from data, starting just past the IV
+            binaryWriter.Write(data, iv.Length, data.Length - iv.Length);
         }
+
+        return ms.ToArray();
     }
 
-    private byte[] getDesKey(string? key)
+    private byte[] GetDesKey(string? key)
     {
         if (string.IsNullOrWhiteSpace(key))
         {
-            throw new InvalidOperationException("Please set the `options.WithEncryptionKey(...)`.");
+            throw new InvalidOperationException(message: "Please set the `options.WithEncryptionKey(...)`.");
         }
 
         // The key size of TripleDES is 168 bits, its len in byte is 24 Bytes (or 192 bits).
         // Last bit of each byte is not used (or used as version in some hardware).
         // Key len for TripleDES can also be 112 bits which is again stored in 128 bits or 16 bytes.
-        return Hash(key).HashBytes.Take(24).ToArray();
+        return Hash(key).HashBytes.Take(count: 24).ToArray();
     }
 }

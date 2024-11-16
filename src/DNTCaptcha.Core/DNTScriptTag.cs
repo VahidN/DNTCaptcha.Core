@@ -9,21 +9,12 @@ namespace DNTCaptcha.Core;
 ///     ASP.NET Core encodes attribute values in a TagBuilder.
 ///     This is a solution to disable this behaviour.
 /// </summary>
-public class DNTScriptTag : IHtmlContent
+/// <remarks>
+///     ASP.NET Core encodes attribute values in a TagBuilder.
+///     This is a solution to disable this behaviour.
+/// </remarks>
+public class DNTScriptTag(string innerText, string nonce) : IHtmlContent
 {
-    private readonly string _innerText;
-    private readonly string _nonce;
-
-    /// <summary>
-    ///     ASP.NET Core encodes attribute values in a TagBuilder.
-    ///     This is a solution to disable this behaviour.
-    /// </summary>
-    public DNTScriptTag(string innerText, string nonce)
-    {
-        _innerText = innerText;
-        _nonce = nonce;
-    }
-
     /// <inheritdoc />
     public void WriteTo(TextWriter writer, HtmlEncoder encoder)
     {
@@ -32,8 +23,8 @@ public class DNTScriptTag : IHtmlContent
             throw new ArgumentNullException(nameof(writer));
         }
 
-        writer.Write($"""<script nonce="{_nonce}" type="text/javascript">""");
-        writer.Write(_innerText);
-        writer.Write("</script>");
+        writer.Write($"""<script nonce="{nonce}" type="text/javascript">""");
+        writer.Write(innerText);
+        writer.Write(value: "</script>");
     }
 }

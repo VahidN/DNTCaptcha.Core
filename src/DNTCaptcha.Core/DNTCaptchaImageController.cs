@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-#if NET7_0 || NET8_0
+#if NET7_0 || NET8_0 || NET9_0
 using Microsoft.AspNetCore.RateLimiting;
 #endif
 
@@ -22,11 +22,21 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     DNTCaptcha Image Controller
 /// </summary>
+/// <remarks>
+///     DNTCaptcha Image Controller
+/// </remarks>
 [AllowAnonymous]
-#if NET7_0 || NET8_0
+#if NET7_0 || NET8_0 || NET9_0
 [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
 #endif
-public class DNTCaptchaImageController : Controller
+public class DNTCaptchaImageController(
+    ICaptchaImageProvider captchaImageProvider,
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    ITempDataProvider tempDataProvider,
+    ICaptchaStorageProvider captchaStorageProvider,
+    ILogger<DNTCaptchaImageController> logger,
+    ISerializationProvider serializationProvider,
+    IOptions<DNTCaptchaOptions> options) : Controller
 {
     private const string TheReceivedDataIsNullOrEmpty = "The received data is null or empty.";
 
@@ -39,42 +49,27 @@ public class DNTCaptchaImageController : Controller
     private const string TurnOnTheLogDebugLevel =
         "Turn on the `LogDebug` level, to see the actual details of the exception, in the logs.";
 
-    private readonly ICaptchaImageProvider _captchaImageProvider;
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly ICaptchaStorageProvider _captchaStorageProvider;
-    private readonly ILogger<DNTCaptchaImageController> _logger;
-    private readonly DNTCaptchaOptions _options;
-    private readonly ISerializationProvider _serializationProvider;
-    private readonly ITempDataProvider _tempDataProvider;
+    private readonly ICaptchaImageProvider _captchaImageProvider =
+        captchaImageProvider ?? throw new ArgumentNullException(nameof(captchaImageProvider));
 
-    /// <summary>
-    ///     DNTCaptcha Image Controller
-    /// </summary>
-    public DNTCaptchaImageController(ICaptchaImageProvider captchaImageProvider,
-        ICaptchaCryptoProvider captchaProtectionProvider,
-        ITempDataProvider tempDataProvider,
-        ICaptchaStorageProvider captchaStorageProvider,
-        ILogger<DNTCaptchaImageController> logger,
-        ISerializationProvider serializationProvider,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _captchaImageProvider = captchaImageProvider ?? throw new ArgumentNullException(nameof(captchaImageProvider));
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
+    private readonly ICaptchaStorageProvider _captchaStorageProvider =
+        captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
 
-        _tempDataProvider = tempDataProvider ?? throw new ArgumentNullException(nameof(tempDataProvider));
+    private readonly ILogger<DNTCaptchaImageController> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _captchaStorageProvider =
-            captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+    private readonly DNTCaptchaOptions _options =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ISerializationProvider _serializationProvider =
+        serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
 
-        _serializationProvider =
-            serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
-
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-    }
+    private readonly ITempDataProvider _tempDataProvider =
+        tempDataProvider ?? throw new ArgumentNullException(nameof(tempDataProvider));
 
     /// <summary>
     ///     The ViewContext Provider
@@ -86,7 +81,8 @@ public class DNTCaptchaImageController : Controller
     ///     Refresh the captcha
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-    [HttpGet("[action]"), HttpPost("[action]")] 
+    [HttpGet(template: "[action]")]
+    [HttpPost(template: "[action]")]
     public IActionResult Refresh(string data)
     {
         try
@@ -110,7 +106,7 @@ public class DNTCaptchaImageController : Controller
                 return BadRequest(IsYourNetworkDistributed);
             }
 
-            invalidateToken(model);
+            InvalidateToken(model);
 
             var tagHelper = HttpContext.RequestServices.GetRequiredService<DNTCaptchaTagHelper>();
             tagHelper.BackColor = model.BackColor;
@@ -131,14 +127,14 @@ public class DNTCaptchaImageController : Controller
             tagHelper.UseRelativeUrls = model.UseRelativeUrls;
             tagHelper.ShowRefreshButton = model.ShowRefreshButton;
 
-            var tagHelperContext = new TagHelperContext(new TagHelperAttributeList(), new Dictionary<object, object>
+            var tagHelperContext = new TagHelperContext([], new Dictionary<object, object>
             {
                 {
                     typeof(IUrlHelper), Url
                 }
-            }, Guid.NewGuid().ToString("N"));
+            }, Guid.NewGuid().ToString(format: "N"));
 
-            var tagHelperOutput = new TagHelperOutput("div", new TagHelperAttributeList(), (useCachedResult, encoder) =>
+            var tagHelperOutput = new TagHelperOutput(tagName: "div", [], (useCachedResult, encoder) =>
             {
                 var tagHelperContent = new DefaultTagHelperContent();
                 tagHelperContent.SetContent(string.Empty);
@@ -159,7 +155,7 @@ public class DNTCaptchaImageController : Controller
 
             foreach (var attr in tagHelperOutput.Attributes)
             {
-                attrs.Append(' ').Append(attr.Name).Append("='").Append(attr.Value).Append('\'');
+                attrs.Append(value: ' ').Append(attr.Name).Append(value: "='").Append(attr.Value).Append(value: '\'');
             }
 
             var content = $"<div {attrs}>{tagHelperOutput.Content.GetContent()}</div>";
@@ -168,20 +164,21 @@ public class DNTCaptchaImageController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogDebug(ex, "Failed to refresh the captcha image.");
+            _logger.LogDebug(ex, message: "Failed to refresh the captcha image.");
 
             return _options.ShowExceptions ? BadRequest(ex.ToString()) : BadRequest(TurnOnTheLogDebugLevel);
         }
     }
 
-    private void invalidateToken(DNTCaptchaTagHelperHtmlAttributes model)
+    private void InvalidateToken(DNTCaptchaTagHelperHtmlAttributes model)
         => _captchaStorageProvider.Remove(HttpContext, model.CaptchaToken);
 
     /// <summary>
     ///     Creates the captcha image.
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-    [HttpGet("[action]"), HttpPost("[action]")] 
+    [HttpGet(template: "[action]")]
+    [HttpPost(template: "[action]")]
     public IActionResult Show(string data)
     {
         try
@@ -209,17 +206,17 @@ public class DNTCaptchaImageController : Controller
 
             if (decryptedText == null)
             {
-                return BadRequest("Couldn't decrypt the text.");
+                return BadRequest(error: "Couldn't decrypt the text.");
             }
 
             var image = _captchaImageProvider.DrawCaptcha(decryptedText, model.ForeColor, model.BackColor,
                 model.FontSize, model.FontName);
 
-            return new FileContentResult(image, "image/png");
+            return new FileContentResult(image, contentType: "image/png");
         }
         catch (Exception ex)
         {
-            _logger.LogDebug(ex, "Failed to show the captcha image.");
+            _logger.LogDebug(ex, message: "Failed to show the captcha image.");
 
             return _options.ShowExceptions ? BadRequest(ex.ToString()) : BadRequest(TurnOnTheLogDebugLevel);
         }

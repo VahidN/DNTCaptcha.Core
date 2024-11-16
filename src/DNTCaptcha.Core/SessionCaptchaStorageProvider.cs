@@ -9,24 +9,19 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Represents a session storage to save the captcha tokens.
 /// </summary>
-public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
+/// <remarks>
+///     Represents the storage to save the captcha tokens.
+/// </remarks>
+public class SessionCaptchaStorageProvider(
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    ILogger<SessionCaptchaStorageProvider> logger) : ICaptchaStorageProvider
 {
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly ILogger<SessionCaptchaStorageProvider> _logger;
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-    /// <summary>
-    ///     Represents the storage to save the captcha tokens.
-    /// </summary>
-    public SessionCaptchaStorageProvider(ICaptchaCryptoProvider captchaProtectionProvider,
-        ILogger<SessionCaptchaStorageProvider> logger)
-    {
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
-
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        _logger.LogDebug("Using the SessionCaptchaStorageProvider.");
-    }
+    private readonly ILogger<SessionCaptchaStorageProvider> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -47,7 +42,7 @@ public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
     /// <returns>
     ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
     /// </returns>
-    public bool Contains(HttpContext context, [NotNullWhen(true)] string? token)
+    public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
     {
         if (context == null)
         {
@@ -78,7 +73,7 @@ public class SessionCaptchaStorageProvider : ICaptchaStorageProvider
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            _logger.LogDebug("Couldn't find the captcha's session value in the request.");
+            _logger.LogDebug(message: "Couldn't find the captcha's session value in the request.");
 
             return null;
         }

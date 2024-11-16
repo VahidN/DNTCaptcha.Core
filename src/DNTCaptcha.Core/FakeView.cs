@@ -18,6 +18,5 @@ public class FakeView : IView
     /// <summary>
     ///     A fake view provider for rendering tag helpers
     /// </summary>
-    public Task RenderAsync(ViewContext context)
-        => throw new InvalidOperationException();
+    public Task RenderAsync(ViewContext context) => throw new InvalidOperationException();
 }

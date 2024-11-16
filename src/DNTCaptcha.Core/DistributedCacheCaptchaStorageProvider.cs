@@ -11,30 +11,27 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Represents a distributed cache storage to save the captcha tokens.
 /// </summary>
-public class DistributedCacheCaptchaStorageProvider : ICaptchaStorageProvider
+/// <remarks>
+///     Represents the storage to save the captcha tokens.
+/// </remarks>
+public class DistributedCacheCaptchaStorageProvider(
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    IDistributedCache distributedCache,
+    ILogger<DistributedCacheCaptchaStorageProvider> logger,
+    IOptions<DNTCaptchaOptions> options) : ICaptchaStorageProvider
 {
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly IDistributedCache _distributedCache;
-    private readonly ILogger<DistributedCacheCaptchaStorageProvider> _logger;
-    private readonly DNTCaptchaOptions _options;
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-    /// <summary>
-    ///     Represents the storage to save the captcha tokens.
-    /// </summary>
-    public DistributedCacheCaptchaStorageProvider(ICaptchaCryptoProvider captchaProtectionProvider,
-        IDistributedCache distributedCache,
-        ILogger<DistributedCacheCaptchaStorageProvider> logger,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
+    private readonly IDistributedCache _distributedCache =
+        distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+    private readonly ILogger<DistributedCacheCaptchaStorageProvider> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _logger.LogDebug("Using the DistributedCacheCaptchaStorageProvider.");
-    }
+    private readonly DNTCaptchaOptions _options =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -62,7 +59,7 @@ public class DistributedCacheCaptchaStorageProvider : ICaptchaStorageProvider
     /// <returns>
     ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
     /// </returns>
-    public bool Contains(HttpContext context, [NotNullWhen(true)] string? token)
+    public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
         => !string.IsNullOrWhiteSpace(token) && _distributedCache.Get(token) != null;
 
     /// <summary>
@@ -81,7 +78,7 @@ public class DistributedCacheCaptchaStorageProvider : ICaptchaStorageProvider
 
         if (cookieValueBytes == null)
         {
-            _logger.LogDebug("Couldn't find the captcha cookie in the request.");
+            _logger.LogDebug(message: "Couldn't find the captcha cookie in the request.");
 
             return null;
         }

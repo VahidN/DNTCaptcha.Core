@@ -5,16 +5,11 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     SumOfTwoNumbers Provider
 /// </summary>
-public class SumOfTwoNumbersProvider : ICaptchaTextProvider
+/// <remarks>
+///     SumOfTwoNumbers Provider
+/// </remarks>
+public class SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider) : ICaptchaTextProvider
 {
-    private readonly IRandomNumberProvider _randomNumberProvider;
-
-    /// <summary>
-    ///     SumOfTwoNumbers Provider
-    /// </summary>
-    public SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider)
-        => _randomNumberProvider = randomNumberProvider;
-
     /// <summary>
     ///     display a numeric value using the equivalent text
     /// </summary>
@@ -23,7 +18,7 @@ public class SumOfTwoNumbersProvider : ICaptchaTextProvider
     /// <returns>the equivalent text</returns>
     public string GetText(int number, Language language)
     {
-        var randomNumber = _randomNumberProvider.NextNumber(1, number);
+        var randomNumber = randomNumberProvider.NextNumber(min: 1, number);
 
         return number > randomNumber
             ? Invariant($"{number - randomNumber} + {randomNumber}")

@@ -24,12 +24,13 @@ public static class CaptchaServiceCollectionExtensions
             throw new ArgumentNullException(nameof(services));
         }
 
-        var configuredOptions = configOptions(services, options);
+        var configuredOptions = ConfigOptions(services, options);
 
         services.AddControllers(opts =>
         {
-            opts.Conventions.Add(
-                new ControllerRoutingConvention( typeof(DNTCaptchaImageController), configuredOptions.CaptchaImageControllerRouteTemplate, configuredOptions.CaptchaImageControllerNameTemplate));
+            opts.Conventions.Add(new ControllerRoutingConvention(typeof(DNTCaptchaImageController),
+                configuredOptions.CaptchaImageControllerRouteTemplate,
+                configuredOptions.CaptchaImageControllerNameTemplate));
         });
 
         services.AddMemoryCache();
@@ -37,7 +38,7 @@ public static class CaptchaServiceCollectionExtensions
         services.AddAntiforgery();
         services.AddMvcCore().AddCookieTempDataProvider();
 
-#if NET7_0 || NET8_0
+#if NET7_0 || NET8_0 || NET9_0
 
         //  Also we need to have app.UseRateLimiter() after app.UseRouting()
         services.AddRateLimiter(limiterOptions
@@ -62,12 +63,8 @@ public static class CaptchaServiceCollectionExtensions
 
         services.TryAddScoped<IUrlHelper>(serviceProvider =>
         {
-            var actionContext = serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext;
-
-            if (actionContext is null)
-            {
-                throw new InvalidOperationException("actionContext is null");
-            }
+            var actionContext = serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext ??
+                                throw new InvalidOperationException(message: "actionContext is null");
 
             var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
 
@@ -85,18 +82,18 @@ public static class CaptchaServiceCollectionExtensions
             _ => throw new InvalidOperationException($"Service of type {key} is not implemented.")
         };
 
-    private static DNTCaptchaOptions configOptions(IServiceCollection services, Action<DNTCaptchaOptions>? options)
+    private static DNTCaptchaOptions ConfigOptions(IServiceCollection services, Action<DNTCaptchaOptions>? options)
     {
         var captchaOptions = new DNTCaptchaOptions();
         options?.Invoke(captchaOptions);
-        setCaptchaStorageProvider(services, captchaOptions);
-        setSerializationProvider(services, captchaOptions);
+        SetCaptchaStorageProvider(services, captchaOptions);
+        SetSerializationProvider(services, captchaOptions);
         services.TryAddSingleton(Options.Create(captchaOptions));
 
         return captchaOptions;
     }
 
-    private static void setSerializationProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
+    private static void SetSerializationProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
     {
         if (captchaOptions.CaptchaSerializationProvider == null)
         {
@@ -108,7 +105,7 @@ public static class CaptchaServiceCollectionExtensions
         }
     }
 
-    private static void setCaptchaStorageProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
+    private static void SetCaptchaStorageProvider(IServiceCollection services, DNTCaptchaOptions captchaOptions)
     {
         if (captchaOptions.CaptchaStorageProvider == null)
         {

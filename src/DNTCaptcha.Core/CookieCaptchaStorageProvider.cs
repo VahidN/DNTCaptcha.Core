@@ -9,27 +9,23 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Represents the default storage to save the captcha tokens.
 /// </summary>
-public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
+/// <remarks>
+///     Represents the storage to save the captcha tokens.
+/// </remarks>
+public class CookieCaptchaStorageProvider(
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    ILogger<CookieCaptchaStorageProvider> logger,
+    IOptions<DNTCaptchaOptions> options) : ICaptchaStorageProvider
 {
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly ILogger<CookieCaptchaStorageProvider> _logger;
-    private readonly DNTCaptchaOptions _options;
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-    /// <summary>
-    ///     Represents the storage to save the captcha tokens.
-    /// </summary>
-    public CookieCaptchaStorageProvider(ICaptchaCryptoProvider captchaProtectionProvider,
-        ILogger<CookieCaptchaStorageProvider> logger,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
+    private readonly ILogger<CookieCaptchaStorageProvider> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-
-        _logger.LogDebug("Using the CookieCaptchaStorageProvider.");
-    }
+    private readonly DNTCaptchaOptions _options =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -42,7 +38,7 @@ public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
         }
 
         value = _captchaProtectionProvider.Encrypt($"{value}{context.GetSalt(_captchaProtectionProvider)}");
-        context.Response.Cookies.Append(token, value, getCookieOptions(context));
+        context.Response.Cookies.Append(token, value, GetCookieOptions(context));
     }
 
     /// <summary>
@@ -53,7 +49,7 @@ public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
     /// <returns>
     ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
     /// </returns>
-    public bool Contains(HttpContext context, [NotNullWhen(true)] string? token)
+    public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
     {
         if (context == null)
         {
@@ -77,7 +73,7 @@ public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
 
         if (string.IsNullOrWhiteSpace(token) || !context.Request.Cookies.TryGetValue(token, out var cookieValue))
         {
-            _logger.LogDebug("Couldn't find the captcha cookie in the request.");
+            _logger.LogDebug(message: "Couldn't find the captcha cookie in the request.");
 
             return null;
         }
@@ -86,7 +82,7 @@ public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
 
         if (string.IsNullOrWhiteSpace(cookieValue))
         {
-            _logger.LogDebug("Couldn't find the captcha cookie's value in the request.");
+            _logger.LogDebug(message: "Couldn't find the captcha cookie's value in the request.");
 
             return null;
         }
@@ -106,14 +102,14 @@ public class CookieCaptchaStorageProvider : ICaptchaStorageProvider
     {
         if (Contains(context, token))
         {
-            context.Response.Cookies.Delete(token, getCookieOptions(context));
+            context.Response.Cookies.Delete(token, GetCookieOptions(context));
         }
     }
 
     /// <summary>
     ///     Expires at the end of the browser's session.
     /// </summary>
-    private CookieOptions getCookieOptions(HttpContext context)
+    private CookieOptions GetCookieOptions(HttpContext context)
         => new()
         {
             HttpOnly = true,

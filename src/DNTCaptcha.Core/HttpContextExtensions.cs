@@ -26,7 +26,7 @@ public static class HttpContextExtensions
         //
         if (tryUseXForwardHeader)
         {
-            ip = SplitCsv(GetHeaderValue(httpContext, "X-Forwarded-For")).FirstOrDefault();
+            ip = SplitCsv(GetHeaderValue(httpContext, headerName: "X-Forwarded-For")).FirstOrDefault();
         }
 
         // RemoteIpAddress is always null in DNX RC1 Update1 (bug).
@@ -37,21 +37,16 @@ public static class HttpContextExtensions
 
         if (string.IsNullOrWhiteSpace(ip))
         {
-            ip = GetHeaderValue(httpContext, "REMOTE_ADDR");
+            ip = GetHeaderValue(httpContext, headerName: "REMOTE_ADDR");
         }
 
         return ip ?? "unknown";
     }
 
     private static List<string> SplitCsv(string? csvList)
-    {
-        if (string.IsNullOrWhiteSpace(csvList))
-        {
-            return new List<string>();
-        }
-
-        return csvList.TrimEnd(',').Split(',').AsEnumerable().Select(s => s.Trim()).ToList();
-    }
+        => string.IsNullOrWhiteSpace(csvList)
+            ? []
+            : csvList.TrimEnd(trimChar: ',').Split(separator: ',').AsEnumerable().Select(s => s.Trim()).ToList();
 
     private static string? GetHeaderValue(HttpContext httpContext, string headerName)
     {

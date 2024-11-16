@@ -9,34 +9,31 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Validates the input number.
 /// </summary>
-public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
+/// <remarks>
+///     Validates the input number.
+/// </remarks>
+public class DNTCaptchaValidatorService(
+    IHttpContextAccessor contextAccessor,
+    ILogger<DNTCaptchaValidatorService> logger,
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    ICaptchaStorageProvider captchaStorageProvider,
+    IOptions<DNTCaptchaOptions> options) : IDNTCaptchaValidatorService
 {
-    private readonly DNTCaptchaOptions _captchaOptions;
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly ICaptchaStorageProvider _captchaStorageProvider;
-    private readonly IHttpContextAccessor _contextAccessor;
-    private readonly ILogger<DNTCaptchaValidatorService> _logger;
+    private readonly DNTCaptchaOptions _captchaOptions =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
-    /// <summary>
-    ///     Validates the input number.
-    /// </summary>
-    public DNTCaptchaValidatorService(IHttpContextAccessor contextAccessor,
-        ILogger<DNTCaptchaValidatorService> logger,
-        ICaptchaCryptoProvider captchaProtectionProvider,
-        ICaptchaStorageProvider captchaStorageProvider,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
+    private readonly ICaptchaStorageProvider _captchaStorageProvider =
+        captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
 
-        _captchaStorageProvider =
-            captchaStorageProvider ?? throw new ArgumentNullException(nameof(captchaStorageProvider));
+    private readonly IHttpContextAccessor _contextAccessor =
+        contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
 
-        _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
-        _captchaOptions = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-    }
+    private readonly ILogger<DNTCaptchaValidatorService> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
     ///     Validates the input number.
@@ -51,25 +48,25 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
             return false;
         }
 
-        if (!shouldValidate(httpContext))
+        if (!ShouldValidate(httpContext))
         {
-            _logger.LogDebug("Ignoring ValidateDNTCaptcha during `{Method}`.", httpContext.Request.Method);
+            _logger.LogDebug(message: "Ignoring ValidateDNTCaptcha during `{Method}`.", httpContext.Request.Method);
 
             return true;
         }
 
-        var (captchaText, inputText, cookieToken) = getFormValues(httpContext);
+        var (captchaText, inputText, cookieToken) = GetFormValues(httpContext);
 
         if (string.IsNullOrEmpty(captchaText))
         {
-            _logger.LogDebug("CaptchaHiddenInput is empty.");
+            _logger.LogDebug(message: "CaptchaHiddenInput is empty.");
 
             return false;
         }
 
         if (string.IsNullOrEmpty(inputText))
         {
-            _logger.LogDebug("CaptchaInput is empty.");
+            _logger.LogDebug(message: "CaptchaInput is empty.");
 
             return false;
         }
@@ -79,7 +76,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
         if (!int.TryParse(inputText, NumberStyles.AllowDecimalPoint | NumberStyles.AllowThousands,
                 CultureInfo.InvariantCulture, out var inputNumber))
         {
-            _logger.LogDebug("inputText is not a number.");
+            _logger.LogDebug(message: "inputText is not a number.");
 
             return false;
         }
@@ -89,20 +86,20 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (decryptedText?.Equals(numberToText, StringComparison.Ordinal) != true)
         {
-            _logger.LogDebug("decryptedText:{DecryptedText} != numberToText:{NumberToText}", decryptedText,
+            _logger.LogDebug(message: "decryptedText:{DecryptedText} != numberToText:{NumberToText}", decryptedText,
                 numberToText);
 
             return false;
         }
 
-        return isValidCookie(httpContext, decryptedText, cookieToken);
+        return IsValidCookie(httpContext, decryptedText, cookieToken);
     }
 
-    private bool isValidCookie(HttpContext httpContext, string decryptedText, string? cookieToken)
+    private bool IsValidCookie(HttpContext httpContext, string decryptedText, string? cookieToken)
     {
         if (string.IsNullOrEmpty(cookieToken))
         {
-            _logger.LogDebug("CaptchaHiddenTokenName is empty.");
+            _logger.LogDebug(message: "CaptchaHiddenTokenName is empty.");
 
             return false;
         }
@@ -111,7 +108,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (string.IsNullOrEmpty(cookieToken))
         {
-            _logger.LogDebug("CaptchaHiddenTokenName is invalid.");
+            _logger.LogDebug(message: "CaptchaHiddenTokenName is invalid.");
 
             return false;
         }
@@ -120,7 +117,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (string.IsNullOrWhiteSpace(cookieValue))
         {
-            _logger.LogDebug("isValidCookie:: cookieValue IsNullOrWhiteSpace.");
+            _logger.LogDebug(message: "isValidCookie:: cookieValue IsNullOrWhiteSpace.");
 
             return false;
         }
@@ -129,7 +126,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
 
         if (!areEqual)
         {
-            _logger.LogDebug("isValidCookie:: {CookieValue} != {DecryptedText}", cookieValue, decryptedText);
+            _logger.LogDebug(message: "isValidCookie:: {CookieValue} != {DecryptedText}", cookieValue, decryptedText);
         }
 
         _captchaStorageProvider.Remove(httpContext, cookieToken);
@@ -137,7 +134,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
         return areEqual;
     }
 
-    private (string? captchaText, string? inputText, string? cookieToken) getFormValues(HttpContext httpContext)
+    private (string? captchaText, string? inputText, string? cookieToken) GetFormValues(HttpContext httpContext)
     {
         var captchaHiddenInputName = _captchaOptions.CaptchaComponent.CaptchaHiddenInputName;
         var captchaInputName = _captchaOptions.CaptchaComponent.CaptchaInputName;
@@ -151,7 +148,7 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
         }
 
         var form = httpContext.Request.Form ??
-                   throw new InvalidOperationException("`httpContext.Request.Form` is null.");
+                   throw new InvalidOperationException(message: "`httpContext.Request.Form` is null.");
 
         var captchaTextForm = form[captchaHiddenInputName];
         var inputTextForm = form[captchaInputName];
@@ -160,6 +157,6 @@ public class DNTCaptchaValidatorService : IDNTCaptchaValidatorService
         return (captchaTextForm, inputTextForm, cookieTokenForm);
     }
 
-    private static bool shouldValidate(HttpContext context)
-        => string.Equals("POST", context.Request.Method, StringComparison.OrdinalIgnoreCase);
+    private static bool ShouldValidate(HttpContext context)
+        => string.Equals(a: "POST", context.Request.Method, StringComparison.OrdinalIgnoreCase);
 }

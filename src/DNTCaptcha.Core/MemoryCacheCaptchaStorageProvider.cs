@@ -10,30 +10,26 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Represents a memory cache storage to save the captcha tokens.
 /// </summary>
-public class MemoryCacheCaptchaStorageProvider : ICaptchaStorageProvider
+/// <remarks>
+///     Represents the storage to save the captcha tokens.
+/// </remarks>
+public class MemoryCacheCaptchaStorageProvider(
+    ICaptchaCryptoProvider captchaProtectionProvider,
+    IMemoryCache memoryCache,
+    ILogger<MemoryCacheCaptchaStorageProvider> logger,
+    IOptions<DNTCaptchaOptions> options) : ICaptchaStorageProvider
 {
-    private readonly ICaptchaCryptoProvider _captchaProtectionProvider;
-    private readonly ILogger<MemoryCacheCaptchaStorageProvider> _logger;
-    private readonly IMemoryCache _memoryCache;
-    private readonly DNTCaptchaOptions _options;
+    private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
+                                                                         throw new ArgumentNullException(
+                                                                             nameof(captchaProtectionProvider));
 
-    /// <summary>
-    ///     Represents the storage to save the captcha tokens.
-    /// </summary>
-    public MemoryCacheCaptchaStorageProvider(ICaptchaCryptoProvider captchaProtectionProvider,
-        IMemoryCache memoryCache,
-        ILogger<MemoryCacheCaptchaStorageProvider> logger,
-        IOptions<DNTCaptchaOptions> options)
-    {
-        _captchaProtectionProvider = captchaProtectionProvider ??
-                                     throw new ArgumentNullException(nameof(captchaProtectionProvider));
+    private readonly ILogger<MemoryCacheCaptchaStorageProvider> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+    private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
 
-        _logger.LogDebug("Using the MemoryCacheCaptchaStorageProvider.");
-    }
+    private readonly DNTCaptchaOptions _options =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -62,7 +58,7 @@ public class MemoryCacheCaptchaStorageProvider : ICaptchaStorageProvider
     /// <returns>
     ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
     /// </returns>
-    public bool Contains(HttpContext context, [NotNullWhen(true)] string? token)
+    public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
         => !string.IsNullOrWhiteSpace(token) && _memoryCache.TryGetValue(token, out string? _);
 
     /// <summary>
@@ -75,7 +71,7 @@ public class MemoryCacheCaptchaStorageProvider : ICaptchaStorageProvider
         if (string.IsNullOrWhiteSpace(token) || !_memoryCache.TryGetValue(token, out string? cookieValue) ||
             cookieValue is null)
         {
-            _logger.LogDebug("Couldn't find the captcha cookie in the request.");
+            _logger.LogDebug(message: "Couldn't find the captcha cookie in the request.");
 
             return null;
         }

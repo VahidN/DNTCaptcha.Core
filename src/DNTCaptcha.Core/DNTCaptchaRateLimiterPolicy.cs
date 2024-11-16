@@ -1,4 +1,4 @@
-﻿#if NET7_0 || NET8_0
+﻿#if NET7_0 || NET8_0 || NET9_0
 using System;
 using System.Globalization;
 using System.Threading;
@@ -20,12 +20,6 @@ public class DNTCaptchaRateLimiterPolicy : IRateLimiterPolicy<string>
     /// </summary>
     public const string Name = "DNTCaptcha-RateLimiter-Policy";
 
-    /// <summary>
-    ///     The response that is sent to user when rate limit has exceeded.
-    /// </summary>
-    private static string? _rejectedResponse { get; set; } = string.Empty;
-    private static bool? _rejectedResponseType { get; set; } = false;
-
     private readonly DNTCaptchaOptions _options;
 
     /// <summary>
@@ -34,41 +28,56 @@ public class DNTCaptchaRateLimiterPolicy : IRateLimiterPolicy<string>
     public DNTCaptchaRateLimiterPolicy(IOptions<DNTCaptchaOptions> options)
     {
         _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-        _rejectedResponse = _options.RateLimiterRejectedResponse;
-        if (!string.IsNullOrEmpty(_rejectedResponse))
+        RejectedResponse = _options.RateLimiterRejectedResponse;
+
+        if (!string.IsNullOrEmpty(RejectedResponse))
         {
-            _rejectedResponse = _rejectedResponse.Replace("/TimeoutWindow/", "1", StringComparison.OrdinalIgnoreCase).Replace("/PermitLimit/", _options.PermitLimit.ToString(CultureInfo.InvariantCulture), StringComparison.OrdinalIgnoreCase);
-            _rejectedResponseType = _options.RateLimiterRejectedResponseType;
+            RejectedResponse = RejectedResponse
+                .Replace(oldValue: "/TimeoutWindow/", newValue: "1", StringComparison.OrdinalIgnoreCase)
+                .Replace(oldValue: "/PermitLimit/", _options.PermitLimit.ToString(CultureInfo.InvariantCulture),
+                    StringComparison.OrdinalIgnoreCase);
+
+            RejectedResponseType = _options.RateLimiterRejectedResponseType;
         }
     }
 
+    /// <summary>
+    ///     The response that is sent to user when rate limit has exceeded.
+    /// </summary>
+    private static string? RejectedResponse { get; set; } = string.Empty;
+
+    private static bool? RejectedResponseType { get; set; } = false;
+
     /// <inheritdoc />
-    public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected { get; } = async (context, cancellationToken) =>
-    {
-        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-            context.HttpContext.Response.Headers.RetryAfter =
-                ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
-
-        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
-
-        if (!string.IsNullOrEmpty(_rejectedResponse) && _rejectedResponseType != null)
+    public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected { get; } =
+        async (context, cancellationToken) =>
         {
-            context.HttpContext.Response.Headers.ContentType = (bool)_rejectedResponseType ? "application/json" : "text/plain";
-            await context.HttpContext.Response.WriteAsync(_rejectedResponse);
-        }
-    };
+            if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+            {
+                context.HttpContext.Response.Headers.RetryAfter =
+                    ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+            }
+
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+
+            if (!string.IsNullOrEmpty(RejectedResponse) && RejectedResponseType != null)
+            {
+                context.HttpContext.Response.Headers.ContentType =
+                    (bool)RejectedResponseType ? "application/json" : "text/plain";
+
+                await context.HttpContext.Response.WriteAsync(RejectedResponse);
+            }
+        };
 
     /// <inheritdoc />
     public RateLimitPartition<string> GetPartition(HttpContext httpContext)
-    {
-        return RateLimitPartition.GetFixedWindowLimiter(httpContext.GetClientIP(),
-            partition => new FixedWindowRateLimiterOptions
+        => RateLimitPartition.GetFixedWindowLimiter(httpContext.GetClientIP(), partition
+            => new FixedWindowRateLimiterOptions
             {
                 AutoReplenishment = true,
                 PermitLimit = _options.PermitLimit,
                 QueueLimit = 0,
-                Window = TimeSpan.FromMinutes(1)
+                Window = TimeSpan.FromMinutes(value: 1)
             });
-    }
 }
 #endif

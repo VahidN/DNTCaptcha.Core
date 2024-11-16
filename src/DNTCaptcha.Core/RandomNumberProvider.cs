@@ -14,8 +14,7 @@ public class RandomNumberProvider : IRandomNumberProvider
     ///     Fills an array of bytes with a cryptographically strong random sequence of values.
     /// </summary>
     /// <param name="randomBytes"></param>
-    public void NextBytes(byte[] randomBytes)
-        => _rand.GetBytes(randomBytes);
+    public void NextBytes(byte[] randomBytes) => _rand.GetBytes(randomBytes);
 
     /// <summary>
     ///     Generates a random non-negative number.
@@ -34,7 +33,7 @@ public class RandomNumberProvider : IRandomNumberProvider
     public int NextNumber()
     {
         var randb = NextBytes();
-        var value = BitConverter.ToInt32(randb, 0);
+        var value = BitConverter.ToInt32(randb, startIndex: 0);
 
         if (value < 0)
         {
@@ -52,8 +51,8 @@ public class RandomNumberProvider : IRandomNumberProvider
     {
         var randb = new byte[4];
         _rand.GetBytes(randb);
-        var value = BitConverter.ToInt32(randb, 0);
-        value = value % (max + 1); // % calculates remainder
+        var value = BitConverter.ToInt32(randb, startIndex: 0);
+        value %= max + 1; // % calculates remainder
 
         if (value < 0)
         {

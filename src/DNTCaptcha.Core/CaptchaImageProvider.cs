@@ -13,37 +13,31 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     The default captcha image provider
 /// </summary>
-public class CaptchaImageProvider : ICaptchaImageProvider
+/// <remarks>
+///     The default captcha image provider
+/// </remarks>
+public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IOptions<DNTCaptchaOptions> options)
+    : ICaptchaImageProvider
 {
     private const int TextMargin = 5;
 
     private static readonly ConcurrentDictionary<string, SKTypeface> FontsTypeface =
         new(StringComparer.OrdinalIgnoreCase);
 
-    private readonly DNTCaptchaOptions _options;
-    private readonly IRandomNumberProvider _randomNumberProvider;
+    private readonly DNTCaptchaOptions _options =
+        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
-    /// <summary>
-    ///     The default captcha image provider
-    /// </summary>
-    public CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IOptions<DNTCaptchaOptions> options)
-    {
-        _randomNumberProvider = randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
-    }
+    private readonly IRandomNumberProvider _randomNumberProvider =
+        randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
 
     /// <summary>
     ///     Creates the captcha image.
     /// </summary>
     public byte[] DrawCaptcha(string text, string foreColor, string backColor, float fontSize, string fontName)
     {
-        var fontType = GetFont(fontName, _options.CustomFontPath);
-
-        if (fontType is null)
-        {
-            throw new InvalidOperationException(
-                "`fontType` is null. It's better to set this option first: .UseCustomFont(Path.Combine(env.WebRootPath, \"fonts\", \"my-font.ttf\")); ");
-        }
+        var fontType = GetFont(fontName, _options.CustomFontPath) ?? throw new InvalidOperationException(
+            message:
+            "`fontType` is null. It's better to set this option first: .UseCustomFont(Path.Combine(env.WebRootPath, \"fonts\", \"my-font.ttf\")); ");
 
         using var shaper = new SKShaper(fontType);
 
@@ -91,7 +85,9 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     {
         using var copy = new SKBitmap();
         pic.CopyTo(copy);
-        double distort = _randomNumberProvider.NextNumber(1, 6) * (_randomNumberProvider.NextNumber(2) == 1 ? 1 : -1);
+
+        double distort = _randomNumberProvider.NextNumber(min: 1, max: 6) *
+                         (_randomNumberProvider.NextNumber(max: 2) == 1 ? 1 : -1);
 
         for (var y = 0; y < height; y++)
         {
@@ -129,7 +125,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
     private static float GetTextWidth(string text, float fontSize, SKPaint textPaint)
     {
         using var blob = textPaint.Typeface.OpenStream().ToHarfBuzzBlob();
-        using var hbFace = new Face(blob, 0);
+        using var hbFace = new Face(blob, index: 0);
         using var hbFont = new Font(hbFace);
         using var buffer = new Buffer();
         buffer.AddUtf16(text);
@@ -160,7 +156,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
 
         textPaint.Color = SKColors.LightGray;
 
-        switch (_randomNumberProvider.NextNumber(1, 4))
+        switch (_randomNumberProvider.NextNumber(min: 1, max: 4))
         {
             case 1:
                 canvas.DrawShapedText(shaper, text, x - 1, y - 1, textPaint);
@@ -193,7 +189,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
             StrokeWidth = 1f
         };
 
-        canvas.DrawRect(new SKRect(0, 0, width + 2 * TextMargin - 1, height + 2 * TextMargin - 1), skPaint);
+        canvas.DrawRect(new SKRect(left: 0, top: 0, width + 2 * TextMargin - 1, height + 2 * TextMargin - 1), skPaint);
     }
 
     private static SKTypeface GetFont(string fontName, string? customFontPath)
@@ -213,7 +209,7 @@ public class CaptchaImageProvider : ICaptchaImageProvider
 
     private static byte[] ToPng(SKBitmap bitmap)
     {
-        using var data = bitmap.Encode(SKEncodedImageFormat.Png, 100);
+        using var data = bitmap.Encode(SKEncodedImageFormat.Png, quality: 100);
         using var memory = new MemoryStream();
         data.SaveTo(memory);
 

@@ -7,7 +7,8 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Allow changing the route's template dynamically at run-time.
 /// </summary>
-public class ControllerRoutingConvention(Type controllerType, string? routeTemplate, string? nameTemplate) : IControllerModelConvention
+public class ControllerRoutingConvention(Type controllerType, string? routeTemplate, string? nameTemplate)
+    : IControllerModelConvention
 {
     /// <inheritdoc />
     public void Apply(ControllerModel controller)
@@ -15,10 +16,14 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
         ArgumentNullException.ThrowIfNull(controller);
 
         if (HasRouteAttributes(controller))
+        {
             return;
+        }
 
         if (!IsControllerInstance(controllerType, controller))
+        {
             return;
+        }
 
         ApplyNewRouteDynamically(controller);
         ApplyNewNameDynamically(controller);
@@ -26,8 +31,10 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
 
     private void ApplyNewNameDynamically(ControllerModel controllerModel)
     {
-        if (String.IsNullOrEmpty(nameTemplate))
+        if (string.IsNullOrEmpty(nameTemplate))
+        {
             return;
+        }
 
         controllerModel.ControllerName = nameTemplate;
     }
@@ -35,7 +42,9 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
     private void ApplyNewRouteDynamically(ControllerModel controllerModel)
     {
         if (string.IsNullOrWhiteSpace(routeTemplate))
+        {
             return;
+        }
 
         foreach (var selector in controllerModel.Selectors)
         {
@@ -52,7 +61,7 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
     private static bool IsControllerInstance(Type controller, ControllerModel controllerModel)
     {
         var controllerName =
-            controller.Name.Replace("Controller", "", StringComparison.OrdinalIgnoreCase);
+            controller.Name.Replace(oldValue: "Controller", newValue: "", StringComparison.OrdinalIgnoreCase);
 
         return string.Equals(controllerModel.ControllerType.Namespace, controller.Namespace,
             StringComparison.OrdinalIgnoreCase) && string.Equals(controllerModel.ControllerName, controllerName,

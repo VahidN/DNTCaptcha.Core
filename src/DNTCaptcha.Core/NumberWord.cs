@@ -20,5 +20,5 @@ public class NumberWord
     /// <summary>
     ///     Equivalent names
     /// </summary>
-    public IReadOnlyList<string> Names { set; get; } = new List<string>();
+    public IReadOnlyList<string> Names { set; get; } = [];
 }
