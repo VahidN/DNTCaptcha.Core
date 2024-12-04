@@ -46,19 +46,18 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
             skColor = SKColors.Black;
         }
 
-        using var textPaint = new SKPaint
-        {
-            IsAntialias = true,
-            FilterQuality = SKFilterQuality.High,
-            TextSize = fontSize,
-            Color = skColor,
-            TextAlign = SKTextAlign.Left,
-            Typeface = fontType,
-            SubpixelText = true
-        };
+        using var textPaint = new SKPaint();
+        textPaint.Color = skColor;
+        textPaint.IsAntialias = true;
+        textPaint.Style = SKPaintStyle.Fill;
 
-        var textBounds = GetTextBounds(text, textPaint);
-        var width = GetTextWidth(text, fontSize, textPaint);
+        using var font = new SKFont();
+        font.Size = fontSize;
+        font.Typeface = fontType;
+        font.Subpixel = true;
+
+        var textBounds = GetTextBounds(text, font, textPaint);
+        var width = GetTextWidth(text, fontSize, fontType);
 
         var imageWidth = (int)width + 2 * TextMargin;
         var imageHeight = (int)textBounds.Height + 2 * TextMargin;
@@ -73,7 +72,7 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
 
         canvas.Clear(skBackColor);
 
-        DrawText(text, canvas, shaper, textPaint, textBounds);
+        DrawText(text, canvas, shaper, textPaint, textBounds, SKTextAlign.Left, font);
         AddWaves(imageWidth, imageHeight, sKBitmap);
         CreateNoises(canvas);
         DrawRectangle(canvas, width, textBounds.Height);
@@ -122,9 +121,9 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
         canvas.DrawPaint(paint);
     }
 
-    private static float GetTextWidth(string text, float fontSize, SKPaint textPaint)
+    private static float GetTextWidth(string text, float fontSize, SKTypeface typeface)
     {
-        using var blob = textPaint.Typeface.OpenStream().ToHarfBuzzBlob();
+        using var blob = typeface.OpenStream().ToHarfBuzzBlob();
         using var hbFace = new Face(blob, index: 0);
         using var hbFont = new Font(hbFace);
         using var buffer = new Buffer();
@@ -139,42 +138,47 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
         return width;
     }
 
-    private static SKRect GetTextBounds(string text, SKPaint textPaint)
+    private static SKRect GetTextBounds(string text, SKFont font, SKPaint textPaint)
     {
-        var textBounds = new SKRect();
-        textPaint.MeasureText(text, ref textBounds);
+        font.MeasureText(text, out var textBounds, textPaint);
 
         return textBounds;
     }
 
-    private void DrawText(string text, SKCanvas canvas, SKShaper shaper, SKPaint textPaint, SKRect textBounds)
+    private void DrawText(string text,
+        SKCanvas canvas,
+        SKShaper shaper,
+        SKPaint textPaint,
+        SKRect textBounds,
+        SKTextAlign textAlign,
+        SKFont font)
     {
         var x = TextMargin + textBounds.Left;
         var y = Math.Abs(textBounds.Top) + TextMargin;
 
-        canvas.DrawShapedText(shaper, text, x, y, textPaint);
+        canvas.DrawShapedText(shaper, text, x, y, textAlign, font, textPaint);
 
         textPaint.Color = SKColors.LightGray;
 
         switch (_randomNumberProvider.NextNumber(min: 1, max: 4))
         {
             case 1:
-                canvas.DrawShapedText(shaper, text, x - 1, y - 1, textPaint);
+                canvas.DrawShapedText(shaper, text, x - 1, y - 1, textAlign, font, textPaint);
 
                 break;
 
             case 2:
-                canvas.DrawShapedText(shaper, text, x + 1, y - 1, textPaint);
+                canvas.DrawShapedText(shaper, text, x + 1, y - 1, textAlign, font, textPaint);
 
                 break;
 
             case 3:
-                canvas.DrawShapedText(shaper, text, x - 1, y + 1, textPaint);
+                canvas.DrawShapedText(shaper, text, x - 1, y + 1, textAlign, font, textPaint);
 
                 break;
 
             case 4:
-                canvas.DrawShapedText(shaper, text, x + 1, y + 1, textPaint);
+                canvas.DrawShapedText(shaper, text, x + 1, y + 1, textAlign, font, textPaint);
 
                 break;
         }
@@ -182,12 +186,10 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
 
     private static void DrawRectangle(SKCanvas canvas, float width, float height)
     {
-        using var skPaint = new SKPaint
-        {
-            Color = SKColors.LightGray,
-            IsStroke = true,
-            StrokeWidth = 1f
-        };
+        using var skPaint = new SKPaint();
+        skPaint.Color = SKColors.LightGray;
+        skPaint.IsStroke = true;
+        skPaint.StrokeWidth = 1f;
 
         canvas.DrawRect(new SKRect(left: 0, top: 0, width + 2 * TextMargin - 1, height + 2 * TextMargin - 1), skPaint);
     }
