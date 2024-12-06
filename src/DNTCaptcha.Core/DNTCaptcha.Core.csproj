@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-        <VersionPrefix>5.2.9</VersionPrefix>
+        <VersionPrefix>5.2.10</VersionPrefix>
         <Authors>Vahid Nasiri</Authors>
         <TargetFrameworks>net9.0;net8.0;net7.0;net6.0;</TargetFrameworks>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -79,10 +79,10 @@
     </ItemGroup>
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-        <PackageReference Include="SkiaSharp" Version="3.116.0"/>
-        <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.116.0"/>
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.0" />
-        <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.0" />
+        <PackageReference Include="SkiaSharp" Version="3.116.1"/>
+        <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.116.1"/>
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
+        <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.0.1" />
     </ItemGroup>
     <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <DefineConstants>NET6_0</DefineConstants>
