@@ -220,12 +220,6 @@ namespace DNTCaptcha.TestWebApp.Controllers
         }
 ```
 
-- If you use `Swagger` make sure to install [Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting](https://github.com/chsakell/Swashbuckle.AspNetCore.SwaggerGen.ConventionalRouting) Nuget Package and add it like so:
-
-```csharp
-services.AddSwaggerGenWithConventionalRoutes();
-```
-
 ## How to choose a correct storage mode
 
 If your environment is distributed and you are using a `Session (UseSessionStorageProvider())`
