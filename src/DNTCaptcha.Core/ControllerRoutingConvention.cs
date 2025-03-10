@@ -26,17 +26,6 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
         }
 
         ApplyNewRouteDynamically(controller);
-        ApplyNewNameDynamically(controller);
-    }
-
-    private void ApplyNewNameDynamically(ControllerModel controllerModel)
-    {
-        if (string.IsNullOrEmpty(nameTemplate))
-        {
-            return;
-        }
-
-        controllerModel.ControllerName = nameTemplate;
     }
 
     private void ApplyNewRouteDynamically(ControllerModel controllerModel)
@@ -46,11 +35,12 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
             return;
         }
 
-        foreach (var selector in controllerModel.Selectors)
+        foreach (var action in controllerModel.Actions)
         {
-            selector.AttributeRouteModel = new AttributeRouteModel
+            action.Selectors[0].AttributeRouteModel = new AttributeRouteModel
             {
-                Template = routeTemplate
+                Template = routeTemplate,
+                Name = $"{nameTemplate}-{action.ActionName}"
             };
         }
     }

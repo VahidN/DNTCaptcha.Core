@@ -361,6 +361,11 @@ public class DNTCaptchaOptions
     /// <returns></returns>
     public DNTCaptchaOptions WithCaptchaImageControllerRouteTemplate(string template)
     {
+        if (string.IsNullOrWhiteSpace(template) || !template.Contains("[action]", StringComparison.Ordinal))
+        {
+            throw new ArgumentException("Route template must contain the '[action]' placeholder.", nameof(template));
+        }
+
         CaptchaImageControllerRouteTemplate = template;
 
         return this;

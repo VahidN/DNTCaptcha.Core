@@ -59,6 +59,8 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
                 10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
             .ShowThousandsSeparators(false).WithNoise(0.015f, 0.015f, 1, 0.0f)
             .WithEncryptionKey("This is my secure key!").WithNonceKey("NETESCAPADES_NONCE")
+            .WithCaptchaImageControllerNameTemplate("my-custom-captcha")
+            // The route template must contain [action] placeholder
             .WithCaptchaImageControllerRouteTemplate("my-custom-captcha/[action]")
             .InputNames( // This is optional. Change it if you don't like the default names.
                 new DNTCaptchaComponent
