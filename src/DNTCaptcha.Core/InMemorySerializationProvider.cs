@@ -31,13 +31,13 @@ public class InMemorySerializationProvider : ISerializationProvider
         IOptions<DNTCaptchaOptions> options)
     {
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        _options = options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
         _captchaProtectionProvider = captchaProtectionProvider ??
                                      throw new ArgumentNullException(nameof(captchaProtectionProvider));
 
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        logger.LogDebug("Using the InMemorySerializationProvider.");
+        logger.LogDebug(message: "Using the InMemorySerializationProvider.");
     }
 
     /// <summary>
@@ -65,6 +65,7 @@ public class InMemorySerializationProvider : ISerializationProvider
         if (!_memoryCache.TryGetValue(data, out string? result) || result is null)
         {
             _logger.LogDebug(
+                message:
                 "The registered memory cache provider returned null. Which means your data is expired. Please read the `How to choose a correct storage mode` in the readme file. Probably a local `memory cache` shouldn't be used with your distributed servers.");
 
             return default;

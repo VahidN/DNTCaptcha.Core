@@ -15,10 +15,7 @@ public static class HtmlHelperExtensions
     /// </summary>
     public static string GetString(this IHtmlContent content)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
 
         using var writer = new StringWriter();
         content.WriteTo(writer, HtmlEncoder.Default);

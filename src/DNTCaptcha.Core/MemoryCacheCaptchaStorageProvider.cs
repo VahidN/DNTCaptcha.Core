@@ -29,7 +29,7 @@ public class MemoryCacheCaptchaStorageProvider(
     private readonly IMemoryCache _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
 
     private readonly DNTCaptchaOptions _options =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -56,7 +56,8 @@ public class MemoryCacheCaptchaStorageProvider(
     /// <param name="context"></param>
     /// <param name="token">The specified token.</param>
     /// <returns>
-    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
+    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <see langword="false" />
+    ///     .
     /// </returns>
     public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
         => !string.IsNullOrWhiteSpace(token) && _memoryCache.TryGetValue(token, out string? _);

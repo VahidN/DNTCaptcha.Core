@@ -25,7 +25,7 @@ public class CookieCaptchaStorageProvider(
         logger ?? throw new ArgumentNullException(nameof(logger));
 
     private readonly DNTCaptchaOptions _options =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -47,14 +47,12 @@ public class CookieCaptchaStorageProvider(
     /// <param name="context"></param>
     /// <param name="token">The specified token.</param>
     /// <returns>
-    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
+    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <see langword="false" />
+    ///     .
     /// </returns>
     public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         return !string.IsNullOrWhiteSpace(token) && context.Request.Cookies.ContainsKey(token);
     }
@@ -66,10 +64,7 @@ public class CookieCaptchaStorageProvider(
     /// <param name="token">The specified token.</param>
     public string? GetValue(HttpContext context, string? token)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         if (string.IsNullOrWhiteSpace(token) || !context.Request.Cookies.TryGetValue(token, out var cookieValue))
         {

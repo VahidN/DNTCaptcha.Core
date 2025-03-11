@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.Extensions.Options;
-using static System.FormattableString;
 
 namespace DNTCaptcha.Core;
 
@@ -34,7 +33,7 @@ public class DNTCaptchaTagHelper(
     private readonly IAntiforgery _antiforgery = antiforgery ?? throw new ArgumentNullException(nameof(antiforgery));
 
     private readonly DNTCaptchaOptions _captchaOptions =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
                                                                          throw new ArgumentNullException(
@@ -96,17 +95,11 @@ public class DNTCaptchaTagHelper(
     /// </summary>
     public void Process(TagHelperContext context, TagHelperOutput output)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
-        if (output == null)
-        {
-            throw new ArgumentNullException(nameof(output));
-        }
+        ArgumentNullException.ThrowIfNull(output);
 
-        if (ViewContext == null)
+        if (ViewContext is null)
         {
             throw new InvalidOperationException(message: "`ViewContext` is null.");
         }
@@ -116,8 +109,8 @@ public class DNTCaptchaTagHelper(
         output.TagName = "div";
         output.Attributes.Add(name: "class", _captchaOptions.CaptchaClass);
 
-        var captchaDivId =
-            Invariant($"{_captchaOptions.CaptchaClass}{context.UniqueId}{_randomNumberProvider.NextNumber(Min, Max)}");
+        var captchaDivId = string.Create(CultureInfo.InvariantCulture,
+            $"{_captchaOptions.CaptchaClass}{context.UniqueId}{_randomNumberProvider.NextNumber(Min, Max)}");
 
         output.Attributes.Add(name: "id", captchaDivId);
         output.TagMode = TagMode.StartTagAndEndTag;
@@ -163,7 +156,7 @@ public class DNTCaptchaTagHelper(
     {
         _urlHelper = viewContext.HttpContext.Items.Values.OfType<IUrlHelper>().FirstOrDefault();
 
-        if (_urlHelper == null)
+        if (_urlHelper is null)
         {
             throw new InvalidOperationException(message: "Failed to find the IUrlHelper of ViewContext.HttpContext.");
         }
@@ -201,7 +194,7 @@ public class DNTCaptchaTagHelper(
 
     private TagBuilder GetCaptchaImageTagBuilder(ViewContext viewContext, string encryptedText)
     {
-        if (_urlHelper == null)
+        if (_urlHelper is null)
         {
             throw new InvalidOperationException(message: "Failed to find the IUrlHelper of ViewContext.HttpContext.");
         }
@@ -256,7 +249,7 @@ public class DNTCaptchaTagHelper(
 
     private TagBuilder GetRefreshButtonTagBuilder(ViewContext viewContext, string captchaDivId, string captchaToken)
     {
-        if (_urlHelper == null)
+        if (_urlHelper is null)
         {
             throw new InvalidOperationException(message: "Failed to find the IUrlHelper of ViewContext.HttpContext.");
         }
@@ -372,7 +365,7 @@ public class DNTCaptchaTagHelper(
         {
             var error = captchaInputNameValidationState.Errors.FirstOrDefault();
 
-            if (error != null)
+            if (error is not null)
             {
                 var errorSpan = new TagBuilder(tagName: "span");
                 errorSpan.InnerHtml.AppendHtml(error.ErrorMessage);

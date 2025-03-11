@@ -3,7 +3,6 @@ using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using static System.FormattableString;
 
 namespace DNTCaptcha.Core;
 
@@ -24,7 +23,7 @@ public class DNTCaptchaApiProvider(
     IOptions<DNTCaptchaOptions> options) : IDNTCaptchaApiProvider
 {
     private readonly DNTCaptchaOptions _captchaOptions =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
                                                                          throw new ArgumentNullException(
@@ -53,12 +52,9 @@ public class DNTCaptchaApiProvider(
     /// <param name="captchaAttributes">captcha attributes</param>
     public DNTCaptchaApiResponse CreateDNTCaptcha(DNTCaptchaTagHelperHtmlAttributes captchaAttributes)
     {
-        if (captchaAttributes == null)
-        {
-            throw new ArgumentNullException(nameof(captchaAttributes));
-        }
+        ArgumentNullException.ThrowIfNull(captchaAttributes);
 
-        if (_httpContextAccessor.HttpContext == null)
+        if (_httpContextAccessor.HttpContext is null)
         {
             throw new InvalidOperationException(message: "`_httpContextAccessor.HttpContext` is null.");
         }
@@ -71,9 +67,8 @@ public class DNTCaptchaApiProvider(
         var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
         var captchaImageUrl = GetCaptchaImageUrl(captchaAttributes, encryptedText);
 
-        var captchaDivId =
-            Invariant(
-                $"{_captchaOptions.CaptchaClass}{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}");
+        var captchaDivId = string.Create(CultureInfo.InvariantCulture,
+            $"{_captchaOptions.CaptchaClass}{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}");
 
         var cookieToken = $".{captchaDivId}";
         var hiddenInputToken = _captchaProtectionProvider.Encrypt(cookieToken);
@@ -93,7 +88,7 @@ public class DNTCaptchaApiProvider(
 
     private string GetCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)
     {
-        if (_httpContextAccessor.HttpContext == null)
+        if (_httpContextAccessor.HttpContext is null)
         {
             throw new InvalidOperationException(message: "`_httpContextAccessor.HttpContext` is null.");
         }

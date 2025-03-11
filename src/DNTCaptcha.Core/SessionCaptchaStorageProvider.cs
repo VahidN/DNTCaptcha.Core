@@ -40,14 +40,12 @@ public class SessionCaptchaStorageProvider(
     /// <param name="context"></param>
     /// <param name="token">The specified token.</param>
     /// <returns>
-    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
+    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <see langword="false" />
+    ///     .
     /// </returns>
     public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         return context.Session.Keys.Any(key => string.Equals(key, token, StringComparison.Ordinal));
     }
@@ -59,10 +57,7 @@ public class SessionCaptchaStorageProvider(
     /// <param name="token">The specified token.</param>
     public string? GetValue(HttpContext context, string? token)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         if (string.IsNullOrWhiteSpace(token))
         {

@@ -19,10 +19,7 @@ public static class CaptchaServiceCollectionExtensions
     /// </summary>
     public static void AddDNTCaptcha(this IServiceCollection services, Action<DNTCaptchaOptions>? options = null)
     {
-        if (services == null)
-        {
-            throw new ArgumentNullException(nameof(services));
-        }
+        ArgumentNullException.ThrowIfNull(services);
 
         var configuredOptions = ConfigOptions(services, options);
 

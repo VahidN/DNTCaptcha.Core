@@ -20,7 +20,7 @@ public class DNTCaptchaValidatorService(
     IOptions<DNTCaptchaOptions> options) : IDNTCaptchaValidatorService
 {
     private readonly DNTCaptchaOptions _captchaOptions =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     private readonly ICaptchaCryptoProvider _captchaProtectionProvider = captchaProtectionProvider ??
                                                                          throw new ArgumentNullException(
@@ -43,7 +43,7 @@ public class DNTCaptchaValidatorService(
     {
         var httpContext = _contextAccessor.HttpContext;
 
-        if (httpContext == null)
+        if (httpContext is null)
         {
             return false;
         }

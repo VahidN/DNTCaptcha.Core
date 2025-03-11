@@ -56,7 +56,7 @@ public class ControllerRoutingConvention(Type controllerType, string? routeTempl
     }
 
     private static bool HasRouteAttributes(ControllerModel controllerModel)
-        => controllerModel.Selectors.Any(selector => selector.AttributeRouteModel != null);
+        => controllerModel.Selectors.Any(selector => selector.AttributeRouteModel is not null);
 
     private static bool IsControllerInstance(Type controller, ControllerModel controllerModel)
     {

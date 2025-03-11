@@ -35,7 +35,7 @@ public class DistributedSerializationProvider(
         logger ?? throw new ArgumentNullException(nameof(logger));
 
     private readonly DNTCaptchaOptions _options =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Serialize the given data to an string.
@@ -60,7 +60,7 @@ public class DistributedSerializationProvider(
     {
         var resultBytes = _distributedCache.Get(data);
 
-        if (resultBytes == null)
+        if (resultBytes is null)
         {
             _logger.LogDebug(
                 message: "The registered distributed cache provider returned null. Which means your data is expired.");

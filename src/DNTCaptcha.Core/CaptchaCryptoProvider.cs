@@ -21,10 +21,7 @@ public class CaptchaCryptoProvider : ICaptchaCryptoProvider
     /// </summary>
     public CaptchaCryptoProvider(IOptions<DNTCaptchaOptions> options)
     {
-        if (options == null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
+        ArgumentNullException.ThrowIfNull(options);
 
         _keyBytes = GetDesKey(options.Value.EncryptionKey);
     }
@@ -149,6 +146,6 @@ public class CaptchaCryptoProvider : ICaptchaCryptoProvider
         // The key size of TripleDES is 168 bits, its len in byte is 24 Bytes (or 192 bits).
         // Last bit of each byte is not used (or used as version in some hardware).
         // Key len for TripleDES can also be 112 bits which is again stored in 128 bits or 16 bytes.
-        return Hash(key).HashBytes.Take(count: 24).ToArray();
+        return [.. Hash(key).HashBytes.Take(count: 24)];
     }
 }

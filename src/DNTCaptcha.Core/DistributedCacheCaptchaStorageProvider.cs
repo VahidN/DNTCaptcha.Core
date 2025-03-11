@@ -31,7 +31,7 @@ public class DistributedCacheCaptchaStorageProvider(
         logger ?? throw new ArgumentNullException(nameof(logger));
 
     private readonly DNTCaptchaOptions _options =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     /// <summary>
     ///     Adds the specified token and its value to the storage.
@@ -57,10 +57,11 @@ public class DistributedCacheCaptchaStorageProvider(
     /// <param name="context"></param>
     /// <param name="token">The specified token.</param>
     /// <returns>
-    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <c>false</c>.
+    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <see langword="false" />
+    ///     .
     /// </returns>
     public bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token)
-        => !string.IsNullOrWhiteSpace(token) && _distributedCache.Get(token) != null;
+        => !string.IsNullOrWhiteSpace(token) && _distributedCache.Get(token) is not null;
 
     /// <summary>
     ///     Gets the value associated with the specified token.
@@ -76,7 +77,7 @@ public class DistributedCacheCaptchaStorageProvider(
 
         var cookieValueBytes = _distributedCache.Get(token);
 
-        if (cookieValueBytes == null)
+        if (cookieValueBytes is null)
         {
             _logger.LogDebug(message: "Couldn't find the captcha cookie in the request.");
 

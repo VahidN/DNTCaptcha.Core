@@ -6,7 +6,7 @@ namespace DNTCaptcha.Core;
 /// <summary>
 ///     Provides methods for generating cryptographically-strong random numbers.
 /// </summary>
-public class RandomNumberProvider : IRandomNumberProvider
+public sealed class RandomNumberProvider : IRandomNumberProvider
 {
     private readonly RandomNumberGenerator _rand = RandomNumberGenerator.Create();
 
@@ -74,4 +74,6 @@ public class RandomNumberProvider : IRandomNumberProvider
 
         return value;
     }
+
+    public void Dispose() => _rand.Dispose();
 }

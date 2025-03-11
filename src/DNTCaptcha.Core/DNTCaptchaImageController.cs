@@ -63,7 +63,7 @@ public class DNTCaptchaImageController(
         logger ?? throw new ArgumentNullException(nameof(logger));
 
     private readonly DNTCaptchaOptions _options =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     private readonly ISerializationProvider _serializationProvider =
         serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
@@ -94,14 +94,14 @@ public class DNTCaptchaImageController(
 
             var decryptedModel = _captchaProtectionProvider.Decrypt(data);
 
-            if (decryptedModel == null)
+            if (decryptedModel is null)
             {
                 return BadRequest(CouldntDecryptTheReceivedData);
             }
 
             var model = _serializationProvider.Deserialize<DNTCaptchaTagHelperHtmlAttributes>(decryptedModel);
 
-            if (model == null)
+            if (model is null)
             {
                 return BadRequest(IsYourNetworkDistributed);
             }
@@ -134,7 +134,7 @@ public class DNTCaptchaImageController(
                 }
             }, Guid.NewGuid().ToString(format: "N"));
 
-            var tagHelperOutput = new TagHelperOutput(tagName: "div", [], (useCachedResult, encoder) =>
+            var tagHelperOutput = new TagHelperOutput(tagName: "div", [], (_, _) =>
             {
                 var tagHelperContent = new DefaultTagHelperContent();
                 tagHelperContent.SetContent(string.Empty);
@@ -190,21 +190,21 @@ public class DNTCaptchaImageController(
 
             var decryptedModel = _captchaProtectionProvider.Decrypt(data);
 
-            if (decryptedModel == null)
+            if (decryptedModel is null)
             {
                 return BadRequest(CouldntDecryptTheReceivedData);
             }
 
             var model = _serializationProvider.Deserialize<CaptchaImageParams>(decryptedModel);
 
-            if (model == null)
+            if (model is null)
             {
                 return BadRequest(IsYourNetworkDistributed);
             }
 
             var decryptedText = _captchaProtectionProvider.Decrypt(model.Text);
 
-            if (decryptedText == null)
+            if (decryptedText is null)
             {
                 return BadRequest(error: "Couldn't decrypt the text.");
             }

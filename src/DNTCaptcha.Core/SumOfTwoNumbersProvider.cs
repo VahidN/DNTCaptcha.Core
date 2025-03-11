@@ -1,4 +1,4 @@
-using static System.FormattableString;
+using System.Globalization;
 
 namespace DNTCaptcha.Core;
 
@@ -21,7 +21,7 @@ public class SumOfTwoNumbersProvider(IRandomNumberProvider randomNumberProvider)
         var randomNumber = randomNumberProvider.NextNumber(min: 1, number);
 
         return number > randomNumber
-            ? Invariant($"{number - randomNumber} + {randomNumber}")
-            : Invariant($"0 + {number}");
+            ? string.Create(CultureInfo.InvariantCulture, $"{number - randomNumber} + {randomNumber}")
+            : string.Create(CultureInfo.InvariantCulture, $"0 + {number}");
     }
 }

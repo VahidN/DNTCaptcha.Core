@@ -25,7 +25,7 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
         new(StringComparer.OrdinalIgnoreCase);
 
     private readonly DNTCaptchaOptions _options =
-        options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
 
     private readonly IRandomNumberProvider _randomNumberProvider =
         randomNumberProvider ?? throw new ArgumentNullException(nameof(randomNumberProvider));
@@ -59,8 +59,8 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
         var textBounds = GetTextBounds(text, font, textPaint);
         var width = GetTextWidth(text, fontSize, fontType);
 
-        var imageWidth = (int)width + 2 * TextMargin;
-        var imageHeight = (int)textBounds.Height + 2 * TextMargin;
+        var imageWidth = (int)width + (2 * TextMargin);
+        var imageHeight = (int)textBounds.Height + (2 * TextMargin);
 
         using var sKBitmap = new SKBitmap(imageWidth, imageHeight);
         using var canvas = new SKCanvas(sKBitmap);
@@ -93,8 +93,8 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
             for (var x = 0; x < width; x++)
             {
                 // Adds a simple wave
-                var newX = (int)(x + distort * Math.Sin(Math.PI * y / 84.0));
-                var newY = (int)(y + distort * Math.Cos(Math.PI * x / 44.0));
+                var newX = (int)(x + (distort * Math.Sin(Math.PI * y / 84.0)));
+                var newY = (int)(y + (distort * Math.Cos(Math.PI * x / 44.0)));
 
                 if (newX < 0 || newX >= width)
                 {
@@ -123,7 +123,8 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
 
     private static float GetTextWidth(string text, float fontSize, SKTypeface typeface)
     {
-        using var blob = typeface.OpenStream().ToHarfBuzzBlob();
+        using var skStreamAsset = typeface.OpenStream();
+        using var blob = skStreamAsset.ToHarfBuzzBlob();
         using var hbFace = new Face(blob, index: 0);
         using var hbFont = new Font(hbFace);
         using var buffer = new Buffer();
@@ -191,7 +192,8 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
         skPaint.IsStroke = true;
         skPaint.StrokeWidth = 1f;
 
-        canvas.DrawRect(new SKRect(left: 0, top: 0, width + 2 * TextMargin - 1, height + 2 * TextMargin - 1), skPaint);
+        canvas.DrawRect(new SKRect(left: 0, top: 0, width + (2 * TextMargin) - 1, height + (2 * TextMargin) - 1),
+            skPaint);
     }
 
     private static SKTypeface GetFont(string fontName, string? customFontPath)
@@ -205,7 +207,7 @@ public class CaptchaImageProvider(IRandomNumberProvider randomNumberProvider, IO
         {
             using var embeddedFont = File.OpenRead(key);
 
-            return SKTypeface.FromStream(File.OpenRead(key));
+            return SKTypeface.FromStream(embeddedFont);
         });
     }
 

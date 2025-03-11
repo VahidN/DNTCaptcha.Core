@@ -22,10 +22,7 @@ public class ValidateDNTCaptchaAttribute : ActionFilterAttribute
     /// </summary>
     public override void OnActionExecuting(ActionExecutingContext context)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
         var httpContext = context.HttpContext ?? throw new InvalidOperationException(message: "httpContext is null.");
         var validatorService = httpContext.RequestServices.GetRequiredService<IDNTCaptchaValidatorService>();

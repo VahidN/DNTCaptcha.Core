@@ -15,20 +15,13 @@ public static class ProvidersExtensions
     /// </summary>
     public static string GetSalt(this HttpContext context, ICaptchaCryptoProvider captchaProtectionProvider)
     {
-        if (context == null)
-        {
-            throw new ArgumentNullException(nameof(context));
-        }
+        ArgumentNullException.ThrowIfNull(context);
 
-        if (captchaProtectionProvider == null)
-        {
-            throw new ArgumentNullException(nameof(captchaProtectionProvider));
-        }
+        ArgumentNullException.ThrowIfNull(captchaProtectionProvider);
 
         var userAgent = context.Request.Headers[HeaderNames.UserAgent].ToString();
-        var issueDate = DateTime.Now.ToString("yyyy_MM_dd", CultureInfo.InvariantCulture);
-        var name = nameof(ProvidersExtensions);
-        var salt = $"::{issueDate}::{name}::{userAgent}";
+        var issueDate = DateTime.Now.ToString(format: "yyyy_MM_dd", CultureInfo.InvariantCulture);
+        var salt = $"::{issueDate}::{nameof(ProvidersExtensions)}::{userAgent}";
 
         return captchaProtectionProvider.Hash(salt).HashString;
     }

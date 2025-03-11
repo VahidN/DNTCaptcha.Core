@@ -1,9 +1,11 @@
-﻿namespace DNTCaptcha.Core;
+﻿using System;
+
+namespace DNTCaptcha.Core;
 
 /// <summary>
 ///     Provides methods for generating cryptographically-strong random numbers.
 /// </summary>
-public interface IRandomNumberProvider
+public interface IRandomNumberProvider : IDisposable
 {
     /// <summary>
     ///     Fills an array of bytes with a cryptographically strong random sequence of values.

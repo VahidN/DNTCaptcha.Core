@@ -27,7 +27,7 @@ public class DNTCaptchaRateLimiterPolicy : IRateLimiterPolicy<string>
     /// </summary>
     public DNTCaptchaRateLimiterPolicy(IOptions<DNTCaptchaOptions> options)
     {
-        _options = options == null ? throw new ArgumentNullException(nameof(options)) : options.Value;
+        _options = options is null ? throw new ArgumentNullException(nameof(options)) : options.Value;
         RejectedResponse = _options.RateLimiterRejectedResponse;
 
         if (!string.IsNullOrEmpty(RejectedResponse))
@@ -49,35 +49,33 @@ public class DNTCaptchaRateLimiterPolicy : IRateLimiterPolicy<string>
     private static bool? RejectedResponseType { get; set; } = false;
 
     /// <inheritdoc />
-    public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected { get; } =
-        async (context, cancellationToken) =>
+    public Func<OnRejectedContext, CancellationToken, ValueTask>? OnRejected { get; } = async (context, _) =>
+    {
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
         {
-            if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
-            {
-                context.HttpContext.Response.Headers.RetryAfter =
-                    ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
-            }
+            context.HttpContext.Response.Headers.RetryAfter =
+                ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+        }
 
-            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
 
-            if (!string.IsNullOrEmpty(RejectedResponse) && RejectedResponseType != null)
-            {
-                context.HttpContext.Response.Headers.ContentType =
-                    (bool)RejectedResponseType ? "application/json" : "text/plain";
+        if (!string.IsNullOrEmpty(RejectedResponse) && RejectedResponseType is not null)
+        {
+            context.HttpContext.Response.Headers.ContentType =
+                (bool)RejectedResponseType ? "application/json" : "text/plain";
 
-                await context.HttpContext.Response.WriteAsync(RejectedResponse);
-            }
-        };
+            await context.HttpContext.Response.WriteAsync(RejectedResponse);
+        }
+    };
 
     /// <inheritdoc />
     public RateLimitPartition<string> GetPartition(HttpContext httpContext)
-        => RateLimitPartition.GetFixedWindowLimiter(httpContext.GetClientIP(), partition
-            => new FixedWindowRateLimiterOptions
-            {
-                AutoReplenishment = true,
-                PermitLimit = _options.PermitLimit,
-                QueueLimit = 0,
-                Window = TimeSpan.FromMinutes(value: 1)
-            });
+        => RateLimitPartition.GetFixedWindowLimiter(httpContext.GetClientIP(), _ => new FixedWindowRateLimiterOptions
+        {
+            AutoReplenishment = true,
+            PermitLimit = _options.PermitLimit,
+            QueueLimit = 0,
+            Window = TimeSpan.FromMinutes(value: 1)
+        });
 }
 #endif
