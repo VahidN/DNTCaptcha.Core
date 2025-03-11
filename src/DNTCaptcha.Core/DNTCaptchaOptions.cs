@@ -359,8 +359,15 @@ public class DNTCaptchaOptions
     /// </summary>
     /// <param name="template"></param>
     /// <returns></returns>
+    /// <exception cref="ArgumentException">Route template must contain the '[action]' placeholder.</exception>
     public DNTCaptchaOptions WithCaptchaImageControllerRouteTemplate(string template)
     {
+        if (string.IsNullOrWhiteSpace(template) || !template.Contains(value: "[action]", StringComparison.Ordinal))
+        {
+            throw new ArgumentException(message: "The route template must contain the '[action]' placeholder.",
+                nameof(template));
+        }
+
         CaptchaImageControllerRouteTemplate = template;
 
         return this;

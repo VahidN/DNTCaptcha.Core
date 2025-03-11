@@ -81,8 +81,8 @@ public class DNTCaptchaImageController(
     ///     Refresh the captcha
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-    [HttpGet(template: "[action]")]
-    [HttpPost(template: "[action]")]
+    [HttpGet]
+    [HttpPost]
     public IActionResult Refresh(string data)
     {
         try
@@ -177,8 +177,8 @@ public class DNTCaptchaImageController(
     ///     Creates the captcha image.
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
-    [HttpGet(template: "[action]")]
-    [HttpPost(template: "[action]")]
+    [HttpGet]
+    [HttpPost]
     public IActionResult Show(string data)
     {
         try

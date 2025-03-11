@@ -22,9 +22,12 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
 {
     services.AddCors(options =>
     {
-        options.AddPolicy("CorsPolicy", cp => cp
+        options.AddPolicy(name: "CorsPolicy", cp => cp
             .WithOrigins("http://localhost:4200") //Note:  The URL must be specified without a trailing slash (/).
-            .AllowAnyMethod().AllowAnyHeader().SetIsOriginAllowed(_ => true).AllowCredentials());
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .SetIsOriginAllowed(_ => true)
+            .AllowCredentials());
     });
 
     services.AddMvc(options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
@@ -45,28 +48,33 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
     {
         // options.UseSessionStorageProvider() // -> It doesn't rely on the server or client's times. Also it's the safest one.
         // options.UseMemoryCacheStorageProvider() // -> It relies on the server's times. It's safer than the CookieStorageProvider.
-        options
-            .UseCookieStorageProvider(
- /* If you are using CORS, set it to `None` */) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
+        options.UseCookieStorageProvider(
+                /* If you are using CORS, set it to `None` */) // -> It relies on the server and client's times. It's ideal for scalability, because it doesn't save anything in the server's memory.
             // .UseDistributedCacheStorageProvider() // --> It's ideal for scalability using `services.AddStackExchangeRedisCache()` for instance.
             // .UseDistributedSerializationProvider()
 
             // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
             // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
-            .UseCustomFont(Path.Combine(env.WebRootPath, "fonts", "tahoma.ttf"))
-            .ShowExceptionsInResponse(env.IsDevelopment()).AbsoluteExpiration(1)
+            .UseCustomFont(Path.Combine(env.WebRootPath, path2: "fonts", path3: "tahoma.ttf"))
+            .ShowExceptionsInResponse(env.IsDevelopment())
+            .AbsoluteExpiration(minutes: 1)
             .RateLimiterPermitLimit(
+                permitLimit:
                 10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
-            .ShowThousandsSeparators(false).WithNoise(0.015f, 0.015f, 1, 0.0f)
-            .WithEncryptionKey("This is my secure key!").WithNonceKey("NETESCAPADES_NONCE")
-            .WithCaptchaImageControllerRouteTemplate("my-custom-captcha/[action]")
+            .ShowThousandsSeparators(show: false)
+            .WithNoise(baseFrequencyX: 0.015f, baseFrequencyY: 0.015f, numOctaves: 1, seed: 0.0f)
+            .WithEncryptionKey(key: "This is my secure key!")
+            .WithNonceKey(key: "NETESCAPADES_NONCE")
+            .WithCaptchaImageControllerNameTemplate(template: "my-custom-captcha")
+            .WithCaptchaImageControllerRouteTemplate(template: "my-custom-captcha/[action]")
             .InputNames( // This is optional. Change it if you don't like the default names.
                 new DNTCaptchaComponent
                 {
                     CaptchaHiddenInputName = "DNT_CaptchaText",
                     CaptchaHiddenTokenName = "DNT_CaptchaToken",
                     CaptchaInputName = "DNT_CaptchaInputText"
-                }).Identifier("dnt_Captcha") // This is optional. Change it if you don't like its default name.
+                })
+            .Identifier(className: "dnt_Captcha") // This is optional. Change it if you don't like its default name.
             ;
     });
 
@@ -87,7 +95,7 @@ void ConfigureLogging(ILoggingBuilder logging, IHostEnvironment env, IConfigurat
         logging.AddConsole();
     }
 
-    logging.AddConfiguration(configuration.GetSection("Logging"));
+    logging.AddConfiguration(configuration.GetSection(key: "Logging"));
 }
 
 void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
@@ -98,7 +106,7 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
     }
     else
     {
-        app.UseExceptionHandler("/Home/Error");
+        app.UseExceptionHandler(errorHandlingPath: "/Home/Error");
         app.UseHsts();
     }
 
@@ -106,7 +114,7 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
 
     app.UseHttpsRedirection();
 
-    app.UseCors("CorsPolicy");
+    app.UseCors(policyName: "CorsPolicy");
 
     app.UseStaticFiles();
 
@@ -119,6 +127,6 @@ void ConfigureMiddlewares(IApplicationBuilder app, IHostEnvironment env)
 void ConfigureEndpoints(IApplicationBuilder app)
     => app.UseEndpoints(endpoints =>
     {
-        endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+        endpoints.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
         endpoints.MapRazorPages();
     });

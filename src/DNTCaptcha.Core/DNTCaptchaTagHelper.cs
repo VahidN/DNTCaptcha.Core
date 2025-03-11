@@ -212,21 +212,25 @@ public class DNTCaptchaTagHelper(
         var serializedValues = _serializationProvider.Serialize(values);
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
 
+        var controllerName = nameof(DNTCaptchaImageController)
+            .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal);
+
+        if (!string.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate))
+        {
+            controllerName = _captchaOptions.CaptchaImageControllerNameTemplate;
+        }
+
         var actionUrl = UseRelativeUrls
-            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                nameof(DNTCaptchaImageController)
-                    .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal), new
-                {
-                    data = encryptSerializedValues,
-                    area = ""
-                })
-            : _urlHelper.Action(nameof(DNTCaptchaImageController.Show),
-                nameof(DNTCaptchaImageController)
-                    .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal), new
-                {
-                    data = encryptSerializedValues,
-                    area = ""
-                }, viewContext.HttpContext.Request.Scheme);
+            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show), controllerName, new
+            {
+                data = encryptSerializedValues,
+                area = ""
+            })
+            : _urlHelper.Action(nameof(DNTCaptchaImageController.Show), controllerName, new
+            {
+                data = encryptSerializedValues,
+                area = ""
+            }, viewContext.HttpContext.Request.Scheme);
 
         if (string.IsNullOrWhiteSpace(actionUrl))
         {
