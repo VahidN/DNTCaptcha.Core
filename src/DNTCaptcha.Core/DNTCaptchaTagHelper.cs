@@ -192,6 +192,19 @@ public class DNTCaptchaTagHelper(
         return hiddenInput;
     }
 
+    private string GetControllerName()
+    {
+        var controllerName = nameof(DNTCaptchaImageController)
+            .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal);
+
+        if (!string.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate))
+        {
+            controllerName = _captchaOptions.CaptchaImageControllerNameTemplate;
+        }
+
+        return controllerName;
+    }
+
     private TagBuilder GetCaptchaImageTagBuilder(ViewContext viewContext, string encryptedText)
     {
         if (_urlHelper is null)
@@ -212,13 +225,7 @@ public class DNTCaptchaTagHelper(
         var serializedValues = _serializationProvider.Serialize(values);
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
 
-        var controllerName = nameof(DNTCaptchaImageController)
-            .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal);
-
-        if (!string.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate))
-        {
-            controllerName = _captchaOptions.CaptchaImageControllerNameTemplate;
-        }
+        var controllerName = GetControllerName();
 
         var actionUrl = UseRelativeUrls
             ? _urlHelper.Action(nameof(DNTCaptchaImageController.Show), controllerName, new
@@ -284,17 +291,17 @@ public class DNTCaptchaTagHelper(
         var serializedValues = _serializationProvider.Serialize(values);
         var encryptSerializedValues = _captchaProtectionProvider.Encrypt(serializedValues);
 
+        var controllerName = GetControllerName();
+
         var actionUrl = UseRelativeUrls
             ? _urlHelper.Action(nameof(DNTCaptchaImageController.Refresh),
-                nameof(DNTCaptchaImageController)
-                    .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal), new
+                controllerName, new
                 {
                     data = encryptSerializedValues,
                     area = ""
                 })
             : _urlHelper.Action(nameof(DNTCaptchaImageController.Refresh),
-                nameof(DNTCaptchaImageController)
-                    .Replace(oldValue: "Controller", string.Empty, StringComparison.Ordinal), new
+                controllerName, new
                 {
                     data = encryptSerializedValues,
                     area = ""
