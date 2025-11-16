@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>DNTCaptcha.Core is a captcha generator and validator for ASP.NET Core applications.</Description>
-    <VersionPrefix>5.3.1</VersionPrefix>
+    <VersionPrefix>5.3.2</VersionPrefix>
     <Authors>Vahid Nasiri</Authors>
-    <TargetFrameworks>net9.0;net8.0;net7.0;net6.0;</TargetFrameworks>
+    <TargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0;</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>DNTCaptcha.Core</AssemblyName>
     <PackageId>DNTCaptcha.Core</PackageId>
@@ -46,7 +46,7 @@
     <NoWarn>NU5104</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.212">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.253">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -70,7 +70,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Roslynator.Analyzers" Version="4.14.0">
+    <PackageReference Include="Roslynator.Analyzers" Version="4.14.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -83,10 +83,10 @@
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="SkiaSharp" Version="3.119.0"/>
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.119.0"/>
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.0"/>
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.1"/>
+    <PackageReference Include="SkiaSharp" Version="3.119.1"/>
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.119.1"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.119.1"/>
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="8.3.1.2"/>
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <DefineConstants>NET6_0</DefineConstants>
@@ -99,5 +99,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net9.0'">
     <DefineConstants>NET9_0</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <DefineConstants>NET10_0</DefineConstants>
   </PropertyGroup>
 </Project>

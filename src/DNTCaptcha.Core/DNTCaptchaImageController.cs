@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-#if NET7_0 || NET8_0 || NET9_0
+#if NET7_0 || NET8_0 || NET9_0 || NET10_0
 using Microsoft.AspNetCore.RateLimiting;
 #endif
 
@@ -26,7 +26,7 @@ namespace DNTCaptcha.Core;
 ///     DNTCaptcha Image Controller
 /// </remarks>
 [AllowAnonymous]
-#if NET7_0 || NET8_0 || NET9_0
+#if NET7_0 || NET8_0 || NET9_0 || NET10_0
 [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
 #endif
 public class DNTCaptchaImageController(

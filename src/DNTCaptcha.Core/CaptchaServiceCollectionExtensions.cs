@@ -1,8 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -35,7 +37,7 @@ public static class CaptchaServiceCollectionExtensions
         services.AddAntiforgery();
         services.AddMvcCore().AddCookieTempDataProvider();
 
-#if NET7_0 || NET8_0 || NET9_0
+#if NET7_0 || NET8_0 || NET9_0 || NET10_0
 
         //  Also we need to have app.UseRateLimiter() after app.UseRouting()
         services.AddRateLimiter(limiterOptions
@@ -56,16 +58,15 @@ public static class CaptchaServiceCollectionExtensions
         services.TryAddTransient<DNTCaptchaTagHelper>();
         services.TryAddTransient<IDNTCaptchaValidatorService, DNTCaptchaValidatorService>();
         services.TryAddScoped<IDNTCaptchaApiProvider, DNTCaptchaApiProvider>();
-        services.TryAddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
         services.TryAddScoped<IUrlHelper>(serviceProvider =>
         {
-            var actionContext = serviceProvider.GetRequiredService<IActionContextAccessor>().ActionContext ??
-                                throw new InvalidOperationException(message: "actionContext is null");
+            var httpContext = serviceProvider.GetRequiredService<IHttpContextAccessor>().HttpContext ??
+                              throw new InvalidOperationException(message: "HttpContext is null");
 
-            var factory = serviceProvider.GetRequiredService<IUrlHelperFactory>();
-
-            return factory.GetUrlHelper(actionContext);
+            return serviceProvider.GetRequiredService<IUrlHelperFactory>()
+                .GetUrlHelper(new ActionContext(httpContext, httpContext.GetRouteData() ?? new RouteData(),
+                    httpContext.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>() ?? new ActionDescriptor()));
         });
     }
 
