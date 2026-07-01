@@ -153,14 +153,9 @@ public class DNTCaptchaTagHelper(
     }
 
     private void SetUrlHelper(ViewContext viewContext)
-    {
-        _urlHelper = viewContext.HttpContext.Items.Values.OfType<IUrlHelper>().FirstOrDefault();
-
-        if (_urlHelper is null)
-        {
-            throw new InvalidOperationException(message: "Failed to find the IUrlHelper of ViewContext.HttpContext.");
-        }
-    }
+        => _urlHelper = viewContext.HttpContext.Items.Values.OfType<IUrlHelper>().FirstOrDefault() ??
+                        throw new InvalidOperationException(
+                            message: "Failed to find the IUrlHelper of ViewContext.HttpContext.");
 
     private TagBuilder GetHiddenInputTagBuilder(string encryptedText)
     {
@@ -294,18 +289,16 @@ public class DNTCaptchaTagHelper(
         var controllerName = GetControllerName();
 
         var actionUrl = UseRelativeUrls
-            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Refresh),
-                controllerName, new
-                {
-                    data = encryptSerializedValues,
-                    area = ""
-                })
-            : _urlHelper.Action(nameof(DNTCaptchaImageController.Refresh),
-                controllerName, new
-                {
-                    data = encryptSerializedValues,
-                    area = ""
-                }, viewContext.HttpContext.Request.Scheme);
+            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Refresh), controllerName, new
+            {
+                data = encryptSerializedValues,
+                area = ""
+            })
+            : _urlHelper.Action(nameof(DNTCaptchaImageController.Refresh), controllerName, new
+            {
+                data = encryptSerializedValues,
+                area = ""
+            }, viewContext.HttpContext.Request.Scheme);
 
         var refreshButton = new TagBuilder(tagName: "a");
         var dntCaptchaRefreshButton = $"{_captchaOptions.CaptchaClass}RefreshButton";

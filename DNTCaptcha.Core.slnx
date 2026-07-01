@@ -1,0 +1,23 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="LICENSE.md" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/DNTCaptcha.Core/DNTCaptcha.Core.csproj">
+      <BuildType Project="Debug" />
+    </Project>
+    <Project Path="src/DNTCaptcha.TestApiApp/DNTCaptcha.TestApiApp.csproj">
+      <BuildType Project="Debug" />
+    </Project>
+    <Project Path="src/DNTCaptcha.TestRazorPages/DNTCaptcha.TestRazorPages.csproj">
+      <BuildType Project="Debug" />
+    </Project>
+    <Project Path="src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.csproj">
+      <BuildType Project="Debug" />
+    </Project>
+  </Folder>
+</Solution>
