@@ -6,6 +6,6 @@
     <ProjectReference Include="..\DNTCaptcha.Core\DNTCaptcha.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
   </ItemGroup>
 </Project>
