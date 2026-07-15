@@ -62,7 +62,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.27.0.140913">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.29.0.143774">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -79,14 +79,14 @@
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.301" PrivateAssets="All"/>
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="SkiaSharp" Version="4.148.0"/>
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.148.0"/>
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.148.0"/>
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="14.2.0"/>
+    <PackageReference Include="SkiaSharp" Version="4.150.1"/>
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.150.1"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.150.1"/>
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="14.2.1.1"/>
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <DefineConstants>NET6_0</DefineConstants>
