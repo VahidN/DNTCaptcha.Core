@@ -28,6 +28,12 @@
 				type="button" role="tab" aria-controls="login3" 
 				aria-selected="true">Instance 3/Ajax Form</button>            			
         </li>
+        <li role="presentation" class="nav-item">		
+		    <button class="nav-link" id="home-tab" 
+				data-bs-toggle="tab" data-bs-target="#login4" 
+				type="button" role="tab" aria-controls="login4" 
+				aria-selected="true">Farsi</button>            			
+        </li>		
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
@@ -52,6 +58,15 @@
                   <partial name="_LoginFormBody" model="Model" />
             </form>
         </div>
+        <div role="tabpanel" class="tab-pane fade" id="login4">
+            <form asp-controller="Home" asp-action="Login3" asp-antiforgery="true"
+                  method="post" id="loginForm3" autocomplete="off" role="form"
+                  data-ajax="true"
+                  data-ajax-success="dataAjaxSuccess"
+                  data-ajax-failure="dataAjaxFailure">
+                  <partial name="_LoginFormBodyFa" model="Model" />
+            </form>
+        </div>		
     </div>
 </div>
 

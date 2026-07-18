@@ -1,0 +1,61 @@
+﻿@model DNTCaptcha.TestWebApp.Models.AccountViewModel
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h3 class="card-title">ورود</h3>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label"></label>
+            <div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <span class="bi-person"></span>
+                    </span>
+                    <input asp-for="Username" class="form-control" dir="ltr" AutoCompleteType="Disabled"/>
+                </div>
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <div>
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <span class="bi-key"></span>
+                    </span>
+                    <input asp-for="Password" class="form-control" dir="ltr"/>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">
+                كد امنیتی
+            </label>
+            <div>
+                <dnt-captcha asp-captcha-generator-max="9999"
+                             asp-captcha-generator-min="100"
+                             asp-captcha-generator-language="Persian"
+                             asp-captcha-generator-display-mode="NumberToWord"                             
+                             asp-placeholder="عبارت امنیتی به صورت عدد"
+                             asp-validation-error-message="لطفا عدد امنیتی را وارد کنید."
+                             asp-too-many-requests-error-message="Too many requests! Please wait a minute!"
+                             asp-font-name="Tahoma"
+                             asp-font-size="20"
+                             asp-fore-color="#cccccc"
+                             asp-back-color="#00368e"
+                             asp-text-box-class="form-control"
+                             asp-text-box-template="<div class='input-group'><span class='input-group-text'><span class='bi-lock'></span></span>{0}</div>"
+                             asp-validation-message-class="text-danger"
+                             asp-refresh-button-class="bi-arrow-counterclockwise btn-lg"
+                             asp-show-refresh-button="true"
+                             asp-dir="ltr"/>
+            </div>
+        </div>
+    </div>
+    <footer class="card-footer">
+        <input type="submit" class="btn btn-secondary" value="Login"/>
+    </footer>
+</div>
+<div asp-validation-summary="All" class="text-danger alert alert-block"></div>

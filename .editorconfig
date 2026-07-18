@@ -785,6 +785,7 @@ dotnet_diagnostic.S6960.severity = suggestion
 dotnet_diagnostic.S6934.severity = suggestion
 dotnet_diagnostic.S6965.severity = suggestion
 dotnet_diagnostic.S6966.severity = suggestion
+dotnet_diagnostic.S2092.severity = suggestion
 
 dotnet_diagnostic.SA0001.severity = warning
 dotnet_diagnostic.SA1000.severity = warning

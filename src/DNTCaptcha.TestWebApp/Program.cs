@@ -54,8 +54,11 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
             // .UseDistributedSerializationProvider()
 
             // Don't set this line (remove it) to use the installed system's fonts (FontName = "Tahoma").
-            // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!
-            .UseCustomFont(Path.Combine(env.WebRootPath, path2: "fonts", path3: "tahoma.ttf"))
+            // Or if you want to use a custom font, make sure that font is present in the wwwroot/fonts folder and also use a good and complete font!            
+			//.UseCustomFont(Path.Combine(env.WebRootPath, path2: "fonts", path3: "IRANSansWeb(FaNum).V5.2017.ttf"))
+			//.UseCustomFont(Path.Combine(env.WebRootPath, path2: "fonts", path3: "IRANSansWeb(FaNum).V4.2016.ttf"))
+			//.UseCustomFont(Path.Combine(env.WebRootPath, path2: "fonts", path3: "tahoma.ttf"))
+			.UseCustomFont(Path.Combine(env.WebRootPath, path2: "fonts", path3: "Samim-FD.ttf"))			
             .ShowExceptionsInResponse(env.IsDevelopment())
             .AbsoluteExpiration(minutes: 1)
             .RateLimiterPermitLimit(
@@ -63,6 +66,7 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
                 10) // for .NET 7x, Also you need to call app.UseRateLimiter() after calling app.UseRouting().
             .ShowThousandsSeparators(show: false)
             .WithNoise(baseFrequencyX: 0.015f, baseFrequencyY: 0.015f, numOctaves: 1, seed: 0.0f)
+			//.WithNoise(0.015f, 0.020f, 40, 3)
             .WithEncryptionKey(key: "This is my secure key!")
             .WithNonceKey(key: "NETESCAPADES_NONCE")
             .WithCaptchaImageControllerNameTemplate(template: "my-custom-captcha")
