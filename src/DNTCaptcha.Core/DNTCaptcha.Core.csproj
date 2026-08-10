@@ -62,7 +62,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.29.0.143774">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="10.32.0.713">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -70,7 +70,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Roslynator.Analyzers" Version="4.15.0">
+    <PackageReference Include="Roslynator.Analyzers" Version="4.16.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -83,10 +83,10 @@
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="SkiaSharp" Version="4.150.1"/>
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.150.1"/>
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.150.1"/>
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="14.2.1.1"/>
+    <PackageReference Include="SkiaSharp" Version="4.151.1"/>
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.151.1"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.151.1"/>
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="14.2.1.2"/>
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <DefineConstants>NET6_0</DefineConstants>
