@@ -1,90 +1,205 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { ToastrService } from '@openng/ngx-toastr';
+import { of, Subject, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { ToastrService } from 'ngx-toastr';
 import { LoginService } from '../service/login.service';
-import { provideHttpClient } from '@angular/common/http';
-import { of } from 'rxjs';
+
+const captchaEndpoint = 'api/account/CreateDNTCaptchaParams';
 
 describe('LoginComponent', () => {
-  let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
+  let component: LoginComponent;
+  let http: HttpTestingController;
+  let login: ReturnType<typeof vi.fn<LoginService['login']>>;
+  let success: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
+    login = vi.fn<LoginService['login']>().mockReturnValue(of({ name: 'testUsername' }));
+    success = vi.fn();
     TestBed.configureTestingModule({
       imports: [LoginComponent],
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        {
-          provide: ToastrService,
-          useValue: {
-            success: jest.fn(),
-            error: jest.fn()
-          }
-        },
-        {
-          provide: LoginService,
-          useValue: {
-            login: jest.fn()
-          }
-        }
+        { provide: ToastrService, useValue: { success } },
+        { provide: LoginService, useValue: { login } }
       ]
     });
-  });
-
-  it('should create', () => {
+    http = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
-    expect(component).toBeTruthy();
+    fixture.autoDetectChanges();
+    respondToCaptcha();
   });
 
-  describe('upon successful login', () => {
-    let loginService: LoginService;
+  afterEach(() => http.verify());
 
-    beforeEach(() => {
-      fixture = TestBed.createComponent(LoginComponent);
-      component = fixture.componentInstance;
-      fixture.detectChanges();
-
-      component.dntCaptchaComponent.loadNewCaptcha = jest.fn();
-      loginService = TestBed.inject(LoginService);
-      loginService.login = jest.fn().mockReturnValue(of({ name: 'testUsername' }));
-
-      component.captchaForm.setValue({
-        dntCaptchaInputText: 'test',
-        dntCaptchaText: 'test',
-        dntCaptchaToken: 'test'
-      });
-      component.form.setValue({
-        username: 'testUsername',
-        password: 'testPassword'
-      });
+  function respondToCaptcha(): void {
+    fixture.detectChanges();
+    http.expectOne(captchaEndpoint).flush({
+      dntCaptchaImgUrl: new URL('/captcha.png', document.baseURI).href,
+      dntCaptchaTextValue: 'text',
+      dntCaptchaTokenValue: 'token',
+      dntCaptchaId: 'id'
     });
+  }
 
-    it('should pass merged forms as login parameters', () => {
-      component.submitForm();
-      expect(loginService.login).toHaveBeenCalledWith({
-        username: 'testUsername',
-        password: 'testPassword',
-        dntCaptchaInputText: 'test',
-        dntCaptchaText: 'test',
-        dntCaptchaToken: 'test'
-      });
+  function fillForm(): void {
+    component.form.username().value.set('testUsername');
+    component.form.password().value.set('testPassword');
+    component.form.captcha.dntCaptchaInputText().value.set('42');
+  }
+
+  it('rejects invalid submission and focuses the first invalid input', async () => {
+    await fixture.whenStable();
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await fixture.whenStable();
+    expect(login).not.toHaveBeenCalled();
+    expect(document.activeElement?.id).toBe('username');
+    expect(fixture.nativeElement.querySelector('#username-error').textContent).toContain('Enter your username');
+    expect(fixture.nativeElement.querySelector('#password-error').textContent).toContain('Enter your password');
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Enter the CAPTCHA result');
+  });
+
+  it('uses one native form and submits the flattened payload through FormRoot', async () => {
+    fillForm();
+    await fixture.whenStable();
+    const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
+    expect(fixture.nativeElement.querySelectorAll('form')).toHaveLength(1);
+    expect(button.form).toBe(form);
+    const captcha: HTMLInputElement = fixture.nativeElement.querySelector('input[autocomplete="off"]');
+    expect(captcha.form).toBe(form);
+    expect(captcha.labels?.[0]?.textContent).toContain('Captcha');
+    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    expect(login).toHaveBeenCalledExactlyOnceWith({
+      username: 'testUsername',
+      password: 'testPassword',
+      dntCaptchaInputText: '42',
+      dntCaptchaText: 'text',
+      dntCaptchaToken: 'token'
     });
+    await Promise.resolve();
+    expect(success).toHaveBeenCalledWith('You are successfully logged in as testUsername', 'Success');
+    expect(component.form.captcha.dntCaptchaInputText().value()).toBe('');
+    respondToCaptcha();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Enter the result');
+  });
 
-    it('should reload captcha', () => {
-      component.submitForm();
-      expect(component.dntCaptchaComponent.loadNewCaptcha).toHaveBeenCalledTimes(1);
-    });
+  it('prevents duplicate login requests and disables controls while submitting', async () => {
+    const response = new Subject<{ name: string }>();
+    login.mockReturnValue(response);
+    fillForm();
+    const submission = component.submitForm();
+    expect(await component.submitForm()).toBe(false);
+    await fixture.whenStable();
+    expect(login).toHaveBeenCalledTimes(1);
+    expect(component.submitting()).toBe(true);
+    expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBe(true);
+    expect(fixture.nativeElement.querySelector('button[type="button"]').disabled).toBe(true);
+    expect(fixture.nativeElement.querySelector('#password').readOnly).toBe(true);
+    response.next({ name: 'testUsername' });
+    response.complete();
+    await submission;
+    respondToCaptcha();
+    await fixture.whenStable();
+    expect(component.submitting()).toBe(false);
+    expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBe(false);
+  });
 
-    it('should show success toast', () => {
-      const toastr: ToastrService = TestBed.inject(ToastrService);
-      toastr.success = jest.fn();
+  it.each([
+    [0, 'Cannot reach the server'],
+    [400, 'captcha/credentials are not valid'],
+    [401, 'captcha/credentials are not valid'],
+    [403, 'Login was denied'],
+    [429, 'Too many login attempts'],
+    [500, 'server could not complete the login']
+  ])('reports HTTP %s accurately and preserves the credentials', async (status, message) => {
+    login.mockReturnValue(throwError(() => new HttpErrorResponse({ status })));
+    fillForm();
+    await component.submitForm();
+    expect(component.submitting()).toBe(false);
+    expect(component.form.username().value()).toBe('testUsername');
+    expect(component.form.password().value()).toBe('testPassword');
+    expect(component.form.captcha.dntCaptchaInputText().value()).toBe('');
+    respondToCaptcha();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain(message);
+    expect(success).not.toHaveBeenCalled();
+  });
 
-      component.submitForm();
+  it('does not submit while the CAPTCHA is loading or failed', async () => {
+    fillForm();
+    component.dntCaptchaComponent()!.loadNewCaptcha();
+    component.submitForm();
+    fixture.detectChanges();
+    http.expectOne(captchaEndpoint).flush({}, { status: 500, statusText: 'Failed' });
+    component.submitForm();
+    await fixture.whenStable();
+    expect(login).not.toHaveBeenCalled();
+  });
 
-      expect(toastr.success).toHaveBeenCalledWith('You are successfully logged in as testUsername', 'Success');
-    });
+  it('recovers from a timeout without automatically repeating the login', async () => {
+    const response = new Subject<{ name: string }>();
+    login.mockReturnValue(response);
+    fillForm();
+    const submission = component.submitForm();
+    response.error(new HttpErrorResponse({ status: 0, error: new DOMException('Timed out', 'TimeoutError') }));
+    await submission;
+    expect(component.submitting()).toBe(false);
+    expect(component.form.username().value()).toBe('testUsername');
+    expect(component.form.password().value()).toBe('testPassword');
+    expect(component.form.captcha.dntCaptchaToken().value()).toBe('');
+    respondToCaptcha();
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('login request timed out');
+    expect(fixture.nativeElement.querySelector('#password').readOnly).toBe(false);
+    expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBe(false);
+    expect(login).toHaveBeenCalledTimes(1);
+    expect(success).not.toHaveBeenCalled();
+    // Retrying requires a new answer and an explicit submission.
+    login.mockReturnValue(of({ name: 'testUsername' }));
+    component.form.captcha.dntCaptchaInputText().value.set('43');
+    await component.submitForm();
+    respondToCaptcha();
+    await fixture.whenStable();
+    expect(login).toHaveBeenCalledTimes(2);
+    expect(success).toHaveBeenCalledTimes(1);
+  });
+
+  it('cancels a pending login subscription without showing feedback after destruction', async () => {
+    const response = new Subject<{ name: string }>();
+    login.mockReturnValue(response);
+    fillForm();
+    const submission = component.submitForm();
+    expect(response.observed).toBe(true);
+    fixture.destroy();
+    expect(response.observed).toBe(false);
+    await submission;
+    expect(success).not.toHaveBeenCalled();
+    expect(component.state()).toEqual({ status: 'idle' });
+  });
+
+  it('synchronizes browser input with the signal model and schema validation', async () => {
+    await fixture.whenStable();
+    const username: HTMLInputElement = fixture.nativeElement.querySelector('#username');
+    username.value = 'typed-user';
+    username.dispatchEvent(new Event('input', { bubbles: true }));
+    username.dispatchEvent(new Event('blur'));
+    await fixture.whenStable();
+    expect(component.model().username).toBe('typed-user');
+    expect(component.form.username().touched()).toBe(true);
+    expect(component.form.username().valid()).toBe(true);
+
+    component.form.username().value.set('');
+    await fixture.whenStable();
+    expect(username.value).toBe('');
+    expect(username.getAttribute('aria-invalid')).toBe('true');
+    expect(fixture.nativeElement.querySelector('#username-error').textContent).toContain('Enter your username');
   });
 });
