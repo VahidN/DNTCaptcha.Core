@@ -4,6 +4,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { LoginService } from './login.service';
 import { LoginDto } from '../interface/login.dto';
+import { InvalidApiResponseError } from '../../core/http/api-response-validation';
 
 const loginData: LoginDto = {
   dntCaptchaText: 'text',
@@ -36,5 +37,47 @@ describe('LoginService', () => {
     expect(Object.fromEntries(new URLSearchParams(String(body)))).toEqual(loginData);
     request.flush({ name: 'test' });
     expect(next).toHaveBeenCalledExactlyOnceWith({ name: 'test' });
+  });
+
+  it.each(
+    [null, [], {}, 'unexpected', 42, { name: null }, { name: 42 }, { name: '' }, { name: ' \t ' }].map((body) => ({
+      body
+    }))
+  )('rejects malformed successful login response %#', ({ body }) => {
+    const next = vi.fn();
+    const error = vi.fn();
+    service.login(loginData).subscribe({ next, error });
+    http.expectOne('api/account/login').flush(body);
+    expect(next).not.toHaveBeenCalled();
+    expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(InvalidApiResponseError));
+  });
+
+  it('rejects an empty HTTP 204 response', () => {
+    const error = vi.fn();
+    service.login(loginData).subscribe({ error });
+    http.expectOne('api/account/login').flush(null, { status: 204, statusText: 'No Content' });
+    expect(error).toHaveBeenCalledExactlyOnceWith(expect.any(InvalidApiResponseError));
+  });
+
+  it('accepts additional fields and preserves the name without coercing it', () => {
+    const next = vi.fn();
+    service.login(loginData).subscribe(next);
+    http.expectOne('api/account/login').flush({ name: ' Test User ', additionalField: 'ignored' });
+    expect(next).toHaveBeenCalledExactlyOnceWith({ name: ' Test User ' });
+  });
+
+  it('preserves HTTP failure status and headers', () => {
+    const error = vi.fn();
+    service.login(loginData).subscribe({ error });
+    http.expectOne('api/account/login').flush(
+      {},
+      {
+        status: 429,
+        statusText: 'Too Many Requests',
+        headers: { 'Retry-After': '3' }
+      }
+    );
+    expect(error.mock.calls[0]?.[0].status).toBe(429);
+    expect(error.mock.calls[0]?.[0].headers.get('Retry-After')).toBe('3');
   });
 });

@@ -18,6 +18,7 @@ import { DntCaptchaComponent } from '../../dnt-captcha/component/dnt-captcha.com
 import type { LoginFormModel } from '../interface/login-form.interface';
 import type { LoginState } from '../interface/login-state.type';
 import { createRetryAfterCooldown } from '../../core/http/create-retry-after-cooldown';
+import { InvalidApiResponseError } from '../../core/http/api-response-validation';
 
 @Component({
   selector: 'app-login',
@@ -92,7 +93,9 @@ export class LoginComponent {
       // Destroying the component cancels the request and completes firstValueFrom without a value.
       if (this.destroyRef.destroyed) return undefined;
       let message = 'The server could not complete the login. Try again later.';
-      if (error instanceof HttpErrorResponse) {
+      if (error instanceof InvalidApiResponseError) {
+        message = 'The server returned an invalid login response. Try again with the new CAPTCHA.';
+      } else if (error instanceof HttpErrorResponse) {
         if (error.error instanceof DOMException && error.error.name === 'TimeoutError')
           message = 'The login request timed out. Try again with the new CAPTCHA.';
         else if (error.status === 0) message = 'Cannot reach the server. Check your connection and try again.';

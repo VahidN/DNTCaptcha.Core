@@ -75,3 +75,10 @@ and login submission are guarded until their cooldown expires, including direct
 method calls and native form submission. The UI shows the remaining wait; it does
 not automatically repeat the rejected request. Missing, invalid, or expired
 headers allow a manual retry. Timers are cleaned up when the component is destroyed.
+
+API services receive JSON as `unknown` and validate it before exposing typed values.
+Login requires a non-empty name; CAPTCHA requires a non-empty ID, encrypted text,
+token, and a relative or HTTP(S) image URL. Extra response fields are ignored and
+valid strings are preserved without trimming. Invalid successful responses produce
+an inline recovery message rather than login success or a usable CAPTCHA. A failed
+login preserves credentials and loads a new challenge for manual retry.

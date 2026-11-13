@@ -121,6 +121,28 @@ describe('DntCaptchaComponent', () => {
     expect(fixture.nativeElement.querySelector('img')).toBeNull();
   });
 
+  it('keeps a malformed challenge unusable and permits a valid refresh', async () => {
+    http.expectOne(endpoint).flush({
+      dntCaptchaImgUrl: '/captcha.png',
+      dntCaptchaId: 'id',
+      dntCaptchaTextValue: 'text'
+    });
+    await fixture.whenStable();
+    expect(component.state().status).toBe('error');
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('invalid CAPTCHA response');
+    expect(fixture.nativeElement.querySelector('img')).toBeNull();
+    expect(form().value()).toEqual({ dntCaptchaInputText: '', dntCaptchaText: '', dntCaptchaToken: '' });
+    expect(form().invalid()).toBe(true);
+    expect(fixture.nativeElement.querySelector('input').readOnly).toBe(true);
+    expect(fixture.nativeElement.querySelector('button').disabled).toBe(false);
+    component.loadNewCaptcha();
+    respond('valid');
+    await fixture.whenStable();
+    expect(component.state().status).toBe('ready');
+    expect(fixture.nativeElement.querySelector('input').readOnly).toBe(false);
+    expect(form.dntCaptchaToken().value()).toBe('valid token');
+  });
+
   it('blocks refresh until Retry-After expires, then permits a manual retry', async () => {
     vi.useFakeTimers();
     try {

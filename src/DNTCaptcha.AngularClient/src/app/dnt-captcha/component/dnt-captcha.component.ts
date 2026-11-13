@@ -6,6 +6,7 @@ import { DntCaptchaService } from '../service/dnt-captcha.service';
 import type { DntCaptchaForm } from '../interfaces/dnt-captcha-form.interface';
 import type { CaptchaState } from '../interfaces/dnt-captcha-state.type';
 import { createRetryAfterCooldown } from '../../core/http/create-retry-after-cooldown';
+import { InvalidApiResponseError } from '../../core/http/api-response-validation';
 
 @Component({
   selector: 'app-dnt-captcha',
@@ -72,7 +73,9 @@ export class DntCaptchaComponent {
           error: (error: unknown) => {
             if (this.refreshVersion() !== version || this.captchaForm() !== field) return;
             let message = 'Could not load the CAPTCHA. Check your connection, then refresh it.';
-            if (error instanceof HttpErrorResponse) {
+            if (error instanceof InvalidApiResponseError) {
+              message = 'The server returned an invalid CAPTCHA response. Refresh it to try again.';
+            } else if (error instanceof HttpErrorResponse) {
               if (error.error instanceof DOMException && error.error.name === 'TimeoutError')
                 message = 'The CAPTCHA request timed out. Refresh it to try again.';
               else if (error.status === 429) {
