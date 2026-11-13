@@ -34,7 +34,9 @@ configuration file.
 
 The boundaries rules permit app composition files to import login code, and login
 code to import the CAPTCHA module. Imports within each module are allowed. Reverse
-dependencies and unclassified folders under `src/app` are rejected.
+dependencies and unclassified folders under `src/app` are rejected. App composition
+and both features can import shared HTTP utilities from `core`; `core` cannot
+import either feature.
 
 The login page loads lazily and uses a single native form, so Enter submits it.
 Pending logins block repeat submissions and CAPTCHA refreshes. CAPTCHA refreshes
@@ -66,3 +68,10 @@ or pass a request's `timeout` option to override it individually. Values must be
 positive integers in milliseconds. Timed-out requests
 are aborted and show an inline recovery message. Login attempts are not retried
 automatically; credentials are preserved and a fresh CAPTCHA is loaded for retry.
+
+HTTP 429 responses with a valid `Retry-After` header start a cooldown for the
+affected action. Both seconds and HTTP-date values are supported. CAPTCHA refresh
+and login submission are guarded until their cooldown expires, including direct
+method calls and native form submission. The UI shows the remaining wait; it does
+not automatically repeat the rejected request. Missing, invalid, or expired
+headers allow a manual retry. Timers are cleaned up when the component is destroyed.

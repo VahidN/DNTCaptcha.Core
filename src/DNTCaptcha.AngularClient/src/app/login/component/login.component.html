@@ -47,7 +47,7 @@
               }
             </div>
             <div class="mb-3">
-              <app-dnt-captcha [captchaForm]="form.captcha" [busy]="submitting()" />
+              <app-dnt-captcha [captchaForm]="form.captcha" [busy]="submitting() || cooldown.active()" />
             </div>
             @let loginState = state();
             @if (loginState.status === 'error') {
@@ -56,8 +56,14 @@
               <p role="status">{{ loginState.message }}</p>
             }
             <div class="mt-3 w-100 text-end">
-              <button type="submit" class="btn btn-primary" [disabled]="submitting()">
-                {{ submitting() ? 'Sending form…' : 'Send form' }}
+              <button type="submit" class="btn btn-primary" [disabled]="submitting() || cooldown.active()">
+                @if (submitting()) {
+                  Sending form…
+                } @else if (cooldown.active()) {
+                  Try again in {{ cooldown.remainingSeconds() }}s
+                } @else {
+                  Send form
+                }
               </button>
             </div>
           </form>

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpErrorResponse, provideHttpClient } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders, provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ToastrService } from '@openng/ngx-toastr';
 import { of, Subject, throwError } from 'rxjs';
@@ -142,6 +142,53 @@ describe('LoginComponent', () => {
     component.submitForm();
     await fixture.whenStable();
     expect(login).not.toHaveBeenCalled();
+  });
+
+  it('blocks native and programmatic login retries until Retry-After expires', async () => {
+    vi.useFakeTimers();
+    try {
+      login.mockReturnValue(
+        throwError(
+          () =>
+            new HttpErrorResponse({
+              status: 429,
+              headers: new HttpHeaders({ 'Retry-After': '3' })
+            })
+        )
+      );
+      fillForm();
+      await component.submitForm();
+      respondToCaptcha();
+      fixture.detectChanges();
+      const button: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      expect(button.disabled).toBe(true);
+      expect(button.textContent).toContain('Try again in 3s');
+      expect(component.form.username().value()).toBe('testUsername');
+      expect(component.form.password().value()).toBe('testPassword');
+      component.form.captcha.dntCaptchaInputText().value.set('43');
+      expect(await component.submitForm()).toBe(false);
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      await vi.advanceTimersByTimeAsync(0);
+      fixture.detectChanges();
+      expect(login).toHaveBeenCalledTimes(1);
+      await vi.advanceTimersByTimeAsync(2_000);
+      fixture.detectChanges();
+      expect(button.disabled).toBe(true);
+      await vi.advanceTimersByTimeAsync(1_000);
+      fixture.detectChanges();
+      expect(button.disabled).toBe(false);
+      expect(login).toHaveBeenCalledTimes(1);
+      login.mockReturnValue(of({ name: 'testUsername' }));
+      await component.submitForm();
+      respondToCaptcha();
+      fixture.detectChanges();
+      expect(login).toHaveBeenCalledTimes(2);
+      expect(success).toHaveBeenCalledTimes(1);
+    } finally {
+      fixture.destroy();
+      vi.useRealTimers();
+    }
   });
 
   it('recovers from a timeout without automatically repeating the login', async () => {

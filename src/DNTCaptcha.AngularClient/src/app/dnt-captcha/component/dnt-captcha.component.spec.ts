@@ -121,6 +121,71 @@ describe('DntCaptchaComponent', () => {
     expect(fixture.nativeElement.querySelector('img')).toBeNull();
   });
 
+  it('blocks refresh until Retry-After expires, then permits a manual retry', async () => {
+    vi.useFakeTimers();
+    try {
+      http.expectOne(endpoint).flush(
+        {},
+        {
+          status: 429,
+          statusText: 'Too Many Requests',
+          headers: { 'Retry-After': '3' }
+        }
+      );
+      fixture.detectChanges();
+      const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+      expect(button.disabled).toBe(true);
+      expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Try again in 3s');
+      expect(form.dntCaptchaToken().value()).toBe('');
+      component.loadNewCaptcha();
+      fixture.detectChanges();
+      http.expectNone(endpoint);
+      const replacement = TestBed.runInInjectionContext(() =>
+        createForm(
+          signal<DntCaptchaForm>({ dntCaptchaInputText: 'old', dntCaptchaText: 'old', dntCaptchaToken: 'old' })
+        )
+      );
+      fixture.componentRef.setInput('captchaForm', replacement);
+      fixture.detectChanges();
+      http.expectNone(endpoint);
+      expect(replacement.dntCaptchaToken().value()).toBe('');
+      await vi.advanceTimersByTimeAsync(2_000);
+      fixture.detectChanges();
+      expect(button.disabled).toBe(true);
+      expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Try again in 1s');
+      await vi.advanceTimersByTimeAsync(1_000);
+      fixture.detectChanges();
+      expect(button.disabled).toBe(false);
+      http.expectNone(endpoint);
+      button.click();
+      respond('retry');
+      fixture.detectChanges();
+      expect(component.state().status).toBe('ready');
+    } finally {
+      fixture.destroy();
+      vi.useRealTimers();
+    }
+  });
+
+  it('cleans up an active cooldown when destroyed', () => {
+    vi.useFakeTimers();
+    try {
+      http.expectOne(endpoint).flush(
+        {},
+        {
+          status: 429,
+          statusText: 'Too Many Requests',
+          headers: { 'Retry-After': '60' }
+        }
+      );
+      expect(component.cooldown.active()).toBe(true);
+      fixture.destroy();
+      expect(component.cooldown.active()).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('reports a timeout and permits a successful manual refresh', async () => {
     respond();
     vi.spyOn(TestBed.inject(DntCaptchaService), 'getDntCaptchaParams').mockReturnValueOnce(

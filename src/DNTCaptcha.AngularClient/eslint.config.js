@@ -39,6 +39,7 @@ module.exports = defineConfig(
     settings: {
       'boundaries/root-path': __dirname,
       'boundaries/elements': [
+        { type: 'core', pattern: 'src/app/core', partialMatch: false },
         { type: 'login', pattern: 'src/app/login', partialMatch: false },
         { type: 'captcha', pattern: 'src/app/dnt-captcha', partialMatch: false }
       ],
@@ -58,7 +59,11 @@ module.exports = defineConfig(
           policies: [
             {
               from: { file: { categories: ['app'] } },
-              allow: [{ to: { file: { categories: ['app'] } } }, { to: { element: { type: 'login' } } }]
+              allow: [{ to: { file: { categories: ['app'] } } }, { to: { element: { type: ['login', 'core'] } } }]
+            },
+            {
+              from: { element: { type: ['login', 'captcha'] } },
+              allow: { to: { element: { type: 'core' } } }
             },
             {
               from: { element: { type: 'login' } },

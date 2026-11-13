@@ -1,6 +1,15 @@
 import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FieldTree, form, FormField, FormRoot, readonly as readOnly, required, submit } from '@angular/forms/signals';
+import {
+  FieldTree,
+  form,
+  FormField,
+  FormRoot,
+  readonly as readOnly,
+  required,
+  submit,
+  validate
+} from '@angular/forms/signals';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
 import { ToastrService } from '@openng/ngx-toastr';
@@ -8,6 +17,7 @@ import { LoginService } from '../service/login.service';
 import { DntCaptchaComponent } from '../../dnt-captcha/component/dnt-captcha.component';
 import type { LoginFormModel } from '../interface/login-form.interface';
 import type { LoginState } from '../interface/login-state.type';
+import { createRetryAfterCooldown } from '../../core/http/create-retry-after-cooldown';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +28,7 @@ export class LoginComponent {
   private readonly loginService = inject(LoginService);
   private readonly toastr = inject(ToastrService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly cooldown = createRetryAfterCooldown();
   readonly dntCaptchaComponent = viewChild(DntCaptchaComponent);
 
   readonly state = signal<LoginState>({ status: 'idle' });
@@ -29,6 +40,10 @@ export class LoginComponent {
   readonly form: FieldTree<LoginFormModel> = form(
     this.model,
     (path) => {
+      // FormRoot also submits directly on Enter; its validation must honor the cooldown.
+      validate(path, () =>
+        this.cooldown.active() ? { kind: 'rateLimit', message: 'Wait for the login cooldown to finish.' } : undefined
+      );
       required(path.username, { message: 'Enter your username.' });
       required(path.password, { message: 'Enter your password.' });
       required(path.captcha.dntCaptchaInputText, { message: 'Enter the CAPTCHA result.' });
@@ -56,6 +71,7 @@ export class LoginComponent {
   readonly submitting = computed(() => this.form().submitting());
 
   submitForm(): Promise<boolean> {
+    if (this.cooldown.active()) return Promise.resolve(false);
     return submit(this.form);
   }
 
@@ -80,8 +96,10 @@ export class LoginComponent {
         if (error.error instanceof DOMException && error.error.name === 'TimeoutError')
           message = 'The login request timed out. Try again with the new CAPTCHA.';
         else if (error.status === 0) message = 'Cannot reach the server. Check your connection and try again.';
-        else if (error.status === 429) message = 'Too many login attempts. Wait a moment and try again.';
-        else if (error.status === 400 || error.status === 401)
+        else if (error.status === 429) {
+          this.cooldown.start(error.headers.get('Retry-After'));
+          message = 'Too many login attempts. Wait a moment and try again.';
+        } else if (error.status === 400 || error.status === 401)
           message = 'The entered captcha/credentials are not valid.';
         else if (error.status === 403) message = 'Login was denied. Check your access and try again.';
       }

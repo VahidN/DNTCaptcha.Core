@@ -5,6 +5,7 @@ import { FieldTree, FormField } from '@angular/forms/signals';
 import { DntCaptchaService } from '../service/dnt-captcha.service';
 import type { DntCaptchaForm } from '../interfaces/dnt-captcha-form.interface';
 import type { CaptchaState } from '../interfaces/dnt-captcha-state.type';
+import { createRetryAfterCooldown } from '../../core/http/create-retry-after-cooldown';
 
 @Component({
   selector: 'app-dnt-captcha',
@@ -15,6 +16,7 @@ import type { CaptchaState } from '../interfaces/dnt-captcha-state.type';
 export class DntCaptchaComponent {
   private readonly captchaService = inject(DntCaptchaService);
   private readonly refreshVersion = signal(0);
+  readonly cooldown = createRetryAfterCooldown();
 
   readonly captchaForm = input.required<FieldTree<DntCaptchaForm>>();
   readonly inputId = input<string>();
@@ -28,7 +30,9 @@ export class DntCaptchaComponent {
   readonly statusMessage = computed(() => {
     const state = this.state();
     if (state.status === 'loading') return 'Loading CAPTCHA…';
-    if (state.status === 'error') return state.message;
+    if (state.status === 'error') {
+      return this.cooldown.active() ? 'Too many CAPTCHA requests. Wait for the cooldown to finish.' : state.message;
+    }
     const answer = this.captchaForm().dntCaptchaInputText();
     if (answer.touched() && answer.invalid()) {
       return (
@@ -48,6 +52,11 @@ export class DntCaptchaComponent {
       const version = this.refreshVersion();
       // Editing the form must not become a dependency that triggers another HTTP request.
       untracked(() => {
+        if (this.cooldown.active()) {
+          // Replacing the form must not bypass the server's cooldown.
+          field().reset({ dntCaptchaInputText: '', dntCaptchaText: '', dntCaptchaToken: '' });
+          return;
+        }
         this.clearChallenge(field);
         const request = this.captchaService.getDntCaptchaParams().subscribe({
           next: (data) => {
@@ -66,7 +75,10 @@ export class DntCaptchaComponent {
             if (error instanceof HttpErrorResponse) {
               if (error.error instanceof DOMException && error.error.name === 'TimeoutError')
                 message = 'The CAPTCHA request timed out. Refresh it to try again.';
-              else if (error.status === 429) message = 'Too many CAPTCHA requests. Wait a moment, then refresh it.';
+              else if (error.status === 429) {
+                this.cooldown.start(error.headers.get('Retry-After'));
+                message = 'Too many CAPTCHA requests. Refresh it to try again when you are ready.';
+              }
             }
             this.state.set({
               status: 'error',
@@ -80,6 +92,7 @@ export class DntCaptchaComponent {
   }
 
   loadNewCaptcha(): void {
+    if (this.cooldown.active()) return;
     // Invalidate the old challenge immediately, before the effect starts the next request.
     this.clearChallenge(this.captchaForm());
     this.refreshVersion.update((version) => version + 1);

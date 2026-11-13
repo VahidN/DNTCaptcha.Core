@@ -10,7 +10,7 @@
     title="Refresh captcha"
     aria-label="Refresh captcha"
     class="btn btn-link refresh"
-    [disabled]="busy() || state().status === 'loading'"
+    [disabled]="busy() || state().status === 'loading' || cooldown.active()"
     [attr.aria-describedby]="statusId()"
     (click)="loadNewCaptcha()"
   >
@@ -42,4 +42,7 @@
 </div>
 <p [id]="statusId()" role="status" class="small mt-1 mb-0" [class.text-danger]="state().status === 'error'">
   {{ statusMessage() }}
+  @if (cooldown.active()) {
+    <span aria-hidden="true">Try again in {{ cooldown.remainingSeconds() }}s.</span>
+  }
 </p>
