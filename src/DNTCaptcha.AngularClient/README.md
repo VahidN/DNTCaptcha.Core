@@ -28,6 +28,13 @@ npm run format:check
 
 Use `npm test` for interactive watch mode.
 
+The `Angular CI` GitHub Actions workflow runs on pushes and pull requests and can
+also be started manually. It uses the Node.js version in `.nvmrc`, caches npm's
+downloads using `package-lock.json`, installs with `npm ci`, then checks formatting,
+lint, unit tests without watch mode, and the production build. The job runs from
+this directory and does not require the API backend. Its check is named
+`Angular checks`.
+
 Run `npm run format` to apply formatting. Generated files are excluded by
 `.prettierignore`; ESLint also checks formatting in TypeScript, HTML, and its own
 configuration file.
