@@ -79,9 +79,6 @@
     <PlatformTarget>anycpu</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.301" PrivateAssets="All"/>
-  </ItemGroup>
-  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     <PackageReference Include="SkiaSharp" Version="4.150.1"/>
     <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.150.1"/>
