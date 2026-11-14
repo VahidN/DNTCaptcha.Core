@@ -7,7 +7,7 @@ import { of, Subject, throwError } from 'rxjs';
 import { LoginComponent } from './login.component';
 import { LoginService } from '../service/login.service';
 
-const captchaEndpoint = 'api/account/CreateDNTCaptchaParams';
+const captchaEndpoint = 'api/account/CreateAudioCaptchaParams';
 
 describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
@@ -39,12 +39,15 @@ describe('LoginComponent', () => {
 
   function respondToCaptcha(): void {
     fixture.detectChanges();
-    http.expectOne(captchaEndpoint).flush({
-      dntCaptchaImgUrl: new URL('/captcha.png', document.baseURI).href,
-      dntCaptchaTextValue: 'text',
-      dntCaptchaTokenValue: 'token',
-      dntCaptchaId: 'id'
-    });
+    http
+      .expectOne((request) => request.url === captchaEndpoint)
+      .flush({
+        dntCaptchaImgUrl: '',
+        dntCaptchaAudioUrl: '/my-custom-captcha/Audio?data=protected',
+        dntCaptchaTextValue: 'text',
+        dntCaptchaTokenValue: 'token',
+        dntCaptchaId: 'id'
+      });
   }
 
   function fillForm(): void {
@@ -88,7 +91,7 @@ describe('LoginComponent', () => {
     expect(component.form.captcha.dntCaptchaInputText().value()).toBe('');
     respondToCaptcha();
     await fixture.whenStable();
-    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Enter the result');
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Listen and type');
   });
 
   it('prevents duplicate login requests and disables controls while submitting', async () => {
@@ -138,7 +141,7 @@ describe('LoginComponent', () => {
     component.dntCaptchaComponent()!.loadNewCaptcha();
     component.submitForm();
     fixture.detectChanges();
-    http.expectOne(captchaEndpoint).flush({}, { status: 500, statusText: 'Failed' });
+    http.expectOne((request) => request.url === captchaEndpoint).flush({}, { status: 500, statusText: 'Failed' });
     component.submitForm();
     await fixture.whenStable();
     expect(login).not.toHaveBeenCalled();

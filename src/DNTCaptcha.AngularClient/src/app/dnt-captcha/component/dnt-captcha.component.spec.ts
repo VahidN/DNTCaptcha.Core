@@ -321,3 +321,262 @@ describe('DntCaptchaComponent', () => {
     http.expectNone(endpoint);
   });
 });
+
+describe('DntCaptchaComponent audio', () => {
+  let fixture: ComponentFixture<DntCaptchaComponent>;
+  let component: DntCaptchaComponent;
+  let form: FieldTree<DntCaptchaForm>;
+  let http: HttpTestingController;
+  const endpoint = 'api/account/CreateAudioCaptchaParams';
+  const audioUrl = '/my-custom-captcha/Audio?data=first';
+
+  beforeEach(() => {
+    vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined);
+    vi.spyOn(HTMLMediaElement.prototype, 'load').mockImplementation(() => undefined);
+    vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined);
+    vi.stubGlobal('URL', URL);
+    Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:test-audio') });
+    Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() });
+    TestBed.configureTestingModule({
+      imports: [DntCaptchaComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
+    });
+    http = TestBed.inject(HttpTestingController);
+    fixture = TestBed.createComponent(DntCaptchaComponent);
+    component = fixture.componentInstance;
+    form = TestBed.runInInjectionContext(() =>
+      createForm(
+        signal<DntCaptchaForm>({
+          dntCaptchaInputText: '',
+          dntCaptchaText: '',
+          dntCaptchaToken: ''
+        }),
+        (path) => {
+          readOnly(path.dntCaptchaInputText, { when: () => component.busy() || component.state().status !== 'ready' });
+          required(path.dntCaptchaInputText);
+          required(path.dntCaptchaText);
+          required(path.dntCaptchaToken);
+        }
+      )
+    );
+    fixture.componentRef.setInput('captchaForm', form);
+    fixture.componentRef.setInput('mode', 'audio');
+    fixture.autoDetectChanges();
+  });
+  afterEach(() => {
+    fixture.destroy();
+    http.verify();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
+  });
+
+  function respond(id = 'first') {
+    fixture.detectChanges();
+    const request = http.expectOne((request) => request.url === endpoint);
+    request.flush({
+      dntCaptchaImgUrl: '',
+      dntCaptchaAudioUrl: '/my-custom-captcha/Audio?data=' + id,
+      dntCaptchaId: id,
+      dntCaptchaTextValue: 'text',
+      dntCaptchaTokenValue: 'token'
+    });
+    return request;
+  }
+  async function play() {
+    component.playCaptcha();
+    http.expectOne(audioUrl).flush(new Blob(['wav'], { type: 'audio/wav' }));
+    await fixture.whenStable();
+  }
+
+  it('renders audio parameters without autoplay and updates the signal form', async () => {
+    respond();
+    await fixture.whenStable();
+    expect(component.captchaAudioUrl()).toBe(audioUrl);
+    expect(fixture.nativeElement.querySelector('img')).toBeNull();
+    expect(HTMLMediaElement.prototype.play).not.toHaveBeenCalled();
+    expect(form().value()).toEqual({ dntCaptchaInputText: '', dntCaptchaText: 'text', dntCaptchaToken: 'token' });
+    const input: HTMLInputElement = fixture.nativeElement.querySelector('input');
+    expect(input.labels?.[0]?.textContent).toContain('digits you hear');
+    expect(input.getAttribute('aria-describedby')).toBe(component.statusId());
+  });
+
+  it('replays cached audio and permits stopping without another download', async () => {
+    respond();
+    await play();
+    expect(component.isPlaying()).toBe(true);
+    component.playCaptcha();
+    expect(component.isPlaying()).toBe(false);
+    component.playCaptcha();
+    await fixture.whenStable();
+    http.expectNone(audioUrl);
+    expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
+    component.playbackEnded();
+    expect(component.isPlaying()).toBe(false);
+  });
+
+  it('stops playback, revokes the URL, and invalidates the previous challenge on refresh', async () => {
+    respond();
+    await play();
+    form.dntCaptchaInputText().value.set('1234');
+    component.loadNewCaptcha();
+    expect(component.isPlaying()).toBe(false);
+    expect(form.dntCaptchaInputText().value()).toBe('');
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test-audio');
+    expect(HTMLMediaElement.prototype.pause).toHaveBeenCalled();
+    expect(respond('second').request.params.get('previousAudioData')).toBe('first');
+  });
+
+  it('cancels an audio download and ignores late playback after refresh', async () => {
+    respond();
+    component.playCaptcha();
+    const request = http.expectOne(audioUrl);
+    component.loadNewCaptcha();
+    expect(request.cancelled).toBe(true);
+    expect(URL.createObjectURL).not.toHaveBeenCalled();
+    expect(component.isAudioLoading()).toBe(false);
+    respond('second');
+    await fixture.whenStable();
+    expect(component.isPlaying()).toBe(false);
+  });
+
+  it('ignores a pending play promise after refresh', async () => {
+    let finish!: () => void;
+    vi.mocked(HTMLMediaElement.prototype.play).mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      })
+    );
+    respond();
+    component.playCaptcha();
+    http.expectOne(audioUrl).flush(new Blob(['wav']));
+    component.loadNewCaptcha();
+    finish();
+    respond('second');
+    await fixture.whenStable();
+    expect(component.isPlaying()).toBe(false);
+    expect(component.isAudioLoading()).toBe(false);
+  });
+
+  it('retries cached audio after the browser blocks playback', async () => {
+    vi.mocked(HTMLMediaElement.prototype.play).mockRejectedValueOnce(new DOMException('Blocked', 'NotAllowedError'));
+    respond();
+    await play();
+    expect(component.audioError()).toContain('Playback was blocked');
+    component.playCaptcha();
+    await fixture.whenStable();
+    expect(component.isPlaying()).toBe(true);
+    http.expectNone(audioUrl);
+  });
+
+  it('reports a media error and releases the failed blob', async () => {
+    respond();
+    await play();
+    fixture.nativeElement.querySelector('audio').dispatchEvent(new Event('error'));
+    await fixture.whenStable();
+    expect(component.audioError()).toContain('Could not play');
+    expect(component.isPlaying()).toBe(false);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test-audio');
+  });
+
+  it('clears an expired challenge so it cannot be submitted', async () => {
+    respond();
+    component.playCaptcha();
+    http.expectOne(audioUrl).flush(new Blob(), { status: 400, statusText: 'Expired' });
+    await fixture.whenStable();
+    expect(component.state()).toMatchObject({ status: 'error' });
+    expect(component.statusMessage()).toContain('expired');
+    expect(form.dntCaptchaToken().value()).toBe('');
+    expect(fixture.nativeElement.querySelector('input').readOnly).toBe(true);
+    component.loadNewCaptcha();
+    respond('second');
+  });
+
+  it('honors Retry-After for audio downloads without automatically retrying', async () => {
+    respond();
+    vi.useFakeTimers();
+    try {
+      component.playCaptcha();
+      http
+        .expectOne(audioUrl)
+        .flush(new Blob(), { status: 429, statusText: 'Too Many Requests', headers: { 'Retry-After': '3' } });
+      fixture.detectChanges();
+      expect(component.audioCooldown.active()).toBe(true);
+      expect(fixture.nativeElement.querySelector('.captcha-listen').disabled).toBe(true);
+      component.playCaptcha();
+      http.expectNone(audioUrl);
+      await vi.advanceTimersByTimeAsync(3000);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('.captcha-listen').disabled).toBe(false);
+      http.expectNone(audioUrl);
+      component.playCaptcha();
+      http.expectOne(audioUrl).flush(new Blob(['wav']));
+      await Promise.resolve();
+    } finally {
+      fixture.destroy();
+      vi.useRealTimers();
+    }
+  });
+
+  it('keeps creation cooldowns active after changing mode', async () => {
+    vi.useFakeTimers();
+    try {
+      http
+        .expectOne(endpoint)
+        .flush({}, { status: 429, statusText: 'Too Many Requests', headers: { 'Retry-After': '3' } });
+      fixture.componentRef.setInput('mode', 'image');
+      fixture.detectChanges();
+      http.expectNone('api/account/CreateDNTCaptchaParams');
+      component.loadNewCaptcha();
+      fixture.detectChanges();
+      http.expectNone('api/account/CreateDNTCaptchaParams');
+      await vi.advanceTimersByTimeAsync(3000);
+      fixture.detectChanges();
+      expect(component.state().status).toBe('error');
+      component.loadNewCaptcha();
+      fixture.detectChanges();
+      http.expectOne('api/account/CreateDNTCaptchaParams').flush({
+        dntCaptchaImgUrl: '/captcha.png',
+        dntCaptchaId: 'image',
+        dntCaptchaTextValue: 'text',
+        dntCaptchaTokenValue: 'token'
+      });
+    } finally {
+      fixture.destroy();
+      vi.useRealTimers();
+    }
+  });
+
+  it('ignores a stale audio response after changing mode before the effect runs', async () => {
+    const old = http.expectOne(endpoint);
+    fixture.componentRef.setInput('mode', 'image');
+    old.flush({
+      dntCaptchaImgUrl: '',
+      dntCaptchaAudioUrl: audioUrl,
+      dntCaptchaId: 'stale',
+      dntCaptchaTextValue: 'text',
+      dntCaptchaTokenValue: 'token'
+    });
+    expect(component.captchaAudioUrl()).toBe('');
+    fixture.detectChanges();
+    http.expectOne('api/account/CreateDNTCaptchaParams').flush({
+      dntCaptchaImgUrl: '/captcha.png',
+      dntCaptchaId: 'image',
+      dntCaptchaTextValue: 'text',
+      dntCaptchaTokenValue: 'token'
+    });
+    await fixture.whenStable();
+    expect(component.captchaImageUrl()).toBe('/captcha.png');
+  });
+
+  it('disables playback while submitting and cleans up media on destruction', async () => {
+    respond();
+    fixture.componentRef.setInput('busy', true);
+    component.playCaptcha();
+    http.expectNone(audioUrl);
+    fixture.componentRef.setInput('busy', false);
+    await play();
+    fixture.destroy();
+    expect(component.isPlaying()).toBe(false);
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:test-audio');
+  });
+});

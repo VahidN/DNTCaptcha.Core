@@ -85,7 +85,30 @@ headers allow a manual retry. Timers are cleaned up when the component is destro
 
 API services receive JSON as `unknown` and validate it before exposing typed values.
 Login requires a non-empty name; CAPTCHA requires a non-empty ID, encrypted text,
-token, and a relative or HTTP(S) image URL. Extra response fields are ignored and
+token, and a relative or HTTP(S) URL for the requested image or audio mode. Extra response fields are ignored and
 valid strings are preserved without trimming. Invalid successful responses produce
 an inline recovery message rather than login success or a usable CAPTCHA. A failed
 login preserves credentials and loads a new challenge for manual retry.
+
+### Audio digits example
+
+The login example uses `<app-dnt-captcha [captchaForm]="form.captcha" mode="audio" />`.
+The server configures `DisplayMode.AudioDigits`, `Language.English`, and the voice
+in `AccountController.CreateAudioCaptchaParams`. Change `AudioVoice` there to
+choose `Male` or `Female`; challenge difficulty is configured on the server.
+
+The backend references the optional `DNTCaptcha.Core.Audio.English` project and
+calls `services.AddDNTCaptchaEnglishAudio()`. The core package contains no WAVs.
+
+Select **Listen to captcha** and enter the digits in order. Playback starts only
+after a click. Replaying uses the same downloaded audio. Refresh stops playback,
+cancels pending requests, clears the answer, invalidates the previous challenge,
+and replaces its protected URL and hidden form values. Navigation releases the
+audio object URL. Request and playback failures appear beside the input. Audio
+HTTP 429 responses honor Retry-After using a separate playback cooldown. Expired
+audio challenges clear the hidden values and require a manual refresh.
+
+The development proxy forwards both `/api` and `/my-custom-captcha` to the API
+sample at `https://localhost:5001`; update the latter if you change the configured
+CAPTCHA controller route. Use `mode="image"` (the default) for the existing image
+CAPTCHA example.

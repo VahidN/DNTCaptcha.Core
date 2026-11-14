@@ -47,7 +47,7 @@
               }
             </div>
             <div class="mb-3">
-              <app-dnt-captcha [captchaForm]="form.captcha" [busy]="submitting() || cooldown.active()" />
+              <app-dnt-captcha [captchaForm]="form.captcha" mode="audio" [busy]="submitting() || cooldown.active()" />
             </div>
             @let loginState = state();
             @if (loginState.status === 'error') {

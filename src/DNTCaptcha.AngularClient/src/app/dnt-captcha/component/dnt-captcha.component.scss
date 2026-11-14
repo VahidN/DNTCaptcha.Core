@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.captcha-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.captcha-image {
+  width: 7rem;
+  height: 2.75rem;
+}
+
+.captcha-refresh,
+.captcha-listen {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+.captcha-input {
+  flex: 1 1 8rem;
+}

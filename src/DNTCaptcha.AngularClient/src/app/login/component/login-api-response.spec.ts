@@ -31,12 +31,15 @@ describe('Login API response validation', () => {
 
       function respondToCaptcha(): void {
         fixture.detectChanges();
-        http.expectOne('api/account/CreateDNTCaptchaParams').flush({
-          dntCaptchaImgUrl: new URL('/captcha.png', document.baseURI).href,
-          dntCaptchaId: 'id',
-          dntCaptchaTextValue: 'text',
-          dntCaptchaTokenValue: 'token'
-        });
+        http
+          .expectOne((request) => request.url === 'api/account/CreateAudioCaptchaParams')
+          .flush({
+            dntCaptchaImgUrl: '',
+            dntCaptchaAudioUrl: '/my-custom-captcha/Audio?data=protected',
+            dntCaptchaId: 'id',
+            dntCaptchaTextValue: 'text',
+            dntCaptchaTokenValue: 'token'
+          });
       }
 
       respondToCaptcha();

@@ -1,7 +1,8 @@
-import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FieldTree, FormField } from '@angular/forms/signals';
+import { Subscription } from 'rxjs';
 import { DntCaptchaService } from '../service/dnt-captcha.service';
 import type { DntCaptchaForm } from '../interfaces/dnt-captcha-form.interface';
 import type { CaptchaState } from '../interfaces/dnt-captcha-state.type';
@@ -12,14 +13,21 @@ import { InvalidApiResponseError } from '../../core/http/api-response-validation
   selector: 'app-dnt-captcha',
   imports: [NgOptimizedImage, FormField],
   templateUrl: './dnt-captcha.component.html',
-  styles: ['.captcha-input { width: 65%; } .refresh { min-height: 44px; min-width: 44px; }']
+  styleUrl: './dnt-captcha.component.scss'
 })
 export class DntCaptchaComponent {
   private readonly captchaService = inject(DntCaptchaService);
   private readonly refreshVersion = signal(0);
+  private readonly captchaAudio = viewChild<ElementRef<HTMLAudioElement>>('captchaAudio');
+  private audioRequest?: Subscription;
+  private objectUrl = '';
+  private previousAudioUrl = '';
+  private playbackVersion = 0;
   readonly cooldown = createRetryAfterCooldown();
+  readonly audioCooldown = createRetryAfterCooldown();
 
   readonly captchaForm = input.required<FieldTree<DntCaptchaForm>>();
+  readonly mode = input<'image' | 'audio'>('image');
   readonly inputId = input<string>();
   readonly captchaInputId = computed(
     () => this.inputId() ?? this.captchaForm().dntCaptchaInputText().name() + '-input'
@@ -27,6 +35,10 @@ export class DntCaptchaComponent {
   readonly statusId = computed(() => this.captchaInputId() + '-status');
   readonly busy = input(false);
   readonly captchaImageUrl = signal('');
+  readonly captchaAudioUrl = signal('');
+  readonly isAudioLoading = signal(false);
+  readonly isPlaying = signal(false);
+  readonly audioError = signal('');
   readonly state = signal<CaptchaState>({ status: 'loading' });
   readonly statusMessage = computed(() => {
     const state = this.state();
@@ -34,6 +46,7 @@ export class DntCaptchaComponent {
     if (state.status === 'error') {
       return this.cooldown.active() ? 'Too many CAPTCHA requests. Wait for the cooldown to finish.' : state.message;
     }
+    if (this.audioError()) return this.audioError();
     const answer = this.captchaForm().dntCaptchaInputText();
     if (answer.touched() && answer.invalid()) {
       return (
@@ -44,34 +57,37 @@ export class DntCaptchaComponent {
           .join(' ') || 'The CAPTCHA result is invalid.'
       );
     }
-    return 'Enter the result shown in the image.';
+    return this.mode() === 'audio' ? 'Listen and type the digits in order.' : 'Enter the result shown in the image.';
   });
 
   constructor() {
     effect((onCleanup) => {
       const field = this.captchaForm();
       const version = this.refreshVersion();
-      // Editing the form must not become a dependency that triggers another HTTP request.
+      const mode = this.mode();
+      // Form edits and playback state must not trigger a new CAPTCHA request.
       untracked(() => {
+        this.clearChallenge(field);
         if (this.cooldown.active()) {
-          // Replacing the form must not bypass the server's cooldown.
-          field().reset({ dntCaptchaInputText: '', dntCaptchaText: '', dntCaptchaToken: '' });
+          this.state.set({ status: 'error', message: 'Too many CAPTCHA requests. Refresh it when you are ready.' });
           return;
         }
-        this.clearChallenge(field);
-        const request = this.captchaService.getDntCaptchaParams().subscribe({
+        const current = () => this.refreshVersion() === version && this.captchaForm() === field && this.mode() === mode;
+        const request = this.captchaService.getDntCaptchaParams(mode, this.previousAudioUrl).subscribe({
           next: (data) => {
-            if (this.refreshVersion() !== version || this.captchaForm() !== field) return;
+            if (!current()) return;
             field().reset({
               dntCaptchaText: data.dntCaptchaTextValue,
               dntCaptchaToken: data.dntCaptchaTokenValue,
               dntCaptchaInputText: ''
             });
             this.captchaImageUrl.set(data.dntCaptchaImgUrl);
+            this.captchaAudioUrl.set(data.dntCaptchaAudioUrl ?? '');
+            this.previousAudioUrl = '';
             this.state.set({ status: 'ready' });
           },
           error: (error: unknown) => {
-            if (this.refreshVersion() !== version || this.captchaForm() !== field) return;
+            if (!current()) return;
             let message = 'Could not load the CAPTCHA. Check your connection, then refresh it.';
             if (error instanceof InvalidApiResponseError) {
               message = 'The server returned an invalid CAPTCHA response. Refresh it to try again.';
@@ -83,13 +99,13 @@ export class DntCaptchaComponent {
                 message = 'Too many CAPTCHA requests. Refresh it to try again when you are ready.';
               }
             }
-            this.state.set({
-              status: 'error',
-              message
-            });
+            this.state.set({ status: 'error', message });
           }
         });
-        onCleanup(() => request.unsubscribe());
+        onCleanup(() => {
+          request.unsubscribe();
+          this.stopPlayback(true);
+        });
       });
     });
   }
@@ -106,9 +122,116 @@ export class DntCaptchaComponent {
     this.state.set({ status: 'error', message: 'The CAPTCHA image could not load. Refresh it to try again.' });
   }
 
+  playCaptcha(): void {
+    if (this.busy()) return;
+    if (this.isPlaying()) {
+      this.stopPlayback();
+      return;
+    }
+    if (
+      !this.captchaAudioUrl() ||
+      this.state().status !== 'ready' ||
+      this.isAudioLoading() ||
+      this.audioCooldown.active()
+    )
+      return;
+    this.audioError.set('');
+    const version = ++this.playbackVersion;
+    if (this.objectUrl) {
+      void this.startPlayback(version);
+      return;
+    }
+    this.isAudioLoading.set(true);
+    this.audioRequest = this.captchaService.getAudio(this.captchaAudioUrl()).subscribe({
+      next: (audio) => {
+        if (version !== this.playbackVersion) return;
+        this.objectUrl = URL.createObjectURL(audio);
+        void this.startPlayback(version);
+      },
+      error: (error: unknown) => {
+        if (version !== this.playbackVersion) return;
+        this.isAudioLoading.set(false);
+        let message = 'Could not load the audio. Refresh the CAPTCHA and try again.';
+        if (error instanceof HttpErrorResponse) {
+          if (error.status === 429) {
+            this.audioCooldown.start(error.headers.get('Retry-After'));
+            message = 'Too many audio requests. Wait for the cooldown, then try again.';
+          } else if (error.status === 400) {
+            this.clearChallenge(this.captchaForm());
+            this.state.set({
+              status: 'error',
+              message: 'The audio CAPTCHA expired or is unavailable. Refresh it to try again.'
+            });
+            return;
+          } else if (error.error instanceof DOMException && error.error.name === 'TimeoutError') {
+            message = 'The audio request timed out. Select Listen to captcha to try again.';
+          }
+        }
+        this.audioError.set(message);
+      }
+    });
+  }
+
+  playbackEnded(): void {
+    this.isPlaying.set(false);
+  }
+
+  playbackFailed(): void {
+    if (!this.captchaAudio()?.nativeElement.getAttribute('src')) return;
+    this.stopPlayback(true);
+    this.audioError.set('Could not play the audio. Refresh the CAPTCHA and try again.');
+  }
+
+  private async startPlayback(version: number): Promise<void> {
+    const audio = this.captchaAudio()?.nativeElement;
+    if (!audio || version !== this.playbackVersion) return;
+    audio.src = this.objectUrl;
+    audio.currentTime = 0;
+    this.isAudioLoading.set(true);
+    try {
+      await audio.play();
+      if (version === this.playbackVersion) {
+        this.isAudioLoading.set(false);
+        this.isPlaying.set(true);
+      }
+    } catch (error) {
+      if (version !== this.playbackVersion) return;
+      if (error instanceof DOMException && error.name === 'NotAllowedError') {
+        this.isAudioLoading.set(false);
+        this.audioError.set('Playback was blocked. Select Listen to captcha again.');
+      } else {
+        this.playbackFailed();
+      }
+    }
+  }
+
+  private stopPlayback(releaseAudio = false): void {
+    this.playbackVersion++;
+    this.audioRequest?.unsubscribe();
+    const audio = this.captchaAudio()?.nativeElement;
+    if (audio && (audio.getAttribute('src') || this.objectUrl)) {
+      audio.pause();
+      audio.currentTime = 0;
+      if (releaseAudio) {
+        audio.removeAttribute('src');
+        audio.load();
+      }
+    }
+    this.isPlaying.set(false);
+    this.isAudioLoading.set(false);
+    if (releaseAudio && this.objectUrl) {
+      URL.revokeObjectURL(this.objectUrl);
+      this.objectUrl = '';
+    }
+  }
+
   private clearChallenge(field: FieldTree<DntCaptchaForm>): void {
+    if (this.captchaAudioUrl()) this.previousAudioUrl = this.captchaAudioUrl();
+    this.stopPlayback(true);
     field().reset({ dntCaptchaInputText: '', dntCaptchaText: '', dntCaptchaToken: '' });
     this.captchaImageUrl.set('');
+    this.captchaAudioUrl.set('');
+    this.audioError.set('');
     this.state.set({ status: 'loading' });
   }
 }

@@ -1,15 +1,28 @@
-<label [htmlFor]="captchaInputId()" class="form-label">Captcha:</label>
-<div class="d-flex align-items-center justify-content-between" [attr.aria-busy]="state().status === 'loading'">
+<label [htmlFor]="captchaInputId()" class="form-label">{{
+  mode() === 'audio' ? 'Captcha digits you hear:' : 'Captcha:'
+}}</label>
+<div class="captcha-controls" [attr.aria-busy]="state().status === 'loading' || isAudioLoading()">
   @if (captchaImageUrl()) {
-    <div style="height: 38px" class="w-25 position-relative">
+    <div class="captcha-image position-relative">
       <img [ngSrc]="captchaImageUrl()" fill="true" alt="CAPTCHA challenge" priority="true" (error)="onImageError()" />
     </div>
+  }
+  @if (mode() === 'audio') {
+    <button
+      type="button"
+      class="btn btn-outline-secondary captcha-listen"
+      [disabled]="busy() || state().status !== 'ready' || isAudioLoading() || audioCooldown.active()"
+      [attr.aria-describedby]="statusId()"
+      (click)="playCaptcha()"
+    >
+      {{ isAudioLoading() ? 'Loading audio…' : isPlaying() ? 'Stop audio' : 'Listen to captcha' }}
+    </button>
   }
   <button
     type="button"
     title="Refresh captcha"
     aria-label="Refresh captcha"
-    class="btn btn-link refresh"
+    class="btn btn-link captcha-refresh"
     [disabled]="busy() || state().status === 'loading' || cooldown.active()"
     [attr.aria-describedby]="statusId()"
     (click)="loadNewCaptcha()"
@@ -30,6 +43,7 @@
     <input
       [formField]="captchaForm().dntCaptchaInputText"
       type="text"
+      inputmode="numeric"
       class="form-control"
       [id]="captchaInputId()"
       autocomplete="off"
@@ -40,9 +54,18 @@
     />
   </div>
 </div>
-<p [id]="statusId()" role="status" class="small mt-1 mb-0" [class.text-danger]="state().status === 'error'">
+<audio #captchaAudio preload="none" (ended)="playbackEnded()" (error)="playbackFailed()"></audio>
+<p
+  [id]="statusId()"
+  role="status"
+  class="small mt-1 mb-0"
+  [class.text-danger]="state().status === 'error' || audioError()"
+>
   {{ statusMessage() }}
   @if (cooldown.active()) {
     <span aria-hidden="true">Try again in {{ cooldown.remainingSeconds() }}s.</span>
+  }
+  @if (audioCooldown.active()) {
+    <span aria-hidden="true">Try audio again in {{ audioCooldown.remainingSeconds() }}s.</span>
   }
 </p>

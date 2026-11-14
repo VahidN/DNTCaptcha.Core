@@ -8,7 +8,19 @@ import { parseDntCaptchaParams } from '../validation/parse-dnt-captcha-params';
 export class DntCaptchaService {
   private readonly http = inject(HttpClient);
 
-  getDntCaptchaParams(): Observable<DntCaptchaParams> {
-    return this.http.get<unknown>('api/account/CreateDNTCaptchaParams').pipe(map(parseDntCaptchaParams));
+  getDntCaptchaParams(mode: 'image' | 'audio' = 'image', previousAudioUrl = ''): Observable<DntCaptchaParams> {
+    const endpoint = mode === 'audio' ? 'CreateAudioCaptchaParams' : 'CreateDNTCaptchaParams';
+    const params: Record<string, string> = {};
+    if (mode === 'audio' && previousAudioUrl) {
+      const data = new URL(previousAudioUrl, 'https://captcha.invalid/').searchParams.get('data');
+      if (data) params['previousAudioData'] = data;
+    }
+    return this.http
+      .get<unknown>('api/account/' + endpoint, { params })
+      .pipe(map((value) => parseDntCaptchaParams(value, mode)));
+  }
+
+  getAudio(url: string): Observable<Blob> {
+    return this.http.get(url, { responseType: 'blob' });
   }
 }
