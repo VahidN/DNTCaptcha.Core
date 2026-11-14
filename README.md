@@ -301,8 +301,26 @@ Create challenges with `IDNTCaptchaApiProvider`. The response contains
 modes retain their image responses. The core package does not embed recordings.
 
 The [Angular example](/src/DNTCaptcha.AngularClient/README.md) demonstrates audio
-playback and refresh. Razor TagHelper playback is not yet implemented. Audio
-requests use authenticated, expiring, browser-bound payloads and do not consume
+playback and refresh. Razor views can use native browser playback controls:
+
+```html
+<dnt-captcha asp-captcha-generator-display-mode="AudioDigits"
+             asp-captcha-generator-language="English"
+             asp-captcha-audio-voice="Female"
+             asp-captcha-audio-label="Listen to the CAPTCHA digits"
+             asp-use-relative-urls="true">
+</dnt-captcha>
+```
+
+Register the matching audio package as described above. The player supports
+playback, pause, and replay without autoplay or preloading. Localize
+`asp-captcha-audio-label` for your application. The existing answer input,
+validation, and Ajax refresh work as usual; refresh preserves the selected
+language and voice and invalidates the previous audio challenge. Keep jQuery
+and unobtrusive Ajax loaded for refresh, and allow the audio endpoint in your
+Content Security Policy's `media-src` directive if you use CSP.
+
+Audio requests use authenticated, expiring, browser-bound payloads and do not consume
 the validation answer. Keep the existing rate-limiter middleware enabled on
 .NET 7+; .NET 6 applications need host/proxy rate limiting. For multiple servers,
 configure a shared ASP.NET Core Data Protection key ring and application name.

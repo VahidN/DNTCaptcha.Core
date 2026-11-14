@@ -114,6 +114,9 @@ public class DNTCaptchaImageController(
             tagHelper.FontSize = model.FontSize;
             tagHelper.ForeColor = model.ForeColor;
             tagHelper.Language = model.Language;
+            tagHelper.AudioVoice = model.AudioVoice;
+            tagHelper.AudioLabel = model.AudioLabel;
+            tagHelper.Dir = model.Dir;
             tagHelper.Max = model.Max;
             tagHelper.Min = model.Min;
             tagHelper.Placeholder = model.Placeholder;

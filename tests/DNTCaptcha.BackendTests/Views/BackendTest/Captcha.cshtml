@@ -1,0 +1,13 @@
+@using DNTCaptcha.Core
+@model DNTCaptchaTagHelperHtmlAttributes
+@addTagHelper *, DNTCaptcha.Core
+<dnt-captcha asp-captcha-generator-display-mode="@Model.DisplayMode"
+             asp-captcha-generator-language="@Model.Language"
+             asp-captcha-audio-voice="@Model.AudioVoice"
+             asp-captcha-audio-label="Listen & enter the digits"
+             asp-captcha-generator-min="Model.Min"
+             asp-captcha-generator-max="Model.Max"
+             asp-use-relative-urls="Model.UseRelativeUrls"
+             asp-show-refresh-button="Model.ShowRefreshButton"
+             asp-dir="rtl">
+</dnt-captcha>

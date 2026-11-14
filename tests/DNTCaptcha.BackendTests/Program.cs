@@ -2,6 +2,7 @@ using System.Buffers.Binary;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 using DNTCaptcha.Core;
 using DNTCaptcha.BackendTests;
 using Microsoft.AspNetCore.DataProtection;
@@ -72,12 +73,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
 builder.WebHost.UseUrls("http://127.0.0.1:0");
 builder.Services.AddDNTCaptcha(options => options.UseMemoryCacheStorageProvider()
-    .WithEncryptionKey("backend-regression-test-key").RateLimiterPermitLimit(60));
+    .WithEncryptionKey("backend-regression-test-key").RateLimiterPermitLimit(120));
 builder.Services.AddDNTCaptchaEnglishAudio();
 builder.Services.AddDNTCaptchaPersianAudio();
 builder.Services.AddSingleton<IDataProtectionProvider>(new EphemeralDataProtectionProvider());
-builder.Services.AddControllers().AddApplicationPart(typeof(BackendTestController).Assembly);
+builder.Services.AddControllersWithViews().AddApplicationPart(typeof(BackendTestController).Assembly);
 await using var app = builder.Build();
+app.UseDeveloperExceptionPage();
 app.UsePathBase("/example");
 app.UseRouting();
 app.UseRateLimiter();
@@ -184,8 +186,59 @@ using (var scope = app.Services.CreateScope())
     }), "negative audio range rejected");
 }
 
+Console.WriteLine("Checking Razor TagHelper audio and refresh over HTTP...");
+foreach (var recording in recordings)
+{
+    var html = await GetHtml($"test/razor/AudioDigits/{recording.Voice}?language={recording.Language}");
+    Check(html.Contains("<audio", StringComparison.Ordinal) && !html.Contains("<img", StringComparison.Ordinal), "Razor renders audio without an image of the answer");
+    Check(html.Contains("controls=", StringComparison.Ordinal) && html.Contains("preload=\"none\"", StringComparison.Ordinal) &&
+          !html.Contains("autoplay", StringComparison.Ordinal), "Razor audio uses native controls without preloading or autoplay");
+    Check(html.Contains("aria-label=\"Listen &amp; enter the digits\"", StringComparison.Ordinal), "audio has an encoded localized accessible label");
+    var audioUrl = ElementAttribute(html, "audio", "src");
+    Check(audioUrl.StartsWith("/example/DNTCaptchaImage/Audio?", StringComparison.Ordinal), "Razor audio respects PathBase");
+    using var first = await client.GetAsync(audioUrl);
+    using var replay = await client.GetAsync(audioUrl);
+    Check(first.IsSuccessStatusCode && replay.IsSuccessStatusCode, "Razor audio supports repeated playback");
+    Check((await first.Content.ReadAsByteArrayAsync()).SequenceEqual(
+        recording.Provider.CreateAudio("2107", recording.Language, recording.Voice)), "Razor selects the requested language and voice");
+
+    var refreshUrl = ElementAttribute(html, "a", "data-ajax-url");
+    using var refreshResponse = await client.PostAsync(refreshUrl, null);
+    refreshResponse.EnsureSuccessStatusCode();
+    var refreshedHtml = await refreshResponse.Content.ReadAsStringAsync();
+    var newAudioUrl = ElementAttribute(refreshedHtml, "audio", "src");
+    Check(newAudioUrl != audioUrl, "Razor refresh replaces the protected URL");
+    Check(refreshedHtml.Contains("aria-label=\"Listen &amp; enter the digits\"", StringComparison.Ordinal) &&
+          refreshedHtml.Contains("dir=\"rtl\"", StringComparison.Ordinal), "Razor refresh preserves localized label and direction");
+    using var oldAudio = await client.GetAsync(audioUrl);
+    Check(oldAudio.StatusCode == HttpStatusCode.BadRequest, "Razor refresh invalidates the old audio");
+    using var refreshedAudio = await client.GetAsync(newAudioUrl);
+    Check(refreshedAudio.IsSuccessStatusCode && (await refreshedAudio.Content.ReadAsByteArrayAsync()).SequenceEqual(
+        recording.Provider.CreateAudio("2107", recording.Language, recording.Voice)), "Razor refresh preserves language and voice");
+
+    var hiddenInputs = Regex.Matches(refreshedHtml, "<input\\b[^>]*>").Select(match => match.Value).ToArray();
+    using var form = new FormUrlEncodedContent(new Dictionary<string, string>
+    {
+        ["DNTCaptchaText"] = ElementAttribute(hiddenInputs.Single(input => input.Contains("name=\"DNTCaptchaText\"", StringComparison.Ordinal)), "input", "value"),
+        ["DNTCaptchaToken"] = ElementAttribute(hiddenInputs.Single(input => input.Contains("name=\"DNTCaptchaToken\"", StringComparison.Ordinal)), "input", "value"),
+        ["DNTCaptchaInputText"] = "2107"
+    });
+    using var validation = await client.PostAsync("test/validate", form);
+    Check(await validation.Content.ReadFromJsonAsync<bool>(), "Razor hidden fields validate after playback and refresh");
+    using var consumed = await client.GetAsync(newAudioUrl);
+    Check(consumed.StatusCode == HttpStatusCode.BadRequest, "validated Razor audio cannot be replayed");
+}
+var absoluteHtml = await GetHtml("test/razor/AudioDigits/Female?relative=false&refresh=false");
+Check(ElementAttribute(absoluteHtml, "audio", "src").StartsWith(address + "/example/", StringComparison.Ordinal), "Razor supports absolute audio URLs");
+Check(!absoluteHtml.Contains("data-ajax-url", StringComparison.Ordinal), "Razor audio works without a refresh button");
+foreach (var mode in new[] { DisplayMode.ShowDigits, DisplayMode.NumberToWord, DisplayMode.SumOfTwoNumbers, DisplayMode.SumOfTwoNumbersToWords })
+{
+    var html = await GetHtml($"test/razor/{mode}/Male");
+    Check(html.Contains("<img", StringComparison.Ordinal) && !html.Contains("<audio", StringComparison.Ordinal), $"{mode}: Razor retains visual rendering");
+}
+
 var limited = false;
-for (var attempt = 0; attempt < 80; attempt++)
+for (var attempt = 0; attempt < 160; attempt++)
 {
     using var response = await client.GetAsync(fresh!.DntCaptchaAudioUrl);
     if (response.StatusCode == HttpStatusCode.TooManyRequests)
@@ -202,8 +255,22 @@ Console.WriteLine($"PASS: {checks} backend checks (WAV assembly, HTTP playback, 
 async Task<DNTCaptchaApiResponse> Create(string mode, CaptchaAudioVoice voice, Language language = Language.English)
     => await client.GetFromJsonAsync<DNTCaptchaApiResponse>($"test/create/{mode}/{voice}?language={language}") ?? throw new InvalidOperationException("Missing API response");
 
+async Task<string> GetHtml(string url)
+{
+    using var response = await client.GetAsync(url);
+    var html = await response.Content.ReadAsStringAsync();
+    Check(response.IsSuccessStatusCode, $"Razor response {response.StatusCode}: {html}");
+    return html;
+}
+
 static string Data(DNTCaptchaApiResponse response)
     => QueryHelpers.ParseQuery(new Uri("http://localhost" + response.DntCaptchaAudioUrl).Query)["data"].ToString();
+
+static string ElementAttribute(string html, string element, string attribute)
+{
+    var match = Regex.Match(html, $"<{element}\\b[^>]*\\s{attribute}=\"([^\"]*)\"");
+    return match.Success ? WebUtility.HtmlDecode(match.Groups[1].Value) : throw new InvalidOperationException($"Missing {element}[{attribute}] in: {html}");
+}
 
 void Check(bool condition, string description)
 {

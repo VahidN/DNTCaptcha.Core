@@ -58,6 +58,12 @@ public class DNTCaptchaTagHelperHtmlAttributes
     public CaptchaAudioVoice AudioVoice { set; get; }
 
     /// <summary>
+    ///     Accessible label and fallback link text for the audio player. Localize this for your application.
+    /// </summary>
+    [HtmlAttributeName("asp-captcha-audio-label")]
+    public string AudioLabel { set; get; } = "Audio CAPTCHA";
+
+    /// <summary>
     ///     The max value of the captcha. It's default value is 9000.
     /// </summary>
     [HtmlAttributeName("asp-captcha-generator-max")]

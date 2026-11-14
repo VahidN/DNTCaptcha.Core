@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace DNTCaptcha.Core;
@@ -52,6 +53,20 @@ public class DNTCaptchaTagHelper(
         serializationProvider ?? throw new ArgumentNullException(nameof(serializationProvider));
 
     private IUrlHelper? _urlHelper;
+    private readonly CaptchaAudioService? _captchaAudioService;
+
+    /// <summary>
+    ///     Creates the TagHelper with audio integration, preserving the original constructor for visual modes.
+    /// </summary>
+    [ActivatorUtilitiesConstructor]
+    public DNTCaptchaTagHelper(ICaptchaCryptoProvider captchaProtectionProvider,
+        IRandomNumberProvider randomNumberProvider, Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
+        ICaptchaStorageProvider captchaStorageProvider, IAntiforgery antiforgery,
+        ISerializationProvider serializationProvider, IOptions<DNTCaptchaOptions> options,
+        CaptchaAudioService captchaAudioService)
+        : this(captchaProtectionProvider, randomNumberProvider, captchaTextProvider, captchaStorageProvider,
+            antiforgery, serializationProvider, options)
+        => _captchaAudioService = captchaAudioService ?? throw new ArgumentNullException(nameof(captchaAudioService));
 
     /// <summary>
     ///     The current ViewContext.
@@ -99,10 +114,11 @@ public class DNTCaptchaTagHelper(
 
         ArgumentNullException.ThrowIfNull(output);
 
-        if (DisplayMode == DisplayMode.AudioDigits)
+        if (DisplayMode == DisplayMode.AudioDigits &&
+            (Min < 0 || Max < Min || (long)Max - Min >= int.MaxValue))
         {
-            throw new NotSupportedException(
-                "AudioDigits is currently supported through IDNTCaptchaApiProvider. Razor playback controls are not implemented yet.");
+            throw new InvalidOperationException(
+                "AudioDigits requires a non-negative range smaller than Int32.MaxValue.");
         }
 
         if (ViewContext is null)
@@ -123,12 +139,12 @@ public class DNTCaptchaTagHelper(
 
         var number = _randomNumberProvider.NextNumber(Min, Max);
         var randomText = _captchaTextProvider(DisplayMode).GetText(number, Language);
-        var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
-
-        var captchaImage = GetCaptchaImageTagBuilder(ViewContext, encryptedText);
-        output.Content.AppendHtml(captchaImage);
-
         var cookieToken = $".{captchaDivId}";
+
+        var captchaMedia = DisplayMode == DisplayMode.AudioDigits
+            ? GetCaptchaAudioTagBuilder(ViewContext, randomText, cookieToken, captchaDivId)
+            : GetCaptchaImageTagBuilder(ViewContext, _captchaProtectionProvider.Encrypt(randomText));
+        output.Content.AppendHtml(captchaMedia);
 
         if (ShowRefreshButton)
         {
@@ -259,6 +275,42 @@ public class DNTCaptchaTagHelper(
         return captchaImage;
     }
 
+    private TagBuilder GetCaptchaAudioTagBuilder(ViewContext viewContext, string digits, string token,
+        string captchaDivId)
+    {
+        var audioService = _captchaAudioService ??
+                           throw new InvalidOperationException(
+                               "Use the audio-enabled constructor or register services.AddDNTCaptcha() for AudioDigits.");
+        var urlHelper = _urlHelper ?? throw new InvalidOperationException("Failed to find the IUrlHelper of ViewContext.HttpContext.");
+        var data = audioService.Protect(viewContext.HttpContext, digits, token, Language, AudioVoice);
+        var routeValues = new { data, area = "" };
+        var actionUrl = UseRelativeUrls
+            ? urlHelper.Action(nameof(DNTCaptchaImageController.Audio), GetControllerName(), routeValues)
+            : urlHelper.Action(nameof(DNTCaptchaImageController.Audio), GetControllerName(), routeValues,
+                viewContext.HttpContext.Request.Scheme);
+
+        if (string.IsNullOrWhiteSpace(actionUrl))
+        {
+            throw new InvalidOperationException(
+                "Cannot determine the URL of DNTCaptchaImageController.Audio. Register controllers and map controller routes.");
+        }
+
+        var audio = new TagBuilder(tagName: "audio");
+        audio.Attributes.Add(key: "id", $"{captchaDivId}Audio");
+        audio.Attributes.Add(key: "controls", value: "controls");
+        audio.Attributes.Add(key: "preload", value: "none");
+        audio.Attributes.Add(key: "aria-label", AudioLabel);
+        audio.Attributes.Add(key: "src", actionUrl);
+        audio.Attributes.Add(key: "style", value: "max-width: 100%; margin-bottom: 4px;");
+
+        var fallback = new TagBuilder(tagName: "a");
+        fallback.Attributes.Add(key: "href", actionUrl);
+        fallback.InnerHtml.Append(AudioLabel);
+        audio.InnerHtml.AppendHtml(fallback);
+
+        return audio;
+    }
+
     private TagBuilder GetRefreshButtonTagBuilder(ViewContext viewContext, string captchaDivId, string captchaToken)
     {
         if (_urlHelper is null)
@@ -274,6 +326,9 @@ public class DNTCaptchaTagHelper(
             FontSize = FontSize,
             ForeColor = ForeColor,
             Language = Language,
+            AudioVoice = AudioVoice,
+            AudioLabel = AudioLabel,
+            Dir = Dir,
             Max = Max,
             Min = Min,
             Placeholder = Placeholder,

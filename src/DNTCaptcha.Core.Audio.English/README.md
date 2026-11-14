@@ -1,6 +1,6 @@
 # DNTCaptcha.Core.Audio.English
 
-Optional English recordings for the backend `DisplayMode.AudioDigits` pilot.
+Optional English recordings for `DisplayMode.AudioDigits`.
 This project owns and embeds `Resources/Male/0.wav` through `9.wav` and
 `Resources/Female/0.wav` through `9.wav`.
 The core package does not embed these WAV files. No TTS engine, external service,
@@ -50,8 +50,13 @@ value as `previousAudioData`. It invalidates the old challenge before issuing a
 new one. This is not an answer-storage read and does not regenerate a question.
 
 The Angular example provides listening, replay, stop, refresh, and inline error
-handling. Razor playback controls will be added separately; the Razor TagHelper currently rejects
-`AudioDigits` rather than displaying the spoken answer as an image.
+handling. The Razor TagHelper also supports `AudioDigits` with native browser
+audio controls. Select `asp-captcha-generator-display-mode="AudioDigits"`,
+`asp-captcha-generator-language="English"`, and
+`asp-captcha-audio-voice="Female"` (or `Male`). Use
+`asp-captcha-audio-label` to localize the player's accessible label and fallback
+link. Playback does not autoplay or preload; Ajax refresh replaces the player,
+preserves its language and voice, and invalidates the old challenge.
 
 This provider supports English only. For Persian Female, also register the optional
 [DNTCaptcha.Core.Audio.Persian](../DNTCaptcha.Core.Audio.Persian/README.md) package.
