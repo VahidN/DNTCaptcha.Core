@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <!-- Keep the core and optional audio packages on the same supported frameworks. -->
+    <DNTCaptchaTargetFrameworks>net10.0;net9.0;net8.0;net7.0;net6.0</DNTCaptchaTargetFrameworks>
+  </PropertyGroup>
+</Project>
