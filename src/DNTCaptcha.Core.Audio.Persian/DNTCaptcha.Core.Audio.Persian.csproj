@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <VersionPrefix>5.3.4</VersionPrefix>
+    <Authors>Vahid Nasiri</Authors>
+    <Description>Optional Persian female digit recordings and WAV audio provider for DNTCaptcha.Core.</Description>
+    <PackageId>DNTCaptcha.Core.Audio.Persian</PackageId>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/VahidN/DNTCaptcha.Core</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/VahidN/DNTCaptcha.Core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../DNTCaptcha.Core/DNTCaptcha.Core.csproj" />
+    <EmbeddedResource Include="../DNTCaptcha.Core/Resources/Audio/Persian/Female/*.wav"
+                      LogicalName="DNTCaptcha.Core.Audio.Persian.Female.%(Filename)%(Extension)" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="NOTICE.md" Pack="true" PackagePath="/" />
+    <None Include="recordings.json" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

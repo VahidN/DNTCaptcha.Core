@@ -9,21 +9,21 @@ public sealed class BackendTestController(IDNTCaptchaApiProvider api, IDNTCaptch
     CaptchaAudioService audioService) : ControllerBase
 {
     [HttpGet("create/{mode}/{voice}")]
-    public DNTCaptchaApiResponse Create(DisplayMode mode, CaptchaAudioVoice voice) => api.CreateDNTCaptcha(Attributes(mode, voice));
+    public DNTCaptchaApiResponse Create(DisplayMode mode, CaptchaAudioVoice voice, Language language = Language.English) => api.CreateDNTCaptcha(Attributes(mode, voice, language));
 
     [HttpGet("refresh")]
-    public DNTCaptchaApiResponse Refresh(string data)
+    public DNTCaptchaApiResponse Refresh(string data, Language language = Language.English, CaptchaAudioVoice voice = CaptchaAudioVoice.Male)
     {
         audioService.Invalidate(HttpContext, data);
-        return api.CreateDNTCaptcha(Attributes(DisplayMode.AudioDigits, CaptchaAudioVoice.Male));
+        return api.CreateDNTCaptcha(Attributes(DisplayMode.AudioDigits, voice, language));
     }
 
     [HttpPost("validate")]
     public bool Validate() => validator.HasRequestValidCaptchaEntry();
 
-    private static DNTCaptchaTagHelperHtmlAttributes Attributes(DisplayMode mode, CaptchaAudioVoice voice) => new()
+    private static DNTCaptchaTagHelperHtmlAttributes Attributes(DisplayMode mode, CaptchaAudioVoice voice, Language language) => new()
     {
-        DisplayMode = mode, Language = Language.English, AudioVoice = voice,
+        DisplayMode = mode, Language = language, AudioVoice = voice,
         Min = 2107, Max = 2107, UseRelativeUrls = true
     };
 }

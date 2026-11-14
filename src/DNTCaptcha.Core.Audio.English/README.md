@@ -51,8 +51,9 @@ The Angular example provides listening, replay, stop, refresh, and inline error
 handling. Razor playback controls will be added separately; the Razor TagHelper currently rejects
 `AudioDigits` rather than displaying the spoken answer as an image.
 
-Only English is currently supported. Other languages and invalid voices fail
-explicitly. Audio digits ignore the visual thousands-separator setting and
+This provider supports English only. For Persian Female, also register the optional
+[DNTCaptcha.Core.Audio.Persian](../DNTCaptcha.Core.Audio.Persian/README.md) package.
+Other languages and invalid voices fail explicitly. Audio digits ignore the visual thousands-separator setting and
 require a non-negative integer range. The recordings are concatenated with
 150 ms of silence between digits. No background noise is added.
 

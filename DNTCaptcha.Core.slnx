@@ -10,6 +10,9 @@
     <Project Path="src/DNTCaptcha.Core.Audio.English/DNTCaptcha.Core.Audio.English.csproj">
       <BuildType Project="Debug" />
     </Project>
+    <Project Path="src/DNTCaptcha.Core.Audio.Persian/DNTCaptcha.Core.Audio.Persian.csproj">
+      <BuildType Project="Debug" />
+    </Project>
     <Project Path="src/DNTCaptcha.Core/DNTCaptcha.Core.csproj">
       <BuildType Project="Debug" />
     </Project>

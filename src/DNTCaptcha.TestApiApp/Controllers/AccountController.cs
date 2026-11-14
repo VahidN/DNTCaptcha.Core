@@ -67,7 +67,7 @@ public class AccountController : ControllerBase
         return _apiProvider.CreateDNTCaptcha(new DNTCaptchaTagHelperHtmlAttributes
         {
             DisplayMode = DisplayMode.AudioDigits,
-            Language = Language.English,
+            Language = Language.Persian,
             AudioVoice = CaptchaAudioVoice.Female,
             Min = 1000,
             Max = 9999,

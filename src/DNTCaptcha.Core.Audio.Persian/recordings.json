@@ -1,0 +1,89 @@
+{
+  "source": "persian-0-9.wav",
+  "source_sha256": "ed2ceb4b3619067c997d3125d14febb76055749943eb38e4bb5566c2f17bd546",
+  "sample_rate": 24000,
+  "channels": 1,
+  "bits_per_sample": 16,
+  "clips": [
+    {
+      "digit": 0,
+      "source_start_frame": 0,
+      "source_end_frame": 27840,
+      "prefix_frames": 1200,
+      "suffix_frames": 0,
+      "pcm_sha256": "bd15d4c48a7211845b7beae1fc48ec8d6c12ad722b5193dc485fd571b6f8e6b6"
+    },
+    {
+      "digit": 1,
+      "source_start_frame": 44664,
+      "source_end_frame": 65841,
+      "prefix_frames": 1200,
+      "suffix_frames": 183,
+      "pcm_sha256": "2023b12fb603e57bf6749fd06e8980e67921b9f82ffab11e8343293e6c23da97"
+    },
+    {
+      "digit": 2,
+      "source_start_frame": 82641,
+      "source_end_frame": 104933,
+      "prefix_frames": 1200,
+      "suffix_frames": 748,
+      "pcm_sha256": "c831457d132698faea1b29f205a2b139f4d81126c59c606a6de4e4ff8e529461"
+    },
+    {
+      "digit": 3,
+      "source_start_frame": 121733,
+      "source_end_frame": 148483,
+      "prefix_frames": 1200,
+      "suffix_frames": 850,
+      "pcm_sha256": "0e931504e75f257181dfadb4b5a14ee1e09022828f13e2832f6a3690fc5eb555"
+    },
+    {
+      "digit": 4,
+      "source_start_frame": 165283,
+      "source_end_frame": 188689,
+      "prefix_frames": 960,
+      "suffix_frames": 594,
+      "pcm_sha256": "77453bc910636a65d7d19823f6299eb198897ee29fc7382833f5dc8088688465"
+    },
+    {
+      "digit": 5,
+      "source_start_frame": 205489,
+      "source_end_frame": 231124,
+      "prefix_frames": 1200,
+      "suffix_frames": 765,
+      "pcm_sha256": "474a7095a5bd6710c4ae9971f1512798d8603948be4244dcfc9c0bb832d4a08a"
+    },
+    {
+      "digit": 6,
+      "source_start_frame": 247924,
+      "source_end_frame": 270216,
+      "prefix_frames": 1200,
+      "suffix_frames": 508,
+      "pcm_sha256": "7ce27a4cf1001cdff273b4cfca622f04f69d937a95ea04b5e2734ea5f0b0d11c"
+    },
+    {
+      "digit": 7,
+      "source_start_frame": 287016,
+      "source_end_frame": 304536,
+      "prefix_frames": 240,
+      "suffix_frames": 0,
+      "pcm_sha256": "a104b59af6a02a8f36931d5b890bf69984ed8ae8524f66953619d7a4f858f2da"
+    },
+    {
+      "digit": 8,
+      "source_start_frame": 331680,
+      "source_end_frame": 348000,
+      "prefix_frames": 240,
+      "suffix_frames": 0,
+      "pcm_sha256": "7be0d31320961e6f6e95912ca6065eee2d9bdd1747713b871ca2b1c32407cf64"
+    },
+    {
+      "digit": 9,
+      "source_start_frame": 376344,
+      "source_end_frame": 396744,
+      "prefix_frames": 1200,
+      "suffix_frames": 0,
+      "pcm_sha256": "094ac7c2a99b440b5a7c6424ba8e5e7be3369acd40de65445fef1b940796f2b7"
+    }
+  ]
+}

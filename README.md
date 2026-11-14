@@ -288,8 +288,16 @@ services.Configure<ForwardedHeadersOptions>(options =>
 recordings are available through the optional
 [DNTCaptcha.Core.Audio.English package](/src/DNTCaptcha.Core.Audio.English/README.md).
 Register it with `services.AddDNTCaptchaEnglishAudio()`, select `Language.English`
-and `CaptchaAudioVoice.Male` or `Female`, then use `IDNTCaptchaApiProvider`.
-The response contains `DntCaptchaAudioUrl` and an empty image URL. Existing visual
+and `CaptchaAudioVoice.Male` or `Female`.
+
+Persian Female recordings are available through
+[DNTCaptcha.Core.Audio.Persian](/src/DNTCaptcha.Core.Audio.Persian/README.md): call
+`services.AddDNTCaptchaPersianAudio()` and select `Language.Persian`.
+Both `AudioVoice` values use the Female recordings: Persian Male always falls
+back to Persian Female.
+Both optional packages can be registered together.
+Create challenges with `IDNTCaptchaApiProvider`. The response contains
+`DntCaptchaAudioUrl` and an empty image URL. Existing visual
 modes retain their image responses. The core package does not embed recordings.
 
 The [Angular example](/src/DNTCaptcha.AngularClient/README.md) demonstrates audio

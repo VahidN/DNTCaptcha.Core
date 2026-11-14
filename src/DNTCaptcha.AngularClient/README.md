@@ -93,12 +93,15 @@ login preserves credentials and loads a new challenge for manual retry.
 ### Audio digits example
 
 The login example uses `<app-dnt-captcha [captchaForm]="form.captcha" mode="audio" />`.
-The server configures `DisplayMode.AudioDigits`, `Language.English`, and the voice
-in `AccountController.CreateAudioCaptchaParams`. Change `AudioVoice` there to
-choose `Male` or `Female`; challenge difficulty is configured on the server.
+The server configures `DisplayMode.AudioDigits`, `Language.Persian`, and
+`CaptchaAudioVoice.Female` in `AccountController.CreateAudioCaptchaParams`.
+Persian has Female recordings only; Male requests fall back to Female. To use English, change `Language` to
+`Language.English` and select `Male` or `Female`. Challenge difficulty is
+configured on the server.
 
-The backend references the optional `DNTCaptcha.Core.Audio.English` project and
-calls `services.AddDNTCaptchaEnglishAudio()`. The core package contains no WAVs.
+The backend references both optional audio projects and calls
+`services.AddDNTCaptchaEnglishAudio()` and `services.AddDNTCaptchaPersianAudio()`.
+The core assembly contains no WAVs.
 
 Select **Listen to captcha** and enter the digits in order. Playback starts only
 after a click. Replaying uses the same downloaded audio. Refresh stops playback,

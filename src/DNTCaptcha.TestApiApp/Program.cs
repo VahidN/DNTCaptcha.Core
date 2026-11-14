@@ -53,6 +53,7 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
     });
 
     services.AddDNTCaptchaEnglishAudio();
+    services.AddDNTCaptchaPersianAudio();
 
     services.AddControllers()
         .AddJsonOptions(opt =>

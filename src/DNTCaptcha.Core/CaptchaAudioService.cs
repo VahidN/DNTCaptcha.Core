@@ -141,7 +141,7 @@ public sealed class CaptchaAudioService(
     private ICaptchaAudioProvider GetProvider(Language language, CaptchaAudioVoice voice)
         => _audioProviders.FirstOrDefault(provider => provider.Supports(language, voice)) ??
            throw new InvalidOperationException(
-               $"No captcha audio provider supports {language}/{voice}. Install DNTCaptcha.Core.Audio.English and call services.AddDNTCaptchaEnglishAudio() for English recordings.");
+               $"No captcha audio provider supports {language}/{voice}. Register an audio package supporting the requested language and voice: AddDNTCaptchaEnglishAudio() for English Male/Female, or AddDNTCaptchaPersianAudio() for Persian Female recordings (also used for Male requests).");
 
     private static void ValidateDigits(string digits)
     {

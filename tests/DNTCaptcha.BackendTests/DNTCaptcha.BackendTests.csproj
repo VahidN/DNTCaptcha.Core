@@ -8,5 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="../../src/DNTCaptcha.Core/DNTCaptcha.Core.csproj" />
     <ProjectReference Include="../../src/DNTCaptcha.Core.Audio.English/DNTCaptcha.Core.Audio.English.csproj" />
+    <ProjectReference Include="../../src/DNTCaptcha.Core.Audio.Persian/DNTCaptcha.Core.Audio.Persian.csproj" />
   </ItemGroup>
 </Project>
