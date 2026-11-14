@@ -1,20 +1,17 @@
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { inject, Service } from '@angular/core';
+import { map, Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { LoginDto } from '../interface/login.dto';
+import type { LoginResponse } from '../interface/login-response.interface';
+import { parseLoginResponse } from '../validation/parse-login-response';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Service()
 export class LoginService {
-  http: HttpClient = inject(HttpClient);
+  private readonly http = inject(HttpClient);
 
-  // body should contain dntCaptchaText, dntCaptchaToken, dntCaptchaInputText and actual form fields
-  login(body: LoginDto): Observable<{ name: string }> {
-    const data: string = new HttpParams({ fromObject: { ...body } }).toString();
-
-    return this.http.post<{ name: string }>('api/account/login', data, {
-      headers: new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded')
-    });
+  login(body: LoginDto): Observable<LoginResponse> {
+    return this.http
+      .post<unknown>('api/account/login', new HttpParams({ fromObject: { ...body } }))
+      .pipe(map(parseLoginResponse));
   }
 }

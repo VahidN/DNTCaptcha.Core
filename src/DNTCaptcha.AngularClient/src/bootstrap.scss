@@ -1,0 +1,34 @@
+// Bootstrap 5's supported subset build still requires legacy Sass imports.
+// Keep this adapter until Bootstrap adopts Sass modules. Only its import
+// deprecation is silenced in angular.json; Angular template diagnostics stay on.
+@use 'sass:map';
+
+@import 'bootstrap/scss/mixins/banner';
+@include bsBanner('');
+
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+
+// Retain the utility families used by the login and CAPTCHA templates.
+$selected-utilities: ();
+@each $name in 'display', 'position', 'width', 'justify-content', 'align-items', 'margin', 'margin-top',
+  'margin-bottom', 'text-align', 'color'
+{
+  $selected-utilities: map.set($selected-utilities, $name, map.get($utilities, $name));
+}
+$utilities: $selected-utilities;
+
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/containers';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/forms/labels';
+@import 'bootstrap/scss/forms/form-control';
+@import 'bootstrap/scss/buttons';
+@import 'bootstrap/scss/card';
+@import 'bootstrap/scss/utilities/api';

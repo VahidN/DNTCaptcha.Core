@@ -1,28 +1,74 @@
-<div class="container">
+<main class="container">
   <div class="row justify-content-center">
     <div class="col-12 col-md-6">
       <div class="card m-4">
-        <div class="card-header">Example login form</div>
+        <h1 class="card-header h6 mb-0">Example login form</h1>
         <div class="card-body">
-          <form [formGroup]="form">
+          <form [formRoot]="form" [attr.aria-busy]="submitting()">
             <div class="mb-3">
               <label for="username" class="form-label">Username:</label>
-              <input formControlName="username" class="form-control" id="username" />
+              <input
+                [formField]="form.username"
+                class="form-control"
+                id="username"
+                autocomplete="username"
+                [attr.aria-invalid]="form.username().touched() && form.username().invalid()"
+                [attr.aria-describedby]="
+                  form.username().touched() && form.username().invalid() ? 'username-error' : null
+                "
+              />
+              @if (form.username().touched() && form.username().invalid()) {
+                <p id="username-error" class="small text-danger mt-1 mb-0">
+                  @for (error of form.username().errors(); track error) {
+                    <span class="d-block">{{ error.message }}</span>
+                  }
+                </p>
+              }
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password:</label>
-              <input formControlName="password" type="password" class="form-control" id="password" />
+              <input
+                [formField]="form.password"
+                type="password"
+                class="form-control"
+                id="password"
+                autocomplete="current-password"
+                [attr.aria-invalid]="form.password().touched() && form.password().invalid()"
+                [attr.aria-describedby]="
+                  form.password().touched() && form.password().invalid() ? 'password-error' : null
+                "
+              />
+              @if (form.password().touched() && form.password().invalid()) {
+                <p id="password-error" class="small text-danger mt-1 mb-0">
+                  @for (error of form.password().errors(); track error) {
+                    <span class="d-block">{{ error.message }}</span>
+                  }
+                </p>
+              }
+            </div>
+            <div class="mb-3">
+              <app-dnt-captcha [captchaForm]="form.captcha" [busy]="submitting() || cooldown.active()" />
+            </div>
+            @let loginState = state();
+            @if (loginState.status === 'error') {
+              <p role="alert" class="text-danger">{{ loginState.message }}</p>
+            } @else if (loginState.status === 'success') {
+              <p role="status">{{ loginState.message }}</p>
+            }
+            <div class="mt-3 w-100 text-end">
+              <button type="submit" class="btn btn-primary" [disabled]="submitting() || cooldown.active()">
+                @if (submitting()) {
+                  Sending form…
+                } @else if (cooldown.active()) {
+                  Try again in {{ cooldown.remainingSeconds() }}s
+                } @else {
+                  Send form
+                }
+              </button>
             </div>
           </form>
-          <div class="mb-3">
-            <label for="password" class="form-label">Captcha:</label>
-            <app-dnt-captcha [captchaForm]="captchaForm" />
-          </div>
-          <div class="mt-3 w-100 text-end">
-            <button class="btn btn-primary" [disabled]="!form.valid" (click)="submitForm()">Send form</button>
-          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+</main>

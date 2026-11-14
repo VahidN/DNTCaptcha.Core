@@ -245,6 +245,7 @@ ModelManifest.xml
 .fake/
 /.idea
 package-lock.json
+!src/DNTCaptcha.AngularClient/package-lock.json
 
 
 # Compiled output

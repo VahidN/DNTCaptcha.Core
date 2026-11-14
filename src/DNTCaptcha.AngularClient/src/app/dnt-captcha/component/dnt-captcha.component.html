@@ -1,14 +1,48 @@
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <ng-container *ngIf="captchaImageUrl">
+<label [htmlFor]="captchaInputId()" class="form-label">Captcha:</label>
+<div class="d-flex align-items-center justify-content-between" [attr.aria-busy]="state().status === 'loading'">
+  @if (captchaImageUrl()) {
     <div style="height: 38px" class="w-25 position-relative">
-      <img [ngSrc]="captchaImageUrl" fill="true" alt="DNTCaptcha image" priority="true" />
+      <img [ngSrc]="captchaImageUrl()" fill="true" alt="CAPTCHA challenge" priority="true" (error)="onImageError()" />
     </div>
-  </ng-container>
-  <button title="Refresh captcha" class="btn btn-link" (click)="loadNewCaptcha()">
-    <i class="bi bi-arrow-clockwise"></i>
+  }
+  <button
+    type="button"
+    title="Refresh captcha"
+    aria-label="Refresh captcha"
+    class="btn btn-link refresh"
+    [disabled]="busy() || state().status === 'loading' || cooldown.active()"
+    [attr.aria-describedby]="statusId()"
+    (click)="loadNewCaptcha()"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      fill="currentColor"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+    >
+      <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z" />
+      <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466" />
+    </svg>
   </button>
-
-  <form [formGroup]="captchaForm">
-    <input formControlName="dntCaptchaInputText" type="text" class="form-control" id="captcha" />
-  </form>
+  <div class="captcha-input">
+    <input
+      [formField]="captchaForm().dntCaptchaInputText"
+      type="text"
+      class="form-control"
+      [id]="captchaInputId()"
+      autocomplete="off"
+      [attr.aria-invalid]="
+        captchaForm().dntCaptchaInputText().touched() && captchaForm().dntCaptchaInputText().invalid()
+      "
+      [attr.aria-describedby]="statusId()"
+    />
+  </div>
 </div>
+<p [id]="statusId()" role="status" class="small mt-1 mb-0" [class.text-danger]="state().status === 'error'">
+  {{ statusMessage() }}
+  @if (cooldown.active()) {
+    <span aria-hidden="true">Try again in {{ cooldown.remainingSeconds() }}s.</span>
+  }
+</p>
