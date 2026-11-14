@@ -46,6 +46,7 @@ export class DntCaptchaComponent {
     if (state.status === 'error') {
       return this.cooldown.active() ? 'Too many CAPTCHA requests. Wait for the cooldown to finish.' : state.message;
     }
+    if (this.isAudioLoading()) return 'Loading audio…';
     if (this.audioError()) return this.audioError();
     const answer = this.captchaForm().dntCaptchaInputText();
     if (answer.touched() && answer.invalid()) {
@@ -164,7 +165,7 @@ export class DntCaptchaComponent {
             });
             return;
           } else if (error.error instanceof DOMException && error.error.name === 'TimeoutError') {
-            message = 'The audio request timed out. Select Listen to captcha to try again.';
+            message = 'The audio request timed out. Select Play audio to try again.';
           }
         }
         this.audioError.set(message);
@@ -198,7 +199,7 @@ export class DntCaptchaComponent {
       if (version !== this.playbackVersion) return;
       if (error instanceof DOMException && error.name === 'NotAllowedError') {
         this.isAudioLoading.set(false);
-        this.audioError.set('Playback was blocked. Select Listen to captcha again.');
+        this.audioError.set('Playback was blocked. Select Play audio again.');
       } else {
         this.playbackFailed();
       }

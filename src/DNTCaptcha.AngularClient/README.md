@@ -103,7 +103,7 @@ The backend references both optional audio projects and calls
 `services.AddDNTCaptchaEnglishAudio()` and `services.AddDNTCaptchaPersianAudio()`.
 The core assembly contains no WAVs.
 
-Select **Listen to captcha** and enter the digits in order. Playback starts only
+Select the **Play audio** icon and enter the digits in order. Playback starts only
 after a click. Replaying uses the same downloaded audio. Refresh stops playback,
 cancels pending requests, clears the answer, invalidates the previous challenge,
 and replaces its protected URL and hidden form values. Navigation releases the

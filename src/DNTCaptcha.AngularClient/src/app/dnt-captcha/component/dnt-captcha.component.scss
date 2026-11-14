@@ -3,6 +3,9 @@
 }
 
 .captcha-controls {
+  // Match Bootstrap's form-control line height, vertical padding, and borders.
+  --captcha-control-size: calc(1.5em + 0.75rem + 2 * var(--bs-border-width, 1px));
+
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -14,12 +17,17 @@
   height: 2.75rem;
 }
 
-.captcha-refresh,
-.captcha-listen {
-  min-height: 2.75rem;
-  min-width: 2.75rem;
-}
-
 .captcha-input {
   flex: 1 1 8rem;
+}
+
+.captcha-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 var(--captcha-control-size);
+  min-width: var(--captcha-control-size);
+  width: var(--captcha-control-size);
+  height: var(--captcha-control-size);
+  padding: 0;
 }

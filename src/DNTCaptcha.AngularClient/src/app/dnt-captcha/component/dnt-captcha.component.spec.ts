@@ -403,10 +403,16 @@ describe('DntCaptchaComponent audio', () => {
   it('replays cached audio and permits stopping without another download', async () => {
     respond();
     await play();
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.captcha-listen');
     expect(component.isPlaying()).toBe(true);
-    component.playCaptcha();
+    expect(button.getAttribute('aria-label')).toBe('Stop audio');
+    expect(button.textContent?.trim()).toBe('');
+    expect(button.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+    button.click();
+    await fixture.whenStable();
     expect(component.isPlaying()).toBe(false);
-    component.playCaptcha();
+    expect(button.getAttribute('aria-label')).toBe('Play audio');
+    button.click();
     await fixture.whenStable();
     http.expectNone(audioUrl);
     expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
@@ -430,6 +436,12 @@ describe('DntCaptchaComponent audio', () => {
     respond();
     component.playCaptcha();
     const request = http.expectOne(audioUrl);
+    fixture.detectChanges();
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector('.captcha-listen');
+    expect(button.disabled).toBe(true);
+    expect(button.getAttribute('aria-label')).toBe('Loading audio…');
+    expect(button.getAttribute('aria-busy')).toBe('true');
+    expect(component.statusMessage()).toBe('Loading audio…');
     component.loadNewCaptcha();
     expect(request.cancelled).toBe(true);
     expect(URL.createObjectURL).not.toHaveBeenCalled();
