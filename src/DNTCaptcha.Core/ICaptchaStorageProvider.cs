@@ -19,7 +19,8 @@ public interface ICaptchaStorageProvider
     /// <param name="context"></param>
     /// <param name="token">The specified token.</param>
     /// <returns>
-    ///     <c>True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise <see langword="false" />
+    ///     <c language="C#">True</c> if the value is found in the <see cref="ICaptchaStorageProvider" />; otherwise
+    ///     <see langword="false" />
     ///     .
     /// </returns>
     bool Contains(HttpContext context, [NotNullWhen(returnValue: true)] string? token);

@@ -1,5 +1,4 @@
-﻿#if NET7_0 || NET8_0 || NET9_0 || NET10_0
-using System;
+﻿using System;
 using System.Globalization;
 using System.Threading;
 using System.Threading.RateLimiting;
@@ -78,4 +77,3 @@ public class DNTCaptchaRateLimiterPolicy : IRateLimiterPolicy<string>
             Window = TimeSpan.FromMinutes(value: 1)
         });
 }
-#endif

@@ -61,7 +61,7 @@ public class DNTCaptchaTagHelper(
     public ViewContext? ViewContext { get; set; }
 
     /// <summary>
-    ///     Default order is <c>0</c>.
+    ///     Default order is <c language="C#">0</c>.
     /// </summary>
     public int Order { get; }
 

@@ -37,12 +37,9 @@ public static class CaptchaServiceCollectionExtensions
         services.AddAntiforgery();
         services.AddMvcCore().AddCookieTempDataProvider();
 
-#if NET7_0 || NET8_0 || NET9_0 || NET10_0
-
         //  Also we need to have app.UseRateLimiter() after app.UseRouting()
         services.AddRateLimiter(limiterOptions
             => limiterOptions.AddPolicy<string, DNTCaptchaRateLimiterPolicy>(DNTCaptchaRateLimiterPolicy.Name));
-#endif
 
         services.TryAddSingleton<HumanReadableIntegerProvider>();
         services.TryAddSingleton<ShowDigitsProvider>();
