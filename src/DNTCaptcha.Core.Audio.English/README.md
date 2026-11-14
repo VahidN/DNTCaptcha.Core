@@ -1,6 +1,8 @@
 # DNTCaptcha.Core.Audio.English
 
 Optional English recordings for the backend `DisplayMode.AudioDigits` pilot.
+This project owns and embeds `Resources/Male/0.wav` through `9.wav` and
+`Resources/Female/0.wav` through `9.wav`.
 The core package does not embed these WAV files. No TTS engine, external service,
 or runtime download is required. The recording assembly targets .NET 6 and is
 compatible with all framework versions supported by the core package, avoiding

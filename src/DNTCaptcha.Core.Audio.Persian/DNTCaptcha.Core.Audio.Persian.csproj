@@ -19,10 +19,9 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../DNTCaptcha.Core/DNTCaptcha.Core.csproj" />
-    <EmbeddedResource Include="../DNTCaptcha.Core/Resources/Audio/Persian/Female/*.wav"
+    <EmbeddedResource Include="Resources/Female/*.wav"
                       LogicalName="DNTCaptcha.Core.Audio.Persian.Female.%(Filename)%(Extension)" />
     <None Include="README.md" Pack="true" PackagePath="/" />
     <None Include="NOTICE.md" Pack="true" PackagePath="/" />
-    <None Include="recordings.json" Pack="true" PackagePath="/" />
   </ItemGroup>
 </Project>

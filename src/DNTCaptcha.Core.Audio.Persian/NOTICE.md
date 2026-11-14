@@ -10,9 +10,6 @@ using 10 ms RMS windows at a threshold of 50 PCM units, and retained a 50 ms
 buffer on each side of detected activity. No normalization, resampling, or
 new synthesis was applied. Short buffers outside the source are zero padded.
 
-`recordings.json` identifies the source SHA-256, source frame ranges, padding,
-and output PCM SHA-256 for each clip. Reproduce the split from the repository
-root with `python3 tools/split_persian_audio.py /path/to/persian-0-9.wav`.
 The combined source recording and model weights are not included in this package.
 
 Upstream attribution:

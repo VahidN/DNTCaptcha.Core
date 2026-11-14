@@ -1,7 +1,8 @@
 # DNTCaptcha.Core.Audio.Persian
 
 Optional Persian (Iran) female recordings for `DisplayMode.AudioDigits`.
-This package embeds ten WAV clips, one per digit. It targets .NET 6 and works
+This project owns and embeds ten WAV clips in `Resources/Female/`, named `0.wav`
+through `9.wav`. It targets .NET 6 and works
 with every framework supported by the core package. No model, TTS engine,
 network request, or runtime download is required.
 
@@ -42,4 +43,4 @@ Its expiration, browser binding, refresh, validation, rate limiting, and shared
 Data Protection key-ring requirements apply to both languages. The API and
 Angular sample now selects Persian Female; Razor playback is not implemented.
 
-See `NOTICE.md` for provenance and `recordings.json` for source and PCM hashes.
+See `NOTICE.md` for recording provenance and upstream attribution.
