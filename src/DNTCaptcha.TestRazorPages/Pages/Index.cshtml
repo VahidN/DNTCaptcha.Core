@@ -35,14 +35,17 @@
                 </div>
             </div>
             <div class="mb-3">
-                <label class="form-label">
+                <label for="DNT_CaptchaInputText" class="form-label">
                     Security code
                 </label>
                 <div>
-                    <dnt-captcha asp-captcha-generator-max="30"
-                                 asp-captcha-generator-min="1"
+                    <p class="form-text">Play the audio and enter the digits you hear. Use refresh for a new code.</p>
+                    <dnt-captcha asp-captcha-generator-max="9999"
+                                 asp-captcha-generator-min="1000"
                                  asp-captcha-generator-language="English"
-                                 asp-captcha-generator-display-mode="NumberToWord"
+                                 asp-captcha-generator-display-mode="AudioDigits"
+                                 asp-captcha-audio-voice="Female"
+                                 asp-captcha-audio-label="Listen to the security code digits"
                                  asp-use-relative-urls="true"
                                  asp-placeholder="Security code as a number"
                                  asp-validation-error-message="Please enter the security code as a number."

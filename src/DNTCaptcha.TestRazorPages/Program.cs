@@ -46,7 +46,9 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
                 }).Identifier("dnt_Captcha"); // This is optional. Change it if you don't like its default name.
     });
 
-    services.AddControllers(); // this is necessary for the captcha's image provider
+    services.AddDNTCaptchaEnglishAudio();
+
+    services.AddControllers(); // this is necessary for the captcha's image and audio endpoints
     services.AddRazorPages();
 }
 
