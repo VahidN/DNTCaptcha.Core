@@ -46,6 +46,20 @@ public class DNTCaptchaApiProvider(
 
     private readonly IUrlHelper _urlHelper = urlHelper ?? throw new ArgumentNullException(nameof(urlHelper));
 
+    private readonly CaptchaAudioService? _captchaAudioService;
+
+    /// <summary>
+    ///     Creates the API provider with optional audio integration, preserving the original constructor for visual modes.
+    /// </summary>
+    public DNTCaptchaApiProvider(ICaptchaCryptoProvider captchaProtectionProvider,
+        IRandomNumberProvider randomNumberProvider, Func<DisplayMode, ICaptchaTextProvider> captchaTextProvider,
+        ICaptchaStorageProvider captchaStorageProvider, ISerializationProvider serializationProvider,
+        IHttpContextAccessor httpContextAccessor, IUrlHelper urlHelper, IOptions<DNTCaptchaOptions> options,
+        CaptchaAudioService captchaAudioService)
+        : this(captchaProtectionProvider, randomNumberProvider, captchaTextProvider, captchaStorageProvider,
+            serializationProvider, httpContextAccessor, urlHelper, options)
+        => _captchaAudioService = captchaAudioService ?? throw new ArgumentNullException(nameof(captchaAudioService));
+
     /// <summary>
     ///     Creates DNTCaptcha
     /// </summary>
@@ -59,13 +73,18 @@ public class DNTCaptchaApiProvider(
             throw new InvalidOperationException(message: "`_httpContextAccessor.HttpContext` is null.");
         }
 
+        if (captchaAttributes.DisplayMode == DisplayMode.AudioDigits &&
+            (captchaAttributes.Min < 0 || captchaAttributes.Max < captchaAttributes.Min ||
+             (long)captchaAttributes.Max - captchaAttributes.Min >= int.MaxValue))
+        {
+            throw new ArgumentOutOfRangeException(nameof(captchaAttributes),
+                "AudioDigits requires a non-negative range smaller than Int32.MaxValue.");
+        }
+
         var number = _randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max);
 
         var randomText = _captchaTextProvider(captchaAttributes.DisplayMode)
             .GetText(number, captchaAttributes.Language);
-
-        var encryptedText = _captchaProtectionProvider.Encrypt(randomText);
-        var captchaImageUrl = GetCaptchaImageUrl(captchaAttributes, encryptedText);
 
         var captchaDivId = string.Create(CultureInfo.InvariantCulture,
             $"{_captchaOptions.CaptchaClass}{Guid.NewGuid():N}{_randomNumberProvider.NextNumber(captchaAttributes.Min, captchaAttributes.Max)}");
@@ -75,15 +94,48 @@ public class DNTCaptchaApiProvider(
 
         var value = number.ToString(CultureInfo.InvariantCulture);
         var encryptedValue = _captchaProtectionProvider.Encrypt(value);
+
+        var audioUrl = captchaAttributes.DisplayMode == DisplayMode.AudioDigits
+            ? GetCaptchaAudioUrl(captchaAttributes, randomText, cookieToken)
+            : null;
+
+        var captchaImageUrl = captchaAttributes.DisplayMode == DisplayMode.AudioDigits
+            ? string.Empty
+            : GetCaptchaImageUrl(captchaAttributes, _captchaProtectionProvider.Encrypt(randomText));
+
         _captchaStorageProvider.Add(_httpContextAccessor.HttpContext, cookieToken, value);
 
         return new DNTCaptchaApiResponse
         {
             DntCaptchaImgUrl = captchaImageUrl,
+            DntCaptchaAudioUrl = audioUrl,
             DntCaptchaId = captchaDivId,
             DntCaptchaTextValue = encryptedValue,
             DntCaptchaTokenValue = hiddenInputToken
         };
+    }
+
+    private string GetCaptchaAudioUrl(DNTCaptchaTagHelperHtmlAttributes attributes, string digits, string token)
+    {
+        var context = _httpContextAccessor.HttpContext ??
+                      throw new InvalidOperationException("HttpContext is null.");
+
+        var audioService = _captchaAudioService ??
+                           throw new InvalidOperationException("Use the audio-enabled constructor or register services.AddDNTCaptcha() for AudioDigits.");
+        var data = audioService.Protect(context, digits, token, attributes.Language, attributes.AudioVoice);
+        var controller = string.IsNullOrEmpty(_captchaOptions.CaptchaImageControllerNameTemplate)
+            ? nameof(DNTCaptchaImageController).Replace("Controller", string.Empty, StringComparison.Ordinal)
+            : _captchaOptions.CaptchaImageControllerNameTemplate;
+
+        var routeValues = new { data, area = "" };
+        var url = attributes.UseRelativeUrls
+            ? _urlHelper.Action(nameof(DNTCaptchaImageController.Audio), controller, routeValues)
+            : _urlHelper.Action(nameof(DNTCaptchaImageController.Audio), controller, routeValues, context.Request.Scheme);
+
+        return string.IsNullOrWhiteSpace(url)
+            ? throw new InvalidOperationException(
+                "Cannot determine the URL of DNTCaptchaImageController.Audio. Register controllers and map controller routes.")
+            : url;
     }
 
     private string GetCaptchaImageUrl(DNTCaptchaTagHelperHtmlAttributes captchaAttributes, string encryptedText)

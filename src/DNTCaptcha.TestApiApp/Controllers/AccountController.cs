@@ -1,4 +1,5 @@
-﻿using DNTCaptcha.Core;
+﻿using System;
+using DNTCaptcha.Core;
 using DNTCaptcha.TestApiApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -44,4 +45,33 @@ public class AccountController : ControllerBase
                                           Max = 90,
                                           Min = 1,
                                       });
+
+    [HttpGet("[action]")]
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+    [EnableRateLimiting(DNTCaptchaRateLimiterPolicy.Name)]
+    public ActionResult<DNTCaptchaApiResponse> CreateAudioCaptchaParams(
+        [FromServices] CaptchaAudioService audioService, string previousAudioData = null)
+    {
+        ArgumentNullException.ThrowIfNull(audioService);
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        if (!string.IsNullOrEmpty(previousAudioData))
+        {
+            audioService.Invalidate(HttpContext, previousAudioData);
+        }
+
+        return _apiProvider.CreateDNTCaptcha(new DNTCaptchaTagHelperHtmlAttributes
+        {
+            DisplayMode = DisplayMode.AudioDigits,
+            Language = Language.English,
+            AudioVoice = CaptchaAudioVoice.Female,
+            Min = 1000,
+            Max = 9999,
+            UseRelativeUrls = true
+        });
+    }
 }

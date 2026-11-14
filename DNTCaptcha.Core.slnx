@@ -7,6 +7,9 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/DNTCaptcha.Core.Audio.English/DNTCaptcha.Core.Audio.English.csproj">
+      <BuildType Project="Debug" />
+    </Project>
     <Project Path="src/DNTCaptcha.Core/DNTCaptcha.Core.csproj">
       <BuildType Project="Debug" />
     </Project>
@@ -17,6 +20,11 @@
       <BuildType Project="Debug" />
     </Project>
     <Project Path="src/DNTCaptcha.TestWebApp/DNTCaptcha.TestWebApp.csproj">
+      <BuildType Project="Debug" />
+    </Project>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DNTCaptcha.BackendTests/DNTCaptcha.BackendTests.csproj">
       <BuildType Project="Debug" />
     </Project>
   </Folder>

@@ -174,6 +174,31 @@ public class DNTCaptchaImageController(
         => _captchaStorageProvider.Remove(HttpContext, model.CaptchaToken);
 
     /// <summary>
+    ///     Plays an active AudioDigits challenge without consuming its validation token.
+    /// </summary>
+    [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]
+    [HttpGet]
+    public IActionResult Audio(string data, [FromServices] CaptchaAudioService audioService)
+    {
+        ArgumentNullException.ThrowIfNull(audioService);
+
+        // Set this explicitly as well so invalid payloads never get cached.
+        Response.Headers.CacheControl = "no-store, no-cache";
+        Response.Headers.Pragma = "no-cache";
+
+        if (!ModelState.IsValid)
+        {
+            return BadRequest("The audio challenge is invalid or has expired.");
+        }
+
+        var audio = audioService.CreateAudio(HttpContext, data);
+
+        return audio is null
+            ? BadRequest("The audio challenge is invalid or has expired.")
+            : new FileContentResult(audio, "audio/wav");
+    }
+
+    /// <summary>
     ///     Creates the captcha image.
     /// </summary>
     [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true, Duration = 0)]

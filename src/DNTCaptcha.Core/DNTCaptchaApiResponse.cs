@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace DNTCaptcha.Core;
 
 /// <summary>
@@ -10,6 +12,12 @@ public class DNTCaptchaApiResponse
     /// </summary>
     /// <value></value>
     public string DntCaptchaImgUrl { set; get; } = default!;
+
+    /// <summary>
+    ///     The protected audio URL for AudioDigits; otherwise null. Image URL is empty in AudioDigits mode.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DntCaptchaAudioUrl { set; get; }
 
     /// <summary>
     ///     Captcha Id

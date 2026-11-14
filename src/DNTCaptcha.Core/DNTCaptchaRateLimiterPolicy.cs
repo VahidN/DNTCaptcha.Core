@@ -58,6 +58,7 @@ public class DNTCaptchaRateLimiterPolicy : IRateLimiterPolicy<string>
         }
 
         context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.Headers.CacheControl = "no-store, no-cache";
 
         if (!string.IsNullOrEmpty(RejectedResponse) && RejectedResponseType is not null)
         {

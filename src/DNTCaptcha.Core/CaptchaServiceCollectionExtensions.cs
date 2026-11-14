@@ -35,6 +35,7 @@ public static class CaptchaServiceCollectionExtensions
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
         services.AddAntiforgery();
+        services.AddDataProtection();
         services.AddMvcCore().AddCookieTempDataProvider();
 
 #if NET7_0 || NET8_0 || NET9_0 || NET10_0
@@ -46,6 +47,7 @@ public static class CaptchaServiceCollectionExtensions
 
         services.TryAddSingleton<HumanReadableIntegerProvider>();
         services.TryAddSingleton<ShowDigitsProvider>();
+        services.TryAddSingleton<AudioDigitsProvider>();
         services.TryAddSingleton<SumOfTwoNumbersProvider>();
         services.TryAddSingleton<SumOfTwoNumbersToWordsProvider>();
 
@@ -58,6 +60,7 @@ public static class CaptchaServiceCollectionExtensions
         services.TryAddTransient<DNTCaptchaTagHelper>();
         services.TryAddTransient<IDNTCaptchaValidatorService, DNTCaptchaValidatorService>();
         services.TryAddScoped<IDNTCaptchaApiProvider, DNTCaptchaApiProvider>();
+        services.TryAddScoped<CaptchaAudioService>();
 
         services.TryAddScoped<IUrlHelper>(serviceProvider =>
         {
@@ -75,6 +78,7 @@ public static class CaptchaServiceCollectionExtensions
         {
             DisplayMode.NumberToWord => serviceProvider.GetRequiredService<HumanReadableIntegerProvider>(),
             DisplayMode.ShowDigits => serviceProvider.GetRequiredService<ShowDigitsProvider>(),
+            DisplayMode.AudioDigits => serviceProvider.GetRequiredService<AudioDigitsProvider>(),
             DisplayMode.SumOfTwoNumbers => serviceProvider.GetRequiredService<SumOfTwoNumbersProvider>(),
             DisplayMode.SumOfTwoNumbersToWords => serviceProvider.GetRequiredService<SumOfTwoNumbersToWordsProvider>(),
             _ => throw new InvalidOperationException($"Service of type {key} is not implemented.")

@@ -282,6 +282,23 @@ services.Configure<ForwardedHeadersOptions>(options =>
 | SumOfTwoNumbers        | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode3.png) |
 | SumOfTwoNumbersToWords | ![dntcaptcha](/src/DNTCaptcha.TestWebApp/wwwroot/Content/mode4.png) |
 
+### Audio digits (API and Angular pilot)
+
+`DisplayMode.AudioDigits` plays a number digit by digit. English Male and Female
+recordings are available through the optional
+[DNTCaptcha.Core.Audio.English package](/src/DNTCaptcha.Core.Audio.English/README.md).
+Register it with `services.AddDNTCaptchaEnglishAudio()`, select `Language.English`
+and `CaptchaAudioVoice.Male` or `Female`, then use `IDNTCaptchaApiProvider`.
+The response contains `DntCaptchaAudioUrl` and an empty image URL. Existing visual
+modes retain their image responses. The core package does not embed recordings.
+
+The [Angular example](/src/DNTCaptcha.AngularClient/README.md) demonstrates audio
+playback and refresh. Razor TagHelper playback is not yet implemented. Audio
+requests use authenticated, expiring, browser-bound payloads and do not consume
+the validation answer. Keep the existing rate-limiter middleware enabled on
+.NET 7+; .NET 6 applications need host/proxy rate limiting. For multiple servers,
+configure a shared ASP.NET Core Data Protection key ring and application name.
+
 - This library uses unobtrusive Ajax library for the refresh button. Make sure you have included its related scripts
   too:
     - Add required files using the libman. To do it add [libman.json](/src/DNTCaptcha.TestWebApp/libman.json) file and

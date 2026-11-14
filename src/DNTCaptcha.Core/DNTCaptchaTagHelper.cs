@@ -99,6 +99,12 @@ public class DNTCaptchaTagHelper(
 
         ArgumentNullException.ThrowIfNull(output);
 
+        if (DisplayMode == DisplayMode.AudioDigits)
+        {
+            throw new NotSupportedException(
+                "AudioDigits is currently supported through IDNTCaptchaApiProvider. Razor playback controls are not implemented yet.");
+        }
+
         if (ViewContext is null)
         {
             throw new InvalidOperationException(message: "`ViewContext` is null.");

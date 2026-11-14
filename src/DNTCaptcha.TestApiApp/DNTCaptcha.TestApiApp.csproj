@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DNTCaptcha.Core\DNTCaptcha.Core.csproj" />
+    <ProjectReference Include="../DNTCaptcha.Core.Audio.English/DNTCaptcha.Core.Audio.English.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />

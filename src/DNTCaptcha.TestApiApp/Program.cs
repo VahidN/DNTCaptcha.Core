@@ -52,6 +52,8 @@ void ConfigureServices(IServiceCollection services, IWebHostEnvironment env)
             .Identifier(className: "dntCaptcha");
     });
 
+    services.AddDNTCaptchaEnglishAudio();
+
     services.AddControllers()
         .AddJsonOptions(opt =>
         {

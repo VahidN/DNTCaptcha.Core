@@ -52,6 +52,12 @@ public class DNTCaptchaTagHelperHtmlAttributes
     public DisplayMode DisplayMode { set; get; }
 
     /// <summary>
+    ///     The voice for AudioDigits. Its default value is Male.
+    /// </summary>
+    [HtmlAttributeName("asp-captcha-audio-voice")]
+    public CaptchaAudioVoice AudioVoice { set; get; }
+
+    /// <summary>
     ///     The max value of the captcha. It's default value is 9000.
     /// </summary>
     [HtmlAttributeName("asp-captcha-generator-max")]

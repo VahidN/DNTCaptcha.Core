@@ -23,5 +23,10 @@ public enum DisplayMode
     /// <summary>
     ///     Display a numeric value as a sum of 2 numbers using the equivalent text
     /// </summary>
-    SumOfTwoNumbersToWords
+    SumOfTwoNumbersToWords,
+
+    /// <summary>
+    ///     Play digits individually using the optional audio provider. Currently supported by the API provider.
+    /// </summary>
+    AudioDigits
 }
