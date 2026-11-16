@@ -83,10 +83,10 @@
   </ItemGroup>
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"/>
-    <PackageReference Include="SkiaSharp" Version="4.156.0"/>
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.156.0"/>
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.156.0"/>
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="14.4.0.100"/>
+    <PackageReference Include="SkiaSharp" Version="4.156.1"/>
+    <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.156.1"/>
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.156.1"/>
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" Version="14.4.0.101"/>
   </ItemGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net10.0'">
     <DefineConstants>NET10_0</DefineConstants>
